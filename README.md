@@ -14,7 +14,7 @@ To install plutonium, follow these steps:
 1. Ensure you have Go installed on your system. You can download it from [here](https://go.dev/dl)
 
 2. Clone the Plutonium repository:
-`git clone https://github.com/plutonium-lang/Plutonium.git 
+`git clone git@github.com:plutonium-lang/Plutonium.git
 `
 
 3. Navigate to the cloned directory:
