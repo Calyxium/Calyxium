@@ -73,4 +73,4 @@ Contributions to Plutonium are welcome! If you find a bug or have a feature requ
 
 ## License
 
-Plutonium is licensed under the GNUv2 License. See the [LICENSE](LICENSE) file for more details.
+Plutonium is licensed under the BSD 3-Clause License. See the [LICENSE](LICENSE) file for more details.
