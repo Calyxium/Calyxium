@@ -6,6 +6,9 @@ import (
 	"strings"
 
 	"plutonium/lexer"
+	"plutonium/parser"
+
+	"github.com/sanity-io/litter"
 )
 
 func GetInputFilePath() (string, error) {
@@ -29,6 +32,7 @@ func ReadFileContent(filePath string) (string, error) {
 
 	return string(content), nil
 }
+
 func main() {
 	filePath, err := GetInputFilePath()
 	if err != nil {
@@ -43,12 +47,20 @@ func main() {
 	}
 
 	newLexer := lexer.New(string(content))
+	var tokens []lexer.Token
 
 	for {
 		tok := newLexer.Consume()
-		fmt.Printf("{Token Type: %v, Value: %v}\n", tok.Type, tok.Literal)
 		if tok.Type == lexer.EOF {
 			break
 		}
+		tokens = append(tokens, tok)
+	}
+
+	ast := parser.Parse(tokens)
+	litter.Dump(ast)
+
+	for _, tok := range tokens {
+		fmt.Printf("{Token Type: %v, Value: %v}\n", tok.Type, tok.Literal)
 	}
 }
