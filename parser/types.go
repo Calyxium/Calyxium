@@ -24,13 +24,27 @@ func TypeLed(Type lexer.TokenType, BindingPower BindingPower, LedFunction TypeLe
 	TypeLedLu[Type] = LedFunction
 }
 
-func TypeNud(Type lexer.TokenType, NudFunction TypeNudHandler) {
+func TypeNud(Type lexer.TokenType, BindingPower BindingPower, NudFunction TypeNudHandler) {
+	TypeBindingPowerLu[Type] = PRIMARY
 	TypeNudLu[Type] = NudFunction
 }
 
 func CreateTokenTypeLookup() {
-	TypeNud(lexer.IDENTIFIER, ParseSymbolType)
-	TypeNud(lexer.OPEN_BRACKET, ParseArrayType)
+	TypeNud(lexer.IDENTIFIER, PRIMARY, func(Parse *Parser) ast.Type {
+		return ast.SymbolType{
+			Name: Parse.advance().Literal,
+		}
+	})
+
+	TypeNud(lexer.OPEN_BRACKET, MEMBER, func(Parse *Parser) ast.Type {
+		Parse.advance()
+		Parse.Expect(lexer.CLOSE_BRACKET)
+		InsideType := ParseType(Parse, DEFAULT_BP)
+
+		return ast.ArrayType{
+			Underlying: InsideType,
+		}
+	})
 }
 
 func ParseSymbolType(Parse *Parser) ast.Type {

@@ -33,7 +33,7 @@ type FunctionDeclarationStmt struct {
 	ReturnType Type
 }
 
-func (n FunctionDeclarationStmt) stmt() {}
+func (Node FunctionDeclarationStmt) stmt() {}
 
 type IfStmt struct {
 	Condition  Expr
@@ -41,18 +41,24 @@ type IfStmt struct {
 	Alternate  Stmt
 }
 
-func (n IfStmt) stmt() {}
+func (Node IfStmt) stmt() {}
 
 type ImportStmt struct {
 	Name string
 	From string
 }
 
-func (n ImportStmt) stmt() {}
+func (Node ImportStmt) stmt() {}
 
 type ClassDeclarationStmt struct {
 	Name string
 	Body []Stmt
 }
 
-func (n ClassDeclarationStmt) stmt() {}
+func (Node ClassDeclarationStmt) stmt() {}
+
+type ReturnStmt struct {
+	Value Expr
+}
+
+func (Node ReturnStmt) stmt() {}

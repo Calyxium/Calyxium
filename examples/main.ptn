@@ -1,7 +1,9 @@
 import fs;
-import path;
 import time;
+import math;
 
-class DirectoryReader {
-    let directoryPath: string;
+function add(x: number, y: number) {
+    return x + y;
 }
+
+const z: number = 100 + (50 / 2.3);

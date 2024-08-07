@@ -173,3 +173,18 @@ func ParseClassDeclStmt(Parse *Parser) ast.Stmt {
 		Body: ast.ExpectStmt[ast.BlockStmt](ClassBody).Body,
 	}
 }
+
+func ParseReturnStmt(Parse *Parser) ast.Stmt {
+	Parse.advance()
+
+	var ReturnValue ast.Expr
+	if Parse.CurrentTokenType() != lexer.SEMI_COLON {
+		ReturnValue = ParseExpr(Parse, DEFAULT_BP)
+	}
+
+	Parse.Expect(lexer.SEMI_COLON)
+
+	return ast.ReturnStmt{
+		Value: ReturnValue,
+	}
+}
