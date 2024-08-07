@@ -100,7 +100,7 @@ func (lex *Lexer) ReadString() string {
 
 func (lex *Lexer) ReadIdentifier() string {
 	startPosition := lex.Position
-	for IsAlpha(lex.CurrentChar) {
+	for IsAlpha(lex.CurrentChar) || IsDigit(lex.CurrentChar) {
 		lex.advance()
 	}
 	return lex.Content[startPosition:lex.Position]
