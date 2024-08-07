@@ -1,0 +1,15 @@
+# Test Parsing file for Plutonium
+
+let x: number = 10 + (35 / 5 - -5);
+
+struct Rect {
+    width: number;
+    height: number;
+}
+
+const r1 = Rect{
+    width: 10,
+    height: 10,
+};
+
+const number = []number{1, 2};
