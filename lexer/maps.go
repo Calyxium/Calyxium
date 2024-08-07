@@ -58,6 +58,8 @@ var (
 		"switch":   KEYWORDS_SWITCH,
 		"case":     KEYWORDS_CASE,
 		"default":  KEYWORDS_DEFAULT,
+		"struct":   KEYWORDS_STRUCT,
+		"static":   KEYWORDS_STATIC,
 	}
 
 	tokenTypeNames = map[TokenType]string{
@@ -115,6 +117,8 @@ var (
 		KEYWORDS_TRY:        "KEYWORDS_TRY",
 		KEYWORDS_CATCH:      "KEYWORDS_CATCH",
 		KEYWORDS_IMPORT:     "KEYWORDS_IMPORT",
+		KEYWORDS_STRUCT:     "KEYWORDS_STRUCT",
+		KEYWORDS_STATIC:     "KEYWORDS_STATIC",
 	}
 )
 

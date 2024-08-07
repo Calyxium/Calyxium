@@ -27,3 +27,32 @@ type BinaryExpr struct {
 }
 
 func (Node BinaryExpr) expr() {}
+
+type PrefixExpr struct {
+	Operator  lexer.Token
+	RightExpr Expr
+}
+
+func (Node PrefixExpr) expr() {}
+
+type AssignmentExpr struct {
+	Assigne  Expr
+	Operator lexer.Token
+	RHSValue Expr
+}
+
+func (Node AssignmentExpr) expr() {}
+
+type StructInstantiationExpr struct {
+	StructName string
+	Properties map[string]Expr
+}
+
+func (Node StructInstantiationExpr) expr() {}
+
+type ArrayInstantiationExpr struct {
+	Underlying Type
+	Contents   []Expr
+}
+
+func (Node ArrayInstantiationExpr) expr() {}

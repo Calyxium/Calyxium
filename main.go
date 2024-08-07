@@ -60,7 +60,7 @@ func main() {
 	ast := parser.Parse(tokens)
 	litter.Dump(ast)
 
-	for _, tok := range tokens {
-		fmt.Printf("{Token Type: %v, Value: %v}\n", tok.Type, tok.Literal)
-	}
+	//for _, tok := range tokens {
+	//	fmt.Printf("{Token Type: %v, Value: %v}\n", tok.Type, tok.Literal)
+	//}
 }

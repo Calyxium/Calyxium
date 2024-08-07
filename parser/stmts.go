@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"plutonium/ast"
 	"plutonium/lexer"
 )
@@ -24,30 +25,81 @@ func ParseStmt(Parse *Parser) ast.Stmt {
 }
 
 func ParseVarDeclStmt(Parse *Parser) ast.Stmt {
+	var ExplicitType ast.Type
+	var assignedValue ast.Expr
 	IsConstant := Parse.advance().Type == lexer.KEYWORDS_CONST
 	VarName := Parse.ExpectError(lexer.IDENTIFIER, "Inside variable decleration expected to find variable name").Literal
 
-	var DataType string
-	switch Parse.advance().Type {
-	case lexer.TYPE_INT:
-		DataType = ast.TypeInt
-	case lexer.TYPE_FLOAT:
-		DataType = ast.TypeFloat
-	case lexer.TYPE_STRING:
-		DataType = ast.TypeString
-	case lexer.TYPE_BOOLEAN:
-		DataType = ast.TypeBool
-	default:
-		Parse.ExpectError(lexer.ERROR, "Expected a valid type")
+	if Parse.CurrentTokenType() == lexer.COLON {
+		Parse.advance()
+		ExplicitType = ParseType(Parse, DEFAULT_BP)
 	}
 
-	Parse.Expect(lexer.ASSIGN)
-	assignedValue := ParseExpr(Parse, ASSINGMENT)
+	if Parse.CurrentTokenType() != lexer.SEMI_COLON {
+		Parse.Expect(lexer.ASSIGN)
+		assignedValue = ParseExpr(Parse, ASSINGMENT)
+	} else if ExplicitType == nil {
+		panic("Missing either right hand side in variable decleration or explicit type.")
+	}
+
 	Parse.Expect(lexer.SEMI_COLON)
+
+	if IsConstant && assignedValue == nil {
+		panic("Cannot define constants without providing value")
+	}
+
 	return ast.VarDeclStmt{
+		ExplicitType:  ExplicitType,
 		IsConstant:    IsConstant,
 		VariableName:  VarName,
 		AssignedValue: assignedValue,
-		DataType:      DataType,
+	}
+}
+
+func ParseStructDeclStmt(Parse *Parser) ast.Stmt {
+	Parse.Expect(lexer.KEYWORDS_STRUCT)
+	var Methods = map[string]ast.StructMethod{}
+	var Properties = map[string]ast.StructProperty{}
+	var StructName = Parse.Expect(lexer.IDENTIFIER).Literal
+
+	Parse.Expect(lexer.OPEN_BRACE)
+
+	for Parse.HasToken() && Parse.CurrentTokenType() != lexer.CLOSE_BRACE {
+		var IsStatic bool
+		var propertyName string
+		if Parse.CurrentTokenType() == lexer.KEYWORDS_STATIC {
+			IsStatic = true
+			Parse.Expect(lexer.KEYWORDS_STATIC)
+		}
+
+		if Parse.CurrentTokenType() == lexer.IDENTIFIER {
+			propertyName = Parse.Expect(lexer.IDENTIFIER).Literal
+			Parse.ExpectError(lexer.COLON, "Expected to find colon following property name inside struct declaration")
+			StructType := ParseType(Parse, DEFAULT_BP)
+			Parse.Expect(lexer.SEMI_COLON)
+
+			_, exists := Properties[propertyName]
+
+			if exists {
+				panic(fmt.Sprintf("Propery %v has already been defined in struct declaration", propertyName))
+			}
+
+			Properties[propertyName] = ast.StructProperty{
+				IsStatic: IsStatic,
+				Type:     StructType,
+			}
+
+			continue
+		}
+
+		panic("Cannot currently handle methods inside struct decl")
+	}
+
+	Parse.Expect(lexer.CLOSE_BRACE)
+
+	return ast.StructStmt{
+		Properties: Properties,
+		Methods:    Methods,
+		StructName: StructName,
 	}
 }
