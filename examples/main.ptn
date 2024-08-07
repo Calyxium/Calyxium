@@ -1,0 +1,7 @@
+import fs;
+import path;
+import time;
+
+class DirectoryReader {
+    let directoryPath: string;
+}

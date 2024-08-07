@@ -67,7 +67,7 @@ const (
 	KEYWORDS_TRY      // try
 	KEYWORDS_CATCH    // catch
 	KEYWORDS_IMPORT   // import
-	KEYWORDS_STRUCT   // struct
-	KEYWORDS_STATIC   // static
+	KEYWORDS_CLASS    // class
+	KEYWORDS_THIS     // this
 
 )

@@ -3,7 +3,6 @@ package parser
 import (
 	"fmt"
 	"plutonium/ast"
-	"plutonium/helpers"
 	"plutonium/lexer"
 	"strconv"
 )
@@ -79,13 +78,21 @@ func ParsePrefixExpr(Parse *Parser) ast.Expr {
 }
 
 func ParseAssignmentExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
-	Operator := Parse.advance()
+	Parse.advance()
 	Rhs := ParseExpr(Parse, BindingPower)
 
 	return ast.AssignmentExpr{
-		Operator: Operator,
-		RHSValue: Rhs,
-		Assigne:  Left,
+		Assigne:       Left,
+		AssignedValue: Rhs,
+	}
+}
+
+func ParseRangeExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
+	Parse.advance()
+
+	return ast.RangeExpr{
+		Lower: Left,
+		Upper: ParseExpr(Parse, BindingPower),
 	}
 }
 
@@ -94,31 +101,6 @@ func ParseGroupingExpr(Parse *Parser) ast.Expr {
 	Expr := ParseExpr(Parse, DEFAULT_BP)
 	Parse.Expect(lexer.CLOSE_PAREN)
 	return Expr
-}
-
-func ParseStructInstantionsExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
-	var StructName = helpers.ExpectType[ast.IdentExpr](Left).Value
-	var Properties = map[string]ast.Expr{}
-
-	Parse.Expect(lexer.OPEN_BRACE)
-
-	for Parse.HasToken() && Parse.CurrentTokenType() != lexer.CLOSE_BRACE {
-		PropertyName := Parse.Expect(lexer.IDENTIFIER).Literal
-		Parse.Expect(lexer.COLON)
-		Expr := ParseExpr(Parse, LOGICAL)
-
-		Properties[PropertyName] = Expr
-
-		if Parse.CurrentTokenType() != lexer.CLOSE_BRACE {
-			Parse.Expect(lexer.COMMA)
-		}
-	}
-
-	Parse.Expect(lexer.CLOSE_BRACE)
-	return ast.StructInstantiationExpr{
-		StructName: StructName,
-		Properties: Properties,
-	}
 }
 
 func ParseArrayInstantionsExpr(Parse *Parser) ast.Expr {
@@ -143,5 +125,53 @@ func ParseArrayInstantionsExpr(Parse *Parser) ast.Expr {
 	return ast.ArrayInstantiationExpr{
 		Underlying: UnderlyingType,
 		Contents:   Contents,
+	}
+}
+
+func ParseMemberExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
+	isComputed := Parse.advance().Type == lexer.OPEN_BRACKET
+
+	if isComputed {
+		Rhs := ParseExpr(Parse, BindingPower)
+		Parse.Expect(lexer.CLOSE_BRACKET)
+		return ast.ComputedExpr{
+			Member:   Left,
+			Property: Rhs,
+		}
+	}
+
+	return ast.MemberExpr{
+		Member:   Left,
+		Property: Parse.Expect(lexer.IDENTIFIER).Literal,
+	}
+}
+
+func ParseCallExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
+	Parse.advance()
+	Arguments := make([]ast.Expr, 0)
+
+	for Parse.HasToken() && Parse.CurrentTokenType() != lexer.CLOSE_PAREN {
+		Arguments = append(Arguments, ParseExpr(Parse, ASSINGMENT))
+
+		if !Parse.CurrentToken().IsOneOfMany(lexer.EOF, lexer.CLOSE_PAREN) {
+			Parse.Expect(lexer.COMMA)
+		}
+	}
+
+	Parse.Expect(lexer.CLOSE_PAREN)
+	return ast.CallExpr{
+		Method:    Left,
+		Arguments: Arguments,
+	}
+}
+
+func ParseFunctionExpr(Parse *Parser) ast.Expr {
+	Parse.Expect(lexer.KEYWORDS_FUNCTION)
+	FunctionParams, ReturnType, FunctionBody := ParseFunctionParamsAndBody(Parse)
+
+	return ast.FunctionExpr{
+		Parameters: FunctionParams,
+		ReturnType: ReturnType,
+		Body:       FunctionBody,
 	}
 }

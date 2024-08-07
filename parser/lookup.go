@@ -52,15 +52,18 @@ func Stmt(Type lexer.TokenType, StmtFunction StmtHandler) {
 }
 
 func CreateTokenLookup() {
+	// Assignment
 	Led(lexer.ASSIGN, ASSINGMENT, ParseAssignmentExpr)
 	Led(lexer.PLUS_ASSIGN, ASSINGMENT, ParseAssignmentExpr)
 	Led(lexer.MINUS_ASSIGN, ASSINGMENT, ParseAssignmentExpr)
 	Led(lexer.MULTIPLY_ASSIGN, ASSINGMENT, ParseAssignmentExpr)
 	Led(lexer.DIVIDE_ASSIGN, ASSINGMENT, ParseAssignmentExpr)
 
+	// Logical
 	Led(lexer.LOGICAL_AND, LOGICAL, ParseBinaryExpr)
 	Led(lexer.LOGICAL_OR, LOGICAL, ParseBinaryExpr)
 
+	// Relational
 	Led(lexer.LT, RELATIONAL, ParseBinaryExpr)
 	Led(lexer.LESS_THAN_EQUALS, RELATIONAL, ParseBinaryExpr)
 	Led(lexer.GT, RELATIONAL, ParseBinaryExpr)
@@ -68,11 +71,13 @@ func CreateTokenLookup() {
 	Led(lexer.ASSIGN, RELATIONAL, ParseBinaryExpr)
 	Led(lexer.NOT_EQUALS, RELATIONAL, ParseBinaryExpr)
 
+	// Additive & Multiplicitave
 	Led(lexer.PLUS, ADDITIVE, ParseBinaryExpr)
 	Led(lexer.MINUS, ADDITIVE, ParseBinaryExpr)
 	Led(lexer.MULTIPLY, ADDITIVE, ParseBinaryExpr)
 	Led(lexer.DIVIDE, ADDITIVE, ParseBinaryExpr)
 
+	// Literals & Symbols
 	Nud(lexer.TYPE_INT, ParsePrimaryExpr)
 	Nud(lexer.TYPE_FLOAT, ParsePrimaryExpr)
 	Nud(lexer.TYPE_STRING, ParsePrimaryExpr)
@@ -81,11 +86,21 @@ func CreateTokenLookup() {
 	Nud(lexer.OPEN_PAREN, ParseGroupingExpr)
 	Nud(lexer.MINUS, ParsePrefixExpr)
 
-	Led(lexer.OPEN_BRACE, CALL, ParseStructInstantionsExpr)
-	Nud(lexer.OPEN_BRACKET, ParseArrayInstantionsExpr)
+	// Member / Computed // Call
+	Led(lexer.DOT, MEMBER, ParseMemberExpr)
+	Led(lexer.OPEN_BRACKET, MEMBER, ParseMemberExpr)
+	Led(lexer.OPEN_PAREN, MEMBER, ParseMemberExpr)
 
+	//Led(lexer.OPEN_BRACE, CALL, ParseStructInstantionsExpr)
+	Nud(lexer.OPEN_BRACKET, ParseArrayInstantionsExpr)
+	Nud(lexer.KEYWORDS_FUNCTION, ParseFunctionExpr)
+
+	Stmt(lexer.OPEN_BRACE, ParseBlockStmt)
+	Stmt(lexer.KEYWORDS_FUNCTION, ParseFunctionDeclStmt)
+	Stmt(lexer.KEYWORDS_IF, ParseIfDeclStmt)
+	Stmt(lexer.KEYWORDS_IMPORT, ParseImportStmt)
 	Stmt(lexer.KEYWORDS_CONST, ParseVarDeclStmt)
 	Stmt(lexer.KEYWORDS_VAR, ParseVarDeclStmt)
-	Stmt(lexer.KEYWORDS_STRUCT, ParseStructDeclStmt)
+	Stmt(lexer.KEYWORDS_CLASS, ParseClassDeclStmt)
 
 }

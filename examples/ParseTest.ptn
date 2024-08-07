@@ -1,5 +1,3 @@
-# Test Parsing file for Plutonium
-
 let x: number = 10 + (35 / 5 - -5);
 
 struct Rect {

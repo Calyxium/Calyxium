@@ -3,19 +3,18 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
-
 	"plutonium/lexer"
 	"plutonium/parser"
+	"plutonium/repl"
 
 	"github.com/sanity-io/litter"
 )
 
-func GetInputFilePath() (string, error) {
+func GetInputFilePath() string {
 	if len(os.Args) < 2 {
-		return "", fmt.Errorf("%v: fatal error: no input files provided", strings.Join(strings.Split(os.Args[0], "./"), ""))
+		return ""
 	}
-	return os.Args[1], nil
+	return os.Args[1]
 }
 
 func ReadFileContent(filePath string) (string, error) {
@@ -34,9 +33,10 @@ func ReadFileContent(filePath string) (string, error) {
 }
 
 func main() {
-	filePath, err := GetInputFilePath()
-	if err != nil {
-		fmt.Println(err)
+	filePath := GetInputFilePath()
+
+	if filePath == "" {
+		repl.Repl(os.Stdin, os.Stdout)
 		return
 	}
 

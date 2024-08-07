@@ -58,8 +58,8 @@ var (
 		"switch":   KEYWORDS_SWITCH,
 		"case":     KEYWORDS_CASE,
 		"default":  KEYWORDS_DEFAULT,
-		"struct":   KEYWORDS_STRUCT,
-		"static":   KEYWORDS_STATIC,
+		"class":    KEYWORDS_CLASS,
+		"this":     KEYWORDS_THIS,
 	}
 
 	tokenTypeNames = map[TokenType]string{
@@ -117,10 +117,20 @@ var (
 		KEYWORDS_TRY:        "KEYWORDS_TRY",
 		KEYWORDS_CATCH:      "KEYWORDS_CATCH",
 		KEYWORDS_IMPORT:     "KEYWORDS_IMPORT",
-		KEYWORDS_STRUCT:     "KEYWORDS_STRUCT",
-		KEYWORDS_STATIC:     "KEYWORDS_STATIC",
+		KEYWORDS_CLASS:      "KEYWORDS_CLASS",
+		KEYWORDS_THIS:       "KEYWORDS_THIS",
 	}
 )
+
+func (token Token) IsOneOfMany(ExpectedTokens ...TokenType) bool {
+	for _, Expected := range ExpectedTokens {
+		if Expected == token.Type {
+			return true
+		}
+	}
+
+	return false
+}
 
 func TokenTypeToString(t TokenType) string {
 	if name, exists := tokenTypeNames[t]; exists {

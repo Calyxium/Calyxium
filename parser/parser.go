@@ -66,6 +66,14 @@ func (Parse *Parser) ExpectError(ExpectedType lexer.TokenType, err any) lexer.To
 	return Parse.advance()
 }
 
+func (Parse *Parser) NextToken() lexer.Token {
+	return Parse.tokens[Parse.pos+1]
+}
+
+func (Parse *Parser) PreviousToken() lexer.Token {
+	return Parse.tokens[Parse.pos-1]
+}
+
 func (Parse *Parser) Expect(ExpectedType lexer.TokenType) lexer.Token {
 	return Parse.ExpectError(ExpectedType, nil)
 }

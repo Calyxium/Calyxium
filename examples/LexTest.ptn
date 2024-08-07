@@ -1,6 +1,3 @@
-# Test Lexing file for Plutonium
-
 function main() {
-    puts("Hello, world!");~
-    exit(0);
+
 }

@@ -12,29 +12,47 @@ type ExpressionStmt struct {
 
 func (Node ExpressionStmt) stmt() {}
 
-type VarDeclStmt struct {
-	VariableName  string
-	IsConstant    bool
+type VarDeclarationStmt struct {
+	Identifier    string
+	Constant      bool
 	AssignedValue Expr
 	ExplicitType  Type
 }
 
-func (Node VarDeclStmt) stmt() {}
+func (Node VarDeclarationStmt) stmt() {}
 
-type StructProperty struct {
-	IsStatic bool
-	Type     Type
+type Parameter struct {
+	Name string
+	Type Type
 }
 
-type StructMethod struct {
-	IsStatic bool
-	// Type     Type
+type FunctionDeclarationStmt struct {
+	Parameters []Parameter
+	Name       string
+	Body       []Stmt
+	ReturnType Type
 }
 
-type StructStmt struct {
-	StructName string
-	Properties map[string]StructProperty
-	Methods    map[string]StructMethod
+func (n FunctionDeclarationStmt) stmt() {}
+
+type IfStmt struct {
+	Condition  Expr
+	Consequent Stmt
+	Alternate  Stmt
 }
 
-func (Node StructStmt) stmt() {}
+func (n IfStmt) stmt() {}
+
+type ImportStmt struct {
+	Name string
+	From string
+}
+
+func (n ImportStmt) stmt() {}
+
+type ClassDeclarationStmt struct {
+	Name string
+	Body []Stmt
+}
+
+func (n ClassDeclarationStmt) stmt() {}
