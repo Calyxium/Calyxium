@@ -33,6 +33,11 @@ func ParseExpr(Parse *Parser, BindingPower BindingPower) ast.Expr {
 
 func ParsePrimaryExpr(Parse *Parser) ast.Expr {
 	switch Parse.CurrentTokenType() {
+	case lexer.TYPE_FLOAT:
+		number, _ := strconv.ParseFloat(Parse.advance().Literal, 64)
+		return ast.NumberExpr{
+			Value: number,
+		}
 	case lexer.TYPE_INT:
 		number, _ := strconv.ParseFloat(Parse.advance().Literal, 64)
 		return ast.NumberExpr{

@@ -5,6 +5,14 @@ import (
 	"plutonium/lexer"
 )
 
+func ExprStmt(Parse *Parser) ast.Stmt {
+	Expression := ParseExpr(Parse, DEFAULT_BP)
+	Parse.Expect(lexer.SEMI_COLON)
+	return ast.ExpressionStmt{
+		Expression: Expression,
+	}
+}
+
 func ParseStmt(Parse *Parser) ast.Stmt {
 	StmtFunction, exists := StmtLu[Parse.CurrentTokenType()]
 
@@ -12,12 +20,7 @@ func ParseStmt(Parse *Parser) ast.Stmt {
 		return StmtFunction(Parse)
 	}
 
-	Expression := ParseExpr(Parse, DEFAULT_BP)
-	Parse.Expect(lexer.SEMI_COLON)
-
-	return ast.ExpressionStmt{
-		Expression: Expression,
-	}
+	return ExprStmt(Parse)
 }
 
 func ParseVarDeclStmt(Parse *Parser) ast.Stmt {

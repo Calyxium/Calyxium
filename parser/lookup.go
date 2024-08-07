@@ -73,14 +73,12 @@ func CreateTokenLookup() {
 	Led(lexer.DIVIDE, ADDITIVE, ParseBinaryExpr)
 
 	Nud(lexer.TYPE_INT, PRIMARY, ParsePrimaryExpr)
+	Nud(lexer.TYPE_FLOAT, PRIMARY, ParsePrimaryExpr)
 	Nud(lexer.TYPE_STRING, PRIMARY, ParsePrimaryExpr)
+	Nud(lexer.TYPE_BOOLEAN, PRIMARY, ParsePrimaryExpr)
 	Nud(lexer.IDENTIFIER, PRIMARY, ParsePrimaryExpr)
 
 	Stmt(lexer.KEYWORDS_CONST, ParseVarDeclStmt)
 	Stmt(lexer.KEYWORDS_VAR, ParseVarDeclStmt)
-	Stmt(lexer.TYPE_INT, ParseVarDeclStmt)
-	Stmt(lexer.TYPE_STRING, ParseVarDeclStmt)
-	Stmt(lexer.TYPE_BOOLEAN, ParseVarDeclStmt)
-	Stmt(lexer.TYPE_FLOAT, ParseVarDeclStmt)
 
 }
