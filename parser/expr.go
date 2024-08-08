@@ -7,172 +7,151 @@ import (
 	"strconv"
 )
 
-func ParseExpr(Parse *Parser, BindingPower BindingPower) ast.Expr {
-	TokenType := Parse.CurrentTokenType()
-	NudFunction, exists := NudLu[TokenType]
+func ParseExpr(Parse *Parser, bp binding_power) ast.Expr {
+	tokenKind := Parse.currentTokenKind()
+	nud_fn, exists := NudLu[tokenKind]
 
 	if !exists {
-		panic(fmt.Sprintf("Nud handler expected for token %v\n", lexer.TokenTypeToString(TokenType)))
+		panic(fmt.Sprintf("NUD Handler expected for token %s\n", lexer.TokenTypeToString(tokenKind)))
 	}
 
-	Left := NudFunction(Parse)
+	left := nud_fn(Parse)
 
-	for BindingPowerLu[Parse.CurrentTokenType()] > BindingPower {
-		TokenType = Parse.CurrentTokenType()
-		LedFunction, exists := LedLu[TokenType]
+	for BindingPowerLu[Parse.currentTokenKind()] > bp {
+		tokenKind = Parse.currentTokenKind()
+		led_fn, exists := LedLu[tokenKind]
 
 		if !exists {
-			panic(fmt.Sprintf("Led handler expected for token %v\n", lexer.TokenTypeToString(TokenType)))
+			panic(fmt.Sprintf("LED Handler expected for token %s\n", lexer.TokenTypeToString(tokenKind)))
 		}
 
-		Left = LedFunction(Parse, Left, BindingPowerLu[Parse.CurrentTokenType()])
+		left = led_fn(Parse, left, bp)
 	}
 
-	return Left
+	return left
+}
+
+func ParsePrefixExpr(Parse *Parser) ast.Expr {
+	operatorToken := Parse.advance()
+	expr := ParseExpr(Parse, unary)
+
+	return ast.PrefixExpr{
+		Operator: operatorToken,
+		Right:    expr,
+	}
+}
+
+func ParseAssignmentExpr(Parse *Parser, left ast.Expr, bp binding_power) ast.Expr {
+	Parse.advance()
+	rhs := ParseExpr(Parse, bp)
+
+	return ast.AssignmentExpr{
+		Assigne:       left,
+		AssignedValue: rhs,
+	}
+}
+
+func ParseBinaryExpr(Parse *Parser, left ast.Expr, bp binding_power) ast.Expr {
+	operatorToken := Parse.advance()
+	right := ParseExpr(Parse, defalt_bp)
+
+	return ast.BinaryExpr{
+		Left:     left,
+		Operator: operatorToken,
+		Right:    right,
+	}
 }
 
 func ParsePrimaryExpr(Parse *Parser) ast.Expr {
-	switch Parse.CurrentTokenType() {
-	case lexer.TYPE_FLOAT:
-		number, _ := strconv.ParseFloat(Parse.advance().Literal, 64)
-		return ast.NumberExpr{
-			Value: number,
-		}
+	switch Parse.currentTokenKind() {
 	case lexer.TYPE_INT:
 		number, _ := strconv.ParseFloat(Parse.advance().Literal, 64)
 		return ast.NumberExpr{
 			Value: number,
 		}
-	case lexer.TYPE_STRING:
+	case lexer.STRING:
 		return ast.StringExpr{
 			Value: Parse.advance().Literal,
 		}
 	case lexer.IDENTIFIER:
-		return ast.IdentExpr{
+		return ast.SymbolExpr{
 			Value: Parse.advance().Literal,
 		}
 	default:
-		panic(fmt.Sprintf("Cannot create Primary Expression from %v\n", lexer.TokenTypeToString(Parse.CurrentTokenType())))
+		panic(fmt.Sprintf("Cannot create primary_expr from %s\n", lexer.TokenTypeToString(Parse.currentTokenKind())))
 	}
 }
 
-func ParseBinaryExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
-	OperatorToken := Parse.advance()
-	Right := ParseExpr(Parse, BindingPower)
-
-	return ast.BinaryExpr{
-		Left:     Left,
-		Operator: OperatorToken,
-		Right:    Right,
-	}
-}
-
-func ParsePrefixExpr(Parse *Parser) ast.Expr {
-	Operator := Parse.advance()
-	Rhs := ParseExpr(Parse, DEFAULT_BP)
-
-	return ast.PrefixExpr{
-		Operator:  Operator,
-		RightExpr: Rhs,
-	}
-}
-
-func ParseAssignmentExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
-	OperatorToken := Parse.advance()
-	Rhs := ParseExpr(Parse, BindingPower)
-
-	return ast.AssignmentExpr{
-		Operator:      OperatorToken,
-		Assigne:       Left,
-		AssignedValue: Rhs,
-	}
-}
-
-func ParseRangeExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
-	Parse.advance()
-
-	return ast.RangeExpr{
-		Lower: Left,
-		Upper: ParseExpr(Parse, BindingPower),
-	}
-}
-
-func ParseGroupingExpr(Parse *Parser) ast.Expr {
-	Parse.advance()
-	Expr := ParseExpr(Parse, DEFAULT_BP)
-	Parse.Expect(lexer.CLOSE_PAREN)
-	return Expr
-}
-
-func ParseArrayInstantionsExpr(Parse *Parser) ast.Expr {
-	var UnderlyingType ast.Type
-	var Contents = []ast.Expr{}
-
-	Parse.Expect(lexer.OPEN_BRACKET)
-	Parse.Expect(lexer.CLOSE_BRACKET)
-
-	UnderlyingType = ParseType(Parse, DEFAULT_BP)
-
-	Parse.Expect(lexer.OPEN_BRACE)
-	for Parse.HasToken() && Parse.CurrentTokenType() != lexer.CLOSE_BRACE {
-		Contents = append(Contents, ParseExpr(Parse, LOGICAL))
-
-		if Parse.CurrentTokenType() != lexer.CLOSE_BRACE {
-			Parse.Expect(lexer.COMMA)
-		}
-	}
-
-	Parse.Expect(lexer.CLOSE_BRACE)
-	return ast.ArrayInstantiationExpr{
-		Underlying: UnderlyingType,
-		Contents:   Contents,
-	}
-}
-
-func ParseMemberExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
+func ParseMemberExpr(Parse *Parser, left ast.Expr, bp binding_power) ast.Expr {
 	isComputed := Parse.advance().Type == lexer.OPEN_BRACKET
 
 	if isComputed {
-		Rhs := ParseExpr(Parse, BindingPower)
-		Parse.Expect(lexer.CLOSE_BRACKET)
+		rhs := ParseExpr(Parse, bp)
+		Parse.expect(lexer.CLOSE_BRACKET)
 		return ast.ComputedExpr{
-			Member:   Left,
-			Property: Rhs,
+			Member:   left,
+			Property: rhs,
 		}
 	}
 
 	return ast.MemberExpr{
-		Member:   Left,
-		Property: Parse.Expect(lexer.IDENTIFIER).Literal,
+		Member:   left,
+		Property: Parse.expect(lexer.IDENTIFIER).Literal,
 	}
 }
 
-func ParseCallExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
-	Parse.advance()
-	Arguments := make([]ast.Expr, 0)
+func ParseArrayLiteralExpr(Parse *Parser) ast.Expr {
+	Parse.expect(lexer.OPEN_BRACKET)
+	arrayContents := make([]ast.Expr, 0)
 
-	for Parse.HasToken() && Parse.CurrentTokenType() != lexer.CLOSE_PAREN {
-		Arguments = append(Arguments, ParseExpr(Parse, ASSINGMENT))
+	for Parse.hasTokens() && Parse.currentTokenKind() != lexer.CLOSE_BRACKET {
+		arrayContents = append(arrayContents, ParseExpr(Parse, logical))
 
-		if !Parse.CurrentToken().IsOneOfMany(lexer.EOF, lexer.CLOSE_PAREN) {
-			Parse.Expect(lexer.COMMA)
+		if !Parse.currentToken().IsOneOfMany(lexer.EOF, lexer.CLOSE_BRACKET) {
+			Parse.expect(lexer.COMMA)
 		}
 	}
 
-	Parse.Expect(lexer.CLOSE_PAREN)
+	Parse.expect(lexer.CLOSE_BRACKET)
+
+	return ast.ArrayLiteral{
+		Contents: arrayContents,
+	}
+}
+
+func ParseGroupingExpr(Parse *Parser) ast.Expr {
+	Parse.expect(lexer.OPEN_PAREN)
+	expr := ParseExpr(Parse, defalt_bp)
+	Parse.expect(lexer.OPEN_PAREN)
+	return expr
+}
+
+func ParseCallExpr(Parse *Parser, left ast.Expr, bp binding_power) ast.Expr {
+	Parse.advance()
+	arguments := make([]ast.Expr, 0)
+
+	for Parse.hasTokens() && Parse.currentTokenKind() != lexer.CLOSE_PAREN {
+		arguments = append(arguments, ParseExpr(Parse, assignment))
+
+		if !Parse.currentToken().IsOneOfMany(lexer.EOF, lexer.CLOSE_PAREN) {
+			Parse.expect(lexer.COMMA)
+		}
+	}
+
+	Parse.expect(lexer.CLOSE_PAREN)
 	return ast.CallExpr{
-		Method:    Left,
-		Arguments: Arguments,
+		Method:    left,
+		Arguments: arguments,
 	}
 }
 
 func ParseFunctionExpr(Parse *Parser) ast.Expr {
-	Parse.Expect(lexer.KEYWORDS_FUNCTION)
-	FunctionParams, ReturnType, FunctionBody := ParseFunctionParamsAndBody(Parse)
+	Parse.expect(lexer.KEYWORDS_FUNCTION)
+	functionParams, returnType, functionBody := ParseFunctionParamsAndBody(Parse)
 
 	return ast.FunctionExpr{
-		Parameters: FunctionParams,
-		ReturnType: ReturnType,
-		Body:       FunctionBody,
+		Parameters: functionParams,
+		ReturnType: returnType,
+		Body:       functionBody,
 	}
 }

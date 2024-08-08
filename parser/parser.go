@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"plutonium/ast"
 	"plutonium/lexer"
 )
@@ -11,69 +10,27 @@ type Parser struct {
 	pos    int
 }
 
-func New(tokens []lexer.Token) *Parser {
+func createParser(tokens []lexer.Token) *Parser {
 	CreateTokenLookup()
-	CreateTokenTypeLookup()
-	return &Parser{
+	CreateTypeTokenLookup()
+
+	p := &Parser{
 		tokens: tokens,
 		pos:    0,
 	}
+
+	return p
 }
 
-func Parse(tokens []lexer.Token) ast.BlockStmt {
-	Body := make([]ast.Stmt, 0)
-	parser := New(tokens)
+func Parse(tks []lexer.Token) ast.BlockStmt {
+	p := createParser(tks)
+	body := make([]ast.Stmt, 0)
 
-	for parser.HasToken() {
-		Body = append(Body, ParseStmt(parser))
+	for p.hasTokens() {
+		body = append(body, ParseStmt(p))
 	}
 
 	return ast.BlockStmt{
-		Body: Body,
+		Body: body,
 	}
-}
-
-func (parse *Parser) CurrentToken() lexer.Token {
-	return parse.tokens[parse.pos]
-}
-
-func (parse *Parser) CurrentTokenType() lexer.TokenType {
-	return parse.CurrentToken().Type
-}
-
-func (parse *Parser) advance() lexer.Token {
-	token := parse.CurrentToken()
-	parse.pos++
-	return token
-}
-
-func (parse *Parser) HasToken() bool {
-	return parse.pos < len(parse.tokens) && parse.CurrentTokenType() != lexer.EOF
-}
-
-func (Parse *Parser) ExpectError(ExpectedType lexer.TokenType, err any) lexer.Token {
-	token := Parse.CurrentToken()
-	Kind := token.Type
-
-	if Kind != ExpectedType {
-		if err == nil {
-			err = fmt.Sprintf("Expected %v but recieved %v instead\n", lexer.TokenTypeToString(ExpectedType), lexer.TokenTypeToString(Kind))
-		}
-
-		panic(err)
-	}
-
-	return Parse.advance()
-}
-
-func (Parse *Parser) NextToken() lexer.Token {
-	return Parse.tokens[Parse.pos+1]
-}
-
-func (Parse *Parser) PreviousToken() lexer.Token {
-	return Parse.tokens[Parse.pos-1]
-}
-
-func (Parse *Parser) Expect(ExpectedType lexer.TokenType) lexer.Token {
-	return Parse.ExpectError(ExpectedType, nil)
 }

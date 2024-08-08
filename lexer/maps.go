@@ -24,7 +24,6 @@ var (
 		':': COLON,
 		';': SEMI_COLON,
 		',': COMMA,
-		'"': TYPE_STRING,
 	}
 
 	assignmentMap = map[string]TokenType{
@@ -60,6 +59,7 @@ var (
 		"case":     KEYWORDS_CASE,
 		"default":  KEYWORDS_DEFAULT,
 		"class":    KEYWORDS_CLASS,
+		"new":      KEYOWRDS_NEW,
 	}
 
 	tokenTypeNames = map[TokenType]string{
@@ -118,6 +118,7 @@ var (
 		KEYWORDS_CATCH:      "KEYWORDS_CATCH",
 		KEYWORDS_IMPORT:     "KEYWORDS_IMPORT",
 		KEYWORDS_CLASS:      "KEYWORDS_CLASS",
+		KEYOWRDS_NEW:        "KEYWORDS_NEW",
 	}
 )
 

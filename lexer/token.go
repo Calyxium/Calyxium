@@ -46,12 +46,11 @@ const (
 	DIVIDE_ASSIGN       // /=
 
 	IDENTIFIER
-	TYPE_STRING  // "Hello"
-	TYPE_INT     // 10
-	TYPE_FLOAT   // 10.0
-	TYPE_BOOLEAN // True or False
-	TYPE_ANY     // any
-
+	TYPE_STRING       // "Hello"
+	TYPE_INT          // 10
+	TYPE_FLOAT        // 10.0
+	TYPE_BOOLEAN      // True or False
+	STRING            // "Hello"
 	KEYWORDS_FUNCTION // function
 	KEYWORDS_IF       // if
 	KEYWORDS_ELSE     // else
@@ -69,5 +68,6 @@ const (
 	KEYWORDS_IMPORT   // import
 	KEYWORDS_CLASS    // class
 	KEYWORDS_THIS     // this
+	KEYOWRDS_NEW      // new
 
 )

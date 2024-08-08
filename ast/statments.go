@@ -4,13 +4,7 @@ type BlockStmt struct {
 	Body []Stmt
 }
 
-func (Node BlockStmt) stmt() {}
-
-type ExpressionStmt struct {
-	Expression Expr
-}
-
-func (Node ExpressionStmt) stmt() {}
+func (b BlockStmt) stmt() {}
 
 type VarDeclarationStmt struct {
 	Identifier    string
@@ -19,7 +13,13 @@ type VarDeclarationStmt struct {
 	ExplicitType  Type
 }
 
-func (Node VarDeclarationStmt) stmt() {}
+func (n VarDeclarationStmt) stmt() {}
+
+type ExpressionStmt struct {
+	Expression Expr
+}
+
+func (n ExpressionStmt) stmt() {}
 
 type Parameter struct {
 	Name string
@@ -33,7 +33,7 @@ type FunctionDeclarationStmt struct {
 	ReturnType Type
 }
 
-func (Node FunctionDeclarationStmt) stmt() {}
+func (n FunctionDeclarationStmt) stmt() {}
 
 type IfStmt struct {
 	Condition  Expr
@@ -41,24 +41,27 @@ type IfStmt struct {
 	Alternate  Stmt
 }
 
-func (Node IfStmt) stmt() {}
+func (n IfStmt) stmt() {}
 
 type ImportStmt struct {
 	Name string
 	From string
 }
 
-func (Node ImportStmt) stmt() {}
+func (n ImportStmt) stmt() {}
+
+type ForeachStmt struct {
+	Value    string
+	Index    bool
+	Iterable Expr
+	Body     []Stmt
+}
+
+func (n ForeachStmt) stmt() {}
 
 type ClassDeclarationStmt struct {
 	Name string
 	Body []Stmt
 }
 
-func (Node ClassDeclarationStmt) stmt() {}
-
-type ReturnStmt struct {
-	Value Expr
-}
-
-func (Node ReturnStmt) stmt() {}
+func (n ClassDeclarationStmt) stmt() {}

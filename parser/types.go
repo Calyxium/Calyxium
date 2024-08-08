@@ -2,86 +2,76 @@ package parser
 
 import (
 	"fmt"
+
 	"plutonium/ast"
 	"plutonium/lexer"
 )
 
 type TypeNudHandler func(Parse *Parser) ast.Type
-type TypeLedHanlder func(Parse *Parser, Left ast.Type, Bp BindingPower) ast.Type
+type TypeLedHandler func(Parse *Parser, left ast.Type, bp binding_power) ast.Type
 
 type TypeNudLookup map[lexer.TokenType]TypeNudHandler
-type TypeLedLookup map[lexer.TokenType]TypeLedHanlder
-type TypeBindingPowerLookup map[lexer.TokenType]BindingPower
+type TypeLedLookup map[lexer.TokenType]TypeLedHandler
+type TypeBindingPowerLookup map[lexer.TokenType]binding_power
 
-var (
-	TypeBindingPowerLu = BindingPowerLookup{}
-	TypeNudLu          = TypeNudLookup{}
-	TypeLedLu          = TypeLedLookup{}
-)
+var TypeBindingPowerLu = TypeBindingPowerLookup{}
+var TypeNudLu = TypeNudLookup{}
+var TypeLedLu = TypeLedLookup{}
 
-func TypeLed(Type lexer.TokenType, BindingPower BindingPower, LedFunction TypeLedHanlder) {
-	TypeBindingPowerLu[Type] = BindingPower
-	TypeLedLu[Type] = LedFunction
+func TypeLed(kind lexer.TokenType, bp binding_power, led_fn TypeLedHandler) {
+	TypeBindingPowerLu[kind] = bp
+	TypeLedLu[kind] = led_fn
 }
 
-func TypeNud(Type lexer.TokenType, BindingPower BindingPower, NudFunction TypeNudHandler) {
-	TypeBindingPowerLu[Type] = PRIMARY
-	TypeNudLu[Type] = NudFunction
+func TypeNud(kind lexer.TokenType, bp binding_power, nud_fn TypeNudHandler) {
+	TypeBindingPowerLu[kind] = primary
+	TypeNudLu[kind] = nud_fn
 }
 
-func CreateTokenTypeLookup() {
-	TypeNud(lexer.IDENTIFIER, PRIMARY, func(Parse *Parser) ast.Type {
-		return ast.SymbolType{
-			Name: Parse.advance().Literal,
-		}
-	})
-
-	TypeNud(lexer.OPEN_BRACKET, MEMBER, func(Parse *Parser) ast.Type {
-		Parse.advance()
-		Parse.Expect(lexer.CLOSE_BRACKET)
-		InsideType := ParseType(Parse, DEFAULT_BP)
-
-		return ast.ArrayType{
-			Underlying: InsideType,
-		}
-	})
-}
-
-func ParseSymbolType(Parse *Parser) ast.Type {
+func TypePrimary(Parse *Parser) ast.Type {
 	return ast.SymbolType{
-		Name: Parse.Expect(lexer.IDENTIFIER).Literal,
+		Value: Parse.advance().Literal,
 	}
 }
 
-func ParseArrayType(Parse *Parser) ast.Type {
-	Parse.advance()
-	Parse.Expect(lexer.CLOSE_BRACKET)
-	var UnderlyingType = ParseType(Parse, DEFAULT_BP)
-	return ast.ArrayType{
-		Underlying: UnderlyingType,
-	}
+func CreateTypeTokenLookup() {
+	TypeNud(lexer.IDENTIFIER, primary, TypePrimary)
+	TypeNud(lexer.TYPE_BOOLEAN, primary, TypePrimary)
+	TypeNud(lexer.TYPE_INT, primary, TypePrimary)
+	TypeNud(lexer.TYPE_STRING, primary, TypePrimary)
+	TypeNud(lexer.TYPE_FLOAT, primary, TypePrimary)
+
+	TypeNud(lexer.OPEN_BRACKET, member, func(Parse *Parser) ast.Type {
+		Parse.advance()
+		Parse.expect(lexer.CLOSE_BRACKET)
+		insideType := ParseType(Parse, defalt_bp)
+
+		return ast.ListType{
+			Underlying: insideType,
+		}
+	})
 }
 
-func ParseType(Parse *Parser, BindingPower BindingPower) ast.Type {
-	TokenType := Parse.CurrentTokenType()
-	NudFunction, exists := TypeNudLu[TokenType]
+func ParseType(Parse *Parser, bp binding_power) ast.Type {
+	TokenType := Parse.currentTokenKind()
+	nud_fn, exists := TypeNudLu[TokenType]
 
 	if !exists {
-		panic(fmt.Sprintf("Type Nud handler expected for token %v\n", lexer.TokenTypeToString(TokenType)))
+		panic(fmt.Sprintf("type: NUD Handler expected for token %s\n", lexer.TokenTypeToString(TokenType)))
 	}
 
-	Left := NudFunction(Parse)
+	left := nud_fn(Parse)
 
-	for TypeBindingPowerLu[Parse.CurrentTokenType()] > BindingPower {
-		TokenType = Parse.CurrentTokenType()
-		LedFunction, exists := TypeLedLu[TokenType]
+	for TypeBindingPowerLu[Parse.currentTokenKind()] > bp {
+		TokenType = Parse.currentTokenKind()
+		led_fn, exists := TypeLedLu[TokenType]
 
 		if !exists {
-			panic(fmt.Sprintf("Type Led handler expected for token %v\n", lexer.TokenTypeToString(TokenType)))
+			panic(fmt.Sprintf("type: LED Handler expected for token %s\n", lexer.TokenTypeToString(TokenType)))
 		}
 
-		Left = LedFunction(Parse, Left, BindingPowerLu[Parse.CurrentTokenType()])
+		left = led_fn(Parse, left, bp)
 	}
 
-	return Left
+	return left
 }

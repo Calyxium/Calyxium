@@ -6,6 +6,7 @@ import (
 	"plutonium/lexer"
 	"plutonium/parser"
 	"plutonium/repl"
+	"time"
 
 	"github.com/sanity-io/litter"
 )
@@ -57,10 +58,11 @@ func main() {
 		tokens = append(tokens, tok)
 	}
 
+	start := time.Now()
 	ast := parser.Parse(tokens)
-	litter.Dump(ast)
 
-	//for _, tok := range tokens {
-	//	fmt.Printf("{Token Type: %v, Value: %v}\n", tok.Type, tok.Literal)
-	//}
+	duration := time.Since(start)
+	litter.Dump(ast)
+	fmt.Printf("Duration: %v\n", duration)
+
 }

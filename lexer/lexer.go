@@ -2,8 +2,7 @@ package lexer
 
 import (
 	"fmt"
-	"plutonium/inc"
-	"strings"
+	"plutonium/errors"
 )
 
 type Lexer struct {
@@ -42,14 +41,8 @@ func (lex *Lexer) LineContent(line int) string {
 func ReportError(lex *Lexer, char byte) {
 	lineContent := lex.LineContent(lex.Line)
 
-	fmt.Printf(inc.Red+"Error"+inc.Reset+": [line: "+inc.Blue+"%d"+inc.Reset+", column: "+inc.Cyan+"%d"+inc.Reset+"] "+inc.Yellow+"Unexpected character '%c'\n"+inc.Reset, lex.Line, lex.Column, char)
-
-	fmt.Printf(" %d | %s\n", lex.Line, lineContent)
-	caretPosition := lex.Column - 1
-	if caretPosition < 0 {
-		caretPosition = 0
-	}
-	fmt.Printf("   | %s^\n", strings.Repeat(" ", caretPosition))
+	err := errors.NewLexerError(lex.Line, lex.Column, char, lineContent, "Unexpected character")
+	fmt.Print(err.Error())
 	lex.advance()
 }
 
@@ -85,17 +78,24 @@ func (lex *Lexer) advance() {
 	lex.ReadPosition++
 }
 
-func (lex *Lexer) ReadString() string {
+func (lex *Lexer) ReadString() Token {
 	startPosition := lex.Position + 1
-	for {
-		lex.advance()
-		if lex.CurrentChar == '"' {
-			break
-		}
-	}
-	str := lex.Content[startPosition:lex.Position]
 	lex.advance()
-	return str
+
+	for lex.CurrentChar != '"' && lex.CurrentChar != 0 {
+		lex.advance()
+	}
+
+	var literal string
+	if lex.CurrentChar == '"' {
+		literal = lex.Content[startPosition:lex.Position]
+		lex.advance()
+	} else {
+		ReportError(lex, lex.CurrentChar)
+		literal = lex.Content[startPosition:lex.Position]
+	}
+
+	return CreateToken(STRING, literal)
 }
 
 func (lex *Lexer) ReadIdentifier() string {
@@ -129,10 +129,10 @@ func (lex *Lexer) Peek() byte {
 	return lex.Content[lex.ReadPosition]
 }
 
-func CreateToken(tokenType TokenType) Token {
+func CreateToken(tokenType TokenType, lit string) Token {
 	return Token{
 		Type:    tokenType,
-		Literal: TokenTypeToString(tokenType),
+		Literal: lit,
 	}
 }
 
@@ -145,15 +145,19 @@ func (lex *Lexer) Consume() Token {
 		return Token{Type: EOF, Literal: "EOF"}
 	}
 
+	if lex.CurrentChar == '"' {
+		return lex.ReadString()
+	}
+
 	if tokenType := GetAssignmentType(string(lex.CurrentChar) + string(lex.Peek())); tokenType != ERROR {
-		tok = CreateToken(tokenType)
+		tok = CreateToken(tokenType, string(lex.CurrentChar)+string(lex.Peek()))
 		lex.advance()
 		lex.advance()
 		return tok
 	}
 
 	if tokenType := GetOperatorType(lex.CurrentChar); tokenType != ERROR {
-		tok = CreateToken(tokenType)
+		tok = CreateToken(tokenType, string(lex.CurrentChar))
 		lex.advance()
 		return tok
 	}
@@ -172,7 +176,7 @@ func (lex *Lexer) Consume() Token {
 		}
 		return tok
 	default:
-		tok = CreateToken(ERROR)
+		tok = CreateToken(ERROR, "ERROR")
 		ReportError(lex, lex.CurrentChar)
 	}
 

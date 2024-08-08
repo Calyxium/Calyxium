@@ -1,24 +1,34 @@
 package ast
 
-import "plutonium/lexer"
+import (
+	"plutonium/lexer"
+)
+
+// --------------------
+// Literal Expressions
+// --------------------
 
 type NumberExpr struct {
 	Value float64
 }
 
-func (Node NumberExpr) expr() {}
+func (n NumberExpr) expr() {}
 
 type StringExpr struct {
 	Value string
 }
 
-func (Node StringExpr) expr() {}
+func (n StringExpr) expr() {}
 
-type IdentExpr struct {
+type SymbolExpr struct {
 	Value string
 }
 
-func (Node IdentExpr) expr() {}
+func (n SymbolExpr) expr() {}
+
+// --------------------
+// Complex Expressions
+// --------------------
 
 type BinaryExpr struct {
 	Left     Expr
@@ -26,29 +36,28 @@ type BinaryExpr struct {
 	Right    Expr
 }
 
-func (Node BinaryExpr) expr() {}
-
-type PrefixExpr struct {
-	Operator  lexer.Token
-	RightExpr Expr
-}
-
-func (Node PrefixExpr) expr() {}
+func (n BinaryExpr) expr() {}
 
 type AssignmentExpr struct {
-	Operator      lexer.Token
 	Assigne       Expr
 	AssignedValue Expr
 }
 
-func (Node AssignmentExpr) expr() {}
+func (n AssignmentExpr) expr() {}
+
+type PrefixExpr struct {
+	Operator lexer.Token
+	Right    Expr
+}
+
+func (n PrefixExpr) expr() {}
 
 type MemberExpr struct {
 	Member   Expr
 	Property string
 }
 
-func (Node MemberExpr) expr() {}
+func (n MemberExpr) expr() {}
 
 type CallExpr struct {
 	Method    Expr
@@ -79,12 +88,11 @@ type FunctionExpr struct {
 
 func (n FunctionExpr) expr() {}
 
-type ArrayInstantiationExpr struct {
-	Underlying Type
-	Contents   []Expr
+type ArrayLiteral struct {
+	Contents []Expr
 }
 
-func (Node ArrayInstantiationExpr) expr() {}
+func (n ArrayLiteral) expr() {}
 
 type NewExpr struct {
 	Instantiation CallExpr
