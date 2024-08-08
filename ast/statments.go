@@ -50,18 +50,15 @@ type ImportStmt struct {
 
 func (n ImportStmt) stmt() {}
 
-type ForeachStmt struct {
-	Value    string
-	Index    bool
-	Iterable Expr
-	Body     []Stmt
-}
-
-func (n ForeachStmt) stmt() {}
-
 type ClassDeclarationStmt struct {
 	Name string
 	Body []Stmt
 }
 
 func (n ClassDeclarationStmt) stmt() {}
+
+type ReturnStmt struct {
+	Value Expr
+}
+
+func (n ReturnStmt) stmt() {}

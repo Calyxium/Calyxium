@@ -64,9 +64,14 @@ func ParseBinaryExpr(Parse *Parser, left ast.Expr, bp binding_power) ast.Expr {
 
 func ParsePrimaryExpr(Parse *Parser) ast.Expr {
 	switch Parse.currentTokenKind() {
-	case lexer.TYPE_INT:
+	case lexer.TYPE_FLOAT:
 		number, _ := strconv.ParseFloat(Parse.advance().Literal, 64)
-		return ast.NumberExpr{
+		return ast.FloatExpr{
+			Value: number,
+		}
+	case lexer.TYPE_INT:
+		number, _ := strconv.ParseInt(Parse.advance().Literal, 0, 64)
+		return ast.IntExpr{
 			Value: number,
 		}
 	case lexer.STRING:

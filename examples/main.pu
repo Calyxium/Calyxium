@@ -1,26 +1,4 @@
-import fs;
-import path;
-import time;
-
-class DirectoryReader {
-    let directoryPath: string;
-    
-    function mount(directoryPath: string) {
-        this.directoryPath = directoryPath;
-    }
-
-    function readRecentFiles() {
-        let allFiles: []string = fs.readDir(this.directoryPath);
-        let recentFiles: []string = [];
-
-        let fullPath: string = path.join(this.directoryPath, file);
-        let fileInfo: FileInfo = fs.stat(fullPath);
-
-        if this.directoryPath(fileInfo.creationTime) {
-            recentFiles.push(fullPath);
-        }
-
-    }
-
-    puts(file, fs.stat(file).creationTime);
+function main() {
+    let x: float = 10.0;
+    return x;
 }

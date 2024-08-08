@@ -76,6 +76,7 @@ func CreateTokenLookup() {
 
 	// Literals & Symbols
 	Nud(lexer.TYPE_INT, primary, ParsePrimaryExpr)
+	Nud(lexer.TYPE_FLOAT, primary, ParsePrimaryExpr)
 	Nud(lexer.STRING, primary, ParsePrimaryExpr)
 	Nud(lexer.IDENTIFIER, primary, ParsePrimaryExpr)
 
@@ -108,4 +109,5 @@ func CreateTokenLookup() {
 	Stmt(lexer.KEYWORDS_IF, ParseIfStmt)
 	Stmt(lexer.KEYWORDS_IMPORT, ParseImportStmt)
 	Stmt(lexer.KEYWORDS_CLASS, ParseClassDeclStmt)
+	Stmt(lexer.KEYWORDS_RETURN, ParseReturnStmt)
 }

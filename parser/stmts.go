@@ -172,3 +172,14 @@ func ParseClassDeclStmt(Parse *Parser) ast.Stmt {
 		Body: ast.ExpectStmt[ast.BlockStmt](classBody).Body,
 	}
 }
+
+func ParseReturnStmt(Parse *Parser) ast.Stmt {
+	Parse.advance()
+
+	ReturnValue := ParseExpr(Parse, defalt_bp)
+	Parse.expect(lexer.SEMI_COLON)
+
+	return ast.ReturnStmt{
+		Value: ReturnValue,
+	}
+}
