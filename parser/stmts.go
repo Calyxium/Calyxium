@@ -45,8 +45,6 @@ func ParseVarDeclStmt(Parse *Parser) ast.Stmt {
 		panic("Missing explicit type for variable declaration.")
 	}
 
-	Parse.Expect(lexer.SEMI_COLON)
-
 	if isConstant && assignmentValue == nil {
 		panic("Cannot define constant variable without providing default value.")
 	}

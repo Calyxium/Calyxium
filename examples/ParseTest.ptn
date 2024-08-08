@@ -1,13 +1,6 @@
-let x: number = 10 + (35 / 5 - -5);
+class Dict {
+    let x: number;
 
-struct Rect {
-    width: number;
-    height: number;
+    function main() {
+    }
 }
-
-const r1 = Rect{
-    width: 10,
-    height: 10,
-};
-
-const number = []number{1, 2};
