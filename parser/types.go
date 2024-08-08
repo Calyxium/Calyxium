@@ -40,6 +40,7 @@ func CreateTypeTokenLookup() {
 	TypeNud(lexer.TYPE_INT, primary, TypePrimary)
 	TypeNud(lexer.TYPE_STRING, primary, TypePrimary)
 	TypeNud(lexer.TYPE_FLOAT, primary, TypePrimary)
+	TypeNud(lexer.TYPE_ANY, primary, TypePrimary)
 
 	TypeNud(lexer.OPEN_BRACKET, member, func(Parse *Parser) ast.Type {
 		Parse.advance()

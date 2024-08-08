@@ -50,6 +50,7 @@ const (
 	TYPE_INT          // 10
 	TYPE_FLOAT        // 10.0
 	TYPE_BOOLEAN      // True or False
+	TYPE_ANY          // any
 	STRING            // "Hello"
 	KEYWORDS_FUNCTION // function
 	KEYWORDS_IF       // if

@@ -1,4 +1,1 @@
-function main() {
-    let x: float = 10.0;
-    return x;
-}
+let x: any = 10;
