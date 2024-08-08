@@ -129,10 +129,10 @@ func (lex *Lexer) Peek() byte {
 	return lex.Content[lex.ReadPosition]
 }
 
-func CreateToken(tokenType TokenType, char byte) Token {
+func CreateToken(tokenType TokenType) Token {
 	return Token{
 		Type:    tokenType,
-		Literal: string(char),
+		Literal: TokenTypeToString(tokenType),
 	}
 }
 
@@ -145,18 +145,15 @@ func (lex *Lexer) Consume() Token {
 		return Token{Type: EOF, Literal: "EOF"}
 	}
 
+	if tokenType := GetAssignmentType(string(lex.CurrentChar) + string(lex.Peek())); tokenType != ERROR {
+		tok = CreateToken(tokenType)
+		lex.advance()
+		lex.advance()
+		return tok
+	}
+
 	if tokenType := GetOperatorType(lex.CurrentChar); tokenType != ERROR {
-		if tokenType == TYPE_STRING {
-			tok.Type = TYPE_STRING
-			tok.Literal = lex.ReadString()
-			return tok
-		}
-		tok = CreateToken(tokenType, lex.CurrentChar)
-		if lex.Peek() == '=' {
-			lex.advance()
-			tok.Type = GetAssignmentType(lex.CurrentChar)
-			tok.Literal = TokenTypeToString(tok.Type)
-		}
+		tok = CreateToken(tokenType)
 		lex.advance()
 		return tok
 	}
@@ -172,11 +169,10 @@ func (lex *Lexer) Consume() Token {
 		tok.Type = TYPE_INT
 		if isFloat {
 			tok.Type = TYPE_FLOAT
-			return tok
 		}
 		return tok
 	default:
-		tok = CreateToken(ERROR, lex.CurrentChar)
+		tok = CreateToken(ERROR)
 		ReportError(lex, lex.CurrentChar)
 	}
 

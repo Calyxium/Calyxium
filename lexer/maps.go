@@ -27,15 +27,16 @@ var (
 		'"': TYPE_STRING,
 	}
 
-	assignmentMap = map[byte]TokenType{
-		'=': EQUALS,
-		'+': PLUS_ASSIGN,
-		'-': MINUS_ASSIGN,
-		'*': MULTIPLY_ASSIGN,
-		'/': DIVIDE_ASSIGN,
-		'<': LESS_THAN_EQUALS,
-		'>': GREATER_THAN_EQUALS,
-		'|': LOGICAL_OR,
+	assignmentMap = map[string]TokenType{
+		"==": EQUALS,
+		"+=": PLUS_ASSIGN,
+		"-=": MINUS_ASSIGN,
+		"*=": MULTIPLY_ASSIGN,
+		"/=": DIVIDE_ASSIGN,
+		"<=": LESS_THAN_EQUALS,
+		">=": GREATER_THAN_EQUALS,
+		"||": LOGICAL_OR,
+		"!=": NOT_EQUALS,
 	}
 
 	keywordMap = map[string]TokenType{
@@ -59,7 +60,6 @@ var (
 		"case":     KEYWORDS_CASE,
 		"default":  KEYWORDS_DEFAULT,
 		"class":    KEYWORDS_CLASS,
-		"this":     KEYWORDS_THIS,
 	}
 
 	tokenTypeNames = map[TokenType]string{
@@ -118,7 +118,6 @@ var (
 		KEYWORDS_CATCH:      "KEYWORDS_CATCH",
 		KEYWORDS_IMPORT:     "KEYWORDS_IMPORT",
 		KEYWORDS_CLASS:      "KEYWORDS_CLASS",
-		KEYWORDS_THIS:       "KEYWORDS_THIS",
 	}
 )
 
@@ -153,7 +152,7 @@ func GetOperatorType(char byte) TokenType {
 	return ERROR
 }
 
-func GetAssignmentType(char byte) TokenType {
+func GetAssignmentType(char string) TokenType {
 	if tokenType, exists := assignmentMap[char]; exists {
 		return tokenType
 	}

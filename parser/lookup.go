@@ -68,8 +68,8 @@ func CreateTokenLookup() {
 	Led(lexer.LESS_THAN_EQUALS, RELATIONAL, ParseBinaryExpr)
 	Led(lexer.GT, RELATIONAL, ParseBinaryExpr)
 	Led(lexer.GREATER_THAN_EQUALS, RELATIONAL, ParseBinaryExpr)
-	Led(lexer.ASSIGN, RELATIONAL, ParseBinaryExpr)
 	Led(lexer.NOT_EQUALS, RELATIONAL, ParseBinaryExpr)
+	Led(lexer.EQUALS, RELATIONAL, ParseAssignmentExpr)
 
 	// Additive & Multiplicitave
 	Led(lexer.PLUS, ADDITIVE, ParseBinaryExpr)

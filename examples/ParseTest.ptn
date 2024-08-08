@@ -1,6 +1,1 @@
-class Dict {
-    let x: number;
-
-    function main() {
-    }
-}
+this.e = x + y;

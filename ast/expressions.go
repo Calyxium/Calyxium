@@ -36,6 +36,7 @@ type PrefixExpr struct {
 func (Node PrefixExpr) expr() {}
 
 type AssignmentExpr struct {
+	Operator      lexer.Token
 	Assigne       Expr
 	AssignedValue Expr
 }

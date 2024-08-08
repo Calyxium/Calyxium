@@ -78,10 +78,11 @@ func ParsePrefixExpr(Parse *Parser) ast.Expr {
 }
 
 func ParseAssignmentExpr(Parse *Parser, Left ast.Expr, BindingPower BindingPower) ast.Expr {
-	Parse.advance()
+	OperatorToken := Parse.advance()
 	Rhs := ParseExpr(Parse, BindingPower)
 
 	return ast.AssignmentExpr{
+		Operator:      OperatorToken,
 		Assigne:       Left,
 		AssignedValue: Rhs,
 	}
