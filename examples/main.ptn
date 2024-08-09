@@ -1,5 +1,9 @@
-for {
-    let x = function () {
-        this.e = 10;
-    };
+function name(Name: string): string {
+    if Name != nil {
+        puts("Name not found!");
+    } else {
+        return Name;
+    }
 }
+
+name("Azlo");

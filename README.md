@@ -39,7 +39,7 @@ Plutonium is designed to be easy to learn and use. Here are some basic commands 
 
 - `puts("Hello, world!");`: Prints a message to the standard output.
 - `let x: int = 10;` Declares a variable `x` and assigns it the value of `int 10`.
-- `if (condition) { ... }`: Executes a block of code if the condition is true.
+- `if condition { ... }`: Executes a block of code if the condition is true.
 
 For a more indepth tutorial, refer to the [official documentation](#)
 
@@ -60,7 +60,7 @@ Here are some examples to help you get started with Plutonium:
 - **Conditional Statements**:
     ```
     let age: int = 25;
-    if (age >= 18) {
+    if age >= 18 {
         puts("You are an adult.");
     } else {
         puts("You are not an adult.");
