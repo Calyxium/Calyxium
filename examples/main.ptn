@@ -1,9 +1,3 @@
-function name(Name: string): string {
-    if Name != nil {
-        puts("Name not found!");
-    } else {
-        return Name;
-    }
+function add() {
+    return 10 + "Hello";
 }
-
-name("Azlo");
