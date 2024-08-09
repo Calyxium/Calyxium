@@ -1,0 +1,5 @@
+let x: int = 10;
+let y: float = 10.0;
+let z: string = "Hello";
+let a: bool = false;
+let b: any = 10;

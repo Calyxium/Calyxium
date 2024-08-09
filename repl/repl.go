@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"io"
 	"plutonium/lexer"
+	"plutonium/parser"
 	"runtime"
 	"time"
+
+	"github.com/sanity-io/litter"
 )
 
 var (
@@ -78,8 +81,14 @@ func Repl(in io.Reader, out io.Writer) {
 			continue
 		}
 
+		parse(tokens)
 		printTokens(out, tokens)
 	}
+}
+
+func parse(tokens []lexer.Token) {
+	ast := parser.Parse(tokens)
+	litter.Dump(ast)
 }
 
 func tokenize(input string) ([]lexer.Token, error) {

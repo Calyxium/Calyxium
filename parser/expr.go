@@ -82,6 +82,16 @@ func ParsePrimaryExpr(Parse *Parser) ast.Expr {
 		return ast.SymbolExpr{
 			Value: Parse.advance().Literal,
 		}
+	case lexer.KEYWORDS_TRUE:
+		Parse.advance()
+		return ast.BooleanExpr{
+			IsTrue: true,
+		}
+	case lexer.KEYWORDS_FALSE:
+		Parse.advance()
+		return ast.BooleanExpr{
+			IsTrue: false,
+		}
 	default:
 		panic(fmt.Sprintf("Cannot create primary_expr from %s\n", lexer.TokenTypeToString(Parse.currentTokenKind())))
 	}

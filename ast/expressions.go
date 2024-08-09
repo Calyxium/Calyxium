@@ -105,3 +105,9 @@ type NewExpr struct {
 }
 
 func (n NewExpr) expr() {}
+
+type BooleanExpr struct {
+	IsTrue bool
+}
+
+func (n BooleanExpr) expr() {}
