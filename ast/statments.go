@@ -62,3 +62,12 @@ type ReturnStmt struct {
 }
 
 func (n ReturnStmt) stmt() {}
+
+type ForStmt struct {
+	Init      Expr   // Initialization expression (e.g., 'var i = 0')
+	Condition Expr   // Loop condition (e.g., 'i < 10')
+	Post      Expr   // Post-expression (e.g., 'i++')
+	Body      []Stmt // Body of the loop
+}
+
+func (n ForStmt) stmt() {}

@@ -112,4 +112,5 @@ func CreateTokenLookup() {
 	Stmt(lexer.KEYWORDS_IMPORT, ParseImportStmt)
 	Stmt(lexer.KEYWORDS_CLASS, ParseClassDeclStmt)
 	Stmt(lexer.KEYWORDS_RETURN, ParseReturnStmt)
+	Stmt(lexer.KEYWORDS_FOR, ParseForStmt)
 }

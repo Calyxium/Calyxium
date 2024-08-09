@@ -183,3 +183,48 @@ func ParseReturnStmt(Parse *Parser) ast.Stmt {
 		Value: ReturnValue,
 	}
 }
+
+func ParseForStmt(Parse *Parser) ast.Stmt {
+	Parse.advance()
+
+	var init ast.Expr
+	var condition ast.Expr
+	var post ast.Expr
+	var body []ast.Stmt
+
+	if Parse.currentTokenKind() == lexer.OPEN_PAREN {
+		Parse.expect(lexer.OPEN_PAREN)
+
+		if Parse.currentTokenKind() != lexer.SEMI_COLON && Parse.currentTokenKind() != lexer.CLOSE_PAREN {
+			init = ParseExpr(Parse, defalt_bp)
+		}
+		Parse.expect(lexer.SEMI_COLON)
+
+		if Parse.currentTokenKind() != lexer.SEMI_COLON && Parse.currentTokenKind() != lexer.CLOSE_PAREN {
+			condition = ParseExpr(Parse, defalt_bp)
+		} else {
+			condition = ast.BooleanExpr{IsTrue: true}
+		}
+		Parse.expect(lexer.SEMI_COLON)
+
+		if Parse.currentTokenKind() != lexer.CLOSE_PAREN {
+			post = ParseExpr(Parse, defalt_bp)
+		}
+		Parse.expect(lexer.CLOSE_PAREN)
+	} else {
+		condition = ast.BooleanExpr{IsTrue: true}
+	}
+
+	if Parse.currentTokenKind() == lexer.OPEN_BRACE {
+		body = ast.ExpectStmt[ast.BlockStmt](ParseBlockStmt(Parse)).Body
+	} else {
+		body = []ast.Stmt{ParseStmt(Parse)}
+	}
+
+	return ast.ForStmt{
+		Init:      init,
+		Condition: condition,
+		Post:      post,
+		Body:      body,
+	}
+}
