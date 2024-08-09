@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"plutonium/checker"
 	"plutonium/lexer"
 	"plutonium/parser"
 	"runtime"
@@ -81,8 +82,18 @@ func Repl(in io.Reader, out io.Writer) {
 			continue
 		}
 
+		typeCheck(tokens)
 		parse(tokens)
 		printTokens(out, tokens)
+	}
+}
+
+func typeCheck(tokens []lexer.Token) {
+	ast := parser.Parse(tokens)
+	typeChecker := checker.NewTypeChecker()
+	if err := typeChecker.Check(ast); err != nil {
+		fmt.Println("Type checking failed:", err)
+		return
 	}
 }
 
