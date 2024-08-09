@@ -55,6 +55,8 @@ func CreateTokenLookup() {
 	Led(lexer.ASSIGN, assignment, ParseAssignmentExpr)
 	Led(lexer.PLUS_ASSIGN, assignment, ParseAssignmentExpr)
 	Led(lexer.MINUS_ASSIGN, assignment, ParseAssignmentExpr)
+	Led(lexer.MULTIPLY_ASSIGN, assignment, ParseAssignmentExpr)
+	Led(lexer.DIVIDE_ASSIGN, assignment, ParseAssignmentExpr)
 
 	// Logical
 	Led(lexer.LOGICAL_AND, logical, ParseBinaryExpr)
@@ -95,7 +97,7 @@ func CreateTokenLookup() {
 	// Grouping Expr
 	Nud(lexer.OPEN_PAREN, defalt_bp, ParseGroupingExpr)
 	Nud(lexer.KEYWORDS_FUNCTION, defalt_bp, ParseFunctionExpr)
-	Nud(lexer.KEYOWRDS_NEW, defalt_bp, func(Parse *Parser) ast.Expr {
+	Nud(lexer.KEYWORDS_NEW, defalt_bp, func(Parse *Parser) ast.Expr {
 		Parse.advance()
 		classInstantiation := ParseExpr(Parse, defalt_bp)
 

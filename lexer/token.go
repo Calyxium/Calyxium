@@ -69,6 +69,5 @@ const (
 	KEYWORDS_IMPORT   // import
 	KEYWORDS_CLASS    // class
 	KEYWORDS_THIS     // this
-	KEYOWRDS_NEW      // new
-
+	KEYWORDS_NEW      // new
 )
