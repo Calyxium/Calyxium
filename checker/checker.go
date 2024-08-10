@@ -13,10 +13,12 @@ type TypeChecker struct {
 	currentClass       *ast.ClassDeclarationStmt
 }
 
-func TypeToString(tp ast.Type) string {
+func (tc *TypeChecker) TypeToString(tp ast.Type) string {
 	switch t := tp.(type) {
 	case ast.SymbolType:
 		return t.Value
+	case ast.ListType:
+		return "[]" + tc.TypeToString(t.Underlying)
 	default:
 		return "unknown"
 	}
@@ -58,6 +60,10 @@ func (tc *TypeChecker) checkStmt(stmt ast.Stmt) error {
 		_, err := tc.checkExpr(s.Expression)
 		return err
 	case ast.FunctionDeclarationStmt:
+		tc.symbolTable[s.Name] = ast.FunctionType{
+			Parameters: funcParamsToTypes(s.Parameters),
+			ReturnType: s.ReturnType,
+		}
 		return tc.checkFunctionDeclaration(s)
 	case ast.ClassDeclarationStmt:
 		return tc.checkClassDeclaration(s)
@@ -67,6 +73,10 @@ func (tc *TypeChecker) checkStmt(stmt ast.Stmt) error {
 		return tc.checkImportStmt(s)
 	case ast.IfStmt:
 		return tc.checkIfStmt(s)
+	case ast.ForStmt:
+		return tc.checkForStmt(s)
+	case ast.BlockStmt:
+		return tc.Check(s)
 	default:
 		return fmt.Errorf("unsupported statement type: %T", s)
 	}
@@ -90,6 +100,8 @@ func (tc *TypeChecker) checkExpr(expr ast.Expr) (ast.Type, error) {
 		return tc.checkMemberExpr(e)
 	case ast.SymbolExpr:
 		return tc.checkSymbolExpr(e)
+	case ast.CallExpr:
+		return tc.checkCallExpr(e)
 	default:
 		return nil, fmt.Errorf("unsupported expression type: %T", e)
 	}
@@ -188,6 +200,69 @@ func (tc *TypeChecker) checkFunctionDeclaration(stmt ast.FunctionDeclarationStmt
 	return nil
 }
 
+func (tc *TypeChecker) checkForStmt(stmt ast.ForStmt) error {
+	if stmt.Init != nil {
+		if _, err := tc.checkExpr(stmt.Init); err != nil {
+			return err
+		}
+	}
+
+	if stmt.Condition != nil {
+		condType, err := tc.checkExpr(stmt.Condition)
+		if err != nil {
+			return err
+		}
+
+		if tc.TypeToString(condType) != "bool" {
+			return fmt.Errorf("type error: for loop condition must be of type bool, got %s", tc.TypeToString(condType))
+		}
+	}
+
+	if stmt.Post != nil {
+		if _, err := tc.checkExpr(stmt.Post); err != nil {
+			return err
+		}
+	}
+
+	for _, bodyStmt := range stmt.Body {
+		if err := tc.checkStmt(bodyStmt); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (tc *TypeChecker) checkCallExpr(expr ast.CallExpr) (ast.Type, error) {
+	funcType, err := tc.checkExpr(expr.Method)
+	if err != nil {
+		return nil, err
+	}
+
+	switch ft := funcType.(type) {
+	case ast.FunctionType:
+		if len(ft.Parameters) != len(expr.Arguments) {
+			return nil, fmt.Errorf("type error: function expects %d arguments but got %d", len(ft.Parameters), len(expr.Arguments))
+		}
+
+		for i, arg := range expr.Arguments {
+			argType, err := tc.checkExpr(arg)
+			if err != nil {
+				return nil, err
+			}
+
+			if argType != ft.Parameters[i] {
+				return nil, fmt.Errorf("type error: argument %d is of type %s but expected %s", i+1, tc.TypeToString(argType), tc.TypeToString(ft.Parameters[i]))
+			}
+		}
+
+		return ft.ReturnType, nil
+
+	default:
+		return nil, fmt.Errorf("type error: %s is not a function", tc.TypeToString(funcType))
+	}
+}
+
 func (tc *TypeChecker) checkClassDeclaration(stmt ast.ClassDeclarationStmt) error {
 	originalSymbolTable := tc.symbolTable
 	tc.symbolTable = make(map[string]ast.Type)
@@ -211,7 +286,7 @@ func (tc *TypeChecker) checkIfStmt(stmt ast.IfStmt) error {
 		return err
 	}
 
-	if TypeToString(ifType) != "bool" {
+	if tc.TypeToString(ifType) != "bool" {
 		return fmt.Errorf("type error: if condition type does not match bool")
 	}
 
@@ -246,12 +321,12 @@ func (tc *TypeChecker) checkMemberExpr(expr ast.MemberExpr) (ast.Type, error) {
 
 	structType, ok := objectType.(ast.StructType)
 	if !ok {
-		return nil, fmt.Errorf("type error: %s is not a struct or does not have members", TypeToString(objectType))
+		return nil, fmt.Errorf("type error: %s is not a struct or does not have members", tc.TypeToString(objectType))
 	}
 
 	propertyType, exists := structType.GetMemberType(expr.Property)
 	if !exists {
-		return nil, fmt.Errorf("property %s does not exist on type %s", expr.Property, TypeToString(objectType))
+		return nil, fmt.Errorf("property %s does not exist on type %s", expr.Property, tc.TypeToString(objectType))
 	}
 
 	return propertyType, nil
@@ -286,4 +361,12 @@ func (tc *TypeChecker) checkImportStmt(stmt ast.ImportStmt) error {
 
 func (tc *TypeChecker) moduleExists(moduleName string) bool {
 	return tc.knownModules[moduleName]
+}
+
+func funcParamsToTypes(params []ast.Parameter) []ast.Type {
+	types := make([]ast.Type, len(params))
+	for i, param := range params {
+		types[i] = param.Type
+	}
+	return types
 }
