@@ -12,6 +12,14 @@ class Person {
     }
 }
 
+function ifTest(x: int, y: int): int {
+    if x != y {
+        return x;
+    } else {
+        return y;
+    }
+}
+
 function test(i: int): int {
     for i < i + i; {
         return i;
