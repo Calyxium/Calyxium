@@ -65,6 +65,18 @@ type MemberExpr struct {
 
 func (n MemberExpr) expr() {}
 
+type StructType struct {
+	Name    string
+	Members map[string]Type
+}
+
+func (st StructType) _type() {}
+
+func (st StructType) GetMemberType(memberName string) (Type, bool) {
+	memberType, exists := st.Members[memberName]
+	return memberType, exists
+}
+
 type CallExpr struct {
 	Method    Expr
 	Arguments []Expr
@@ -93,6 +105,8 @@ type FunctionExpr struct {
 }
 
 func (n FunctionExpr) expr() {}
+
+func (f FunctionExpr) _type() {}
 
 type ArrayLiteral struct {
 	Contents []Expr

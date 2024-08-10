@@ -58,7 +58,7 @@ func ParseType(Parse *Parser, bp binding_power) ast.Type {
 	nud_fn, exists := TypeNudLu[TokenType]
 
 	if !exists {
-		panic(fmt.Sprintf("type: NUD Handler expected for token %s\n", lexer.TokenTypeToString(TokenType)))
+		fmt.Print(fmt.Errorf("type: NUD Handler expected for token %s", lexer.TokenTypeToString(TokenType)))
 	}
 
 	left := nud_fn(Parse)
@@ -68,7 +68,7 @@ func ParseType(Parse *Parser, bp binding_power) ast.Type {
 		led_fn, exists := TypeLedLu[TokenType]
 
 		if !exists {
-			panic(fmt.Sprintf("type: LED Handler expected for token %s\n", lexer.TokenTypeToString(TokenType)))
+			fmt.Print(fmt.Errorf("type: LED Handler expected for token %s", lexer.TokenTypeToString(TokenType)))
 		}
 
 		left = led_fn(Parse, left, bp)

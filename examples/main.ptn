@@ -1,3 +1,8 @@
-function add() {
-    return 10 + "Hello";
+class Person {
+    let name: string = "Alice";
+    let age: int = 30;
+
+    function greet(): string {
+        return "Hello, " + this.name;
+    }
 }

@@ -30,10 +30,10 @@ func (Parse *Parser) expectError(expectedKind lexer.TokenType, err any) lexer.To
 
 	if kind != expectedKind {
 		if err == nil {
-			err = fmt.Sprintf("Expected %s but recieved %s instead\n", lexer.TokenTypeToString(expectedKind), lexer.TokenTypeToString(kind))
+			err = fmt.Errorf("expected %s but recieved %s instead", lexer.TokenTypeToString(expectedKind), lexer.TokenTypeToString(kind))
 		}
 
-		panic(err)
+		fmt.Print(err)
 	}
 
 	return Parse.advance()

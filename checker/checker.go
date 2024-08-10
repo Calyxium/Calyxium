@@ -8,11 +8,29 @@ import (
 type TypeChecker struct {
 	symbolTable        map[string]ast.Type
 	expectedReturnType ast.Type
+	importedModules    map[string]bool
+	knownModules       map[string]bool
+	currentClass       *ast.ClassDeclarationStmt
+}
+
+func TypeToString(tp ast.Type) string {
+	switch t := tp.(type) {
+	case ast.SymbolType:
+		return t.Value
+	default:
+		return "unknown"
+	}
 }
 
 func NewTypeChecker() *TypeChecker {
 	return &TypeChecker{
-		symbolTable: make(map[string]ast.Type),
+		symbolTable:     make(map[string]ast.Type),
+		importedModules: make(map[string]bool),
+		knownModules: map[string]bool{
+			"math":    true,
+			"strings": true,
+			"json":    true,
+		},
 	}
 }
 
@@ -45,6 +63,10 @@ func (tc *TypeChecker) checkStmt(stmt ast.Stmt) error {
 		return tc.checkClassDeclaration(s)
 	case ast.ReturnStmt:
 		return tc.checkReturnStmt(s)
+	case ast.ImportStmt:
+		return tc.checkImportStmt(s)
+	case ast.IfStmt:
+		return tc.checkIfStmt(s)
 	default:
 		return fmt.Errorf("unsupported statement type: %T", s)
 	}
@@ -64,9 +86,21 @@ func (tc *TypeChecker) checkExpr(expr ast.Expr) (ast.Type, error) {
 		return tc.checkBinaryExpr(e)
 	case ast.AssignmentExpr:
 		return tc.checkAssignmentExpr(e)
+	case ast.MemberExpr:
+		return tc.checkMemberExpr(e)
+	case ast.SymbolExpr:
+		return tc.checkSymbolExpr(e)
 	default:
 		return nil, fmt.Errorf("unsupported expression type: %T", e)
 	}
+}
+
+func (tc *TypeChecker) checkSymbolExpr(expr ast.SymbolExpr) (ast.Type, error) {
+	if symbolType, exists := tc.symbolTable[expr.Value]; exists {
+		return symbolType, nil
+	}
+
+	return nil, fmt.Errorf("type error: symbol %s not found", expr.Value)
 }
 
 func (tc *TypeChecker) checkVarDeclaration(stmt ast.VarDeclarationStmt) error {
@@ -112,6 +146,7 @@ func (tc *TypeChecker) checkBinaryExpr(expr ast.BinaryExpr) (ast.Type, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	rightType, err := tc.checkExpr(expr.Right)
 	if err != nil {
 		return nil, err
@@ -122,7 +157,12 @@ func (tc *TypeChecker) checkBinaryExpr(expr ast.BinaryExpr) (ast.Type, error) {
 			leftType.(ast.SymbolType).Value, rightType.(ast.SymbolType).Value)
 	}
 
-	return leftType, nil
+	switch expr.Operator.Literal {
+	case "==", "!=", "<", ">", "<=", ">=":
+		return ast.SymbolType{Value: "bool"}, nil
+	default:
+		return leftType, nil
+	}
 }
 
 func (tc *TypeChecker) checkFunctionDeclaration(stmt ast.FunctionDeclarationStmt) error {
@@ -151,6 +191,7 @@ func (tc *TypeChecker) checkFunctionDeclaration(stmt ast.FunctionDeclarationStmt
 func (tc *TypeChecker) checkClassDeclaration(stmt ast.ClassDeclarationStmt) error {
 	originalSymbolTable := tc.symbolTable
 	tc.symbolTable = make(map[string]ast.Type)
+	tc.currentClass = &stmt
 
 	for _, bodyStmt := range stmt.Body {
 		if err := tc.checkStmt(bodyStmt); err != nil {
@@ -159,8 +200,61 @@ func (tc *TypeChecker) checkClassDeclaration(stmt ast.ClassDeclarationStmt) erro
 	}
 
 	tc.symbolTable = originalSymbolTable
+	tc.currentClass = nil
 
 	return nil
+}
+
+func (tc *TypeChecker) checkIfStmt(stmt ast.IfStmt) error {
+	ifType, err := tc.checkExpr(stmt.Condition)
+	if err != nil {
+		return err
+	}
+
+	if TypeToString(ifType) != "bool" {
+		return fmt.Errorf("type error: if condition type does not match bool")
+	}
+
+	tc.checkStmt(stmt.Consequent)
+
+	if tc.checkStmt(stmt.Alternate) != nil {
+		tc.checkStmt(stmt.Alternate)
+	}
+
+	return nil
+}
+
+func (tc *TypeChecker) checkMemberExpr(expr ast.MemberExpr) (ast.Type, error) {
+	if symbol, ok := expr.Member.(ast.SymbolExpr); ok && symbol.Value == "this" {
+		if tc.currentClass == nil {
+			return nil, fmt.Errorf("type error: 'this' used outside of class context")
+		}
+
+		for _, bodyStmt := range tc.currentClass.Body {
+			if varDecl, ok := bodyStmt.(ast.VarDeclarationStmt); ok && varDecl.Identifier == expr.Property {
+				return tc.checkExpr(varDecl.AssignedValue)
+			}
+		}
+
+		return nil, fmt.Errorf("property %s does not exist on type %s", expr.Property, tc.currentClass.Name)
+	}
+
+	objectType, err := tc.checkExpr(expr.Member)
+	if err != nil {
+		return nil, err
+	}
+
+	structType, ok := objectType.(ast.StructType)
+	if !ok {
+		return nil, fmt.Errorf("type error: %s is not a struct or does not have members", TypeToString(objectType))
+	}
+
+	propertyType, exists := structType.GetMemberType(expr.Property)
+	if !exists {
+		return nil, fmt.Errorf("property %s does not exist on type %s", expr.Property, TypeToString(objectType))
+	}
+
+	return propertyType, nil
 }
 
 func (tc *TypeChecker) checkReturnStmt(stmt ast.ReturnStmt) error {
@@ -175,4 +269,21 @@ func (tc *TypeChecker) checkReturnStmt(stmt ast.ReturnStmt) error {
 	}
 
 	return nil
+}
+
+func (tc *TypeChecker) checkImportStmt(stmt ast.ImportStmt) error {
+	if tc.importedModules[stmt.Name] {
+		return fmt.Errorf("module %s is already imported", stmt.Name)
+	}
+
+	if !tc.moduleExists(stmt.Name) {
+		return fmt.Errorf("module %s does not exist", stmt.Name)
+	}
+
+	tc.importedModules[stmt.Name] = true
+	return nil
+}
+
+func (tc *TypeChecker) moduleExists(moduleName string) bool {
+	return tc.knownModules[moduleName]
 }

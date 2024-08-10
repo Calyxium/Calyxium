@@ -12,7 +12,7 @@ func ParseExpr(Parse *Parser, bp binding_power) ast.Expr {
 	nud_fn, exists := NudLu[tokenKind]
 
 	if !exists {
-		panic(fmt.Sprintf("NUD Handler expected for token %s\n", lexer.TokenTypeToString(tokenKind)))
+		fmt.Print(fmt.Errorf("NUD Handler expected for token %s", lexer.TokenTypeToString(tokenKind)))
 	}
 
 	left := nud_fn(Parse)
@@ -22,7 +22,7 @@ func ParseExpr(Parse *Parser, bp binding_power) ast.Expr {
 		led_fn, exists := LedLu[tokenKind]
 
 		if !exists {
-			panic(fmt.Sprintf("LED Handler expected for token %s\n", lexer.TokenTypeToString(tokenKind)))
+			fmt.Print(fmt.Errorf("LED Handler expected for token %s", lexer.TokenTypeToString(tokenKind)))
 		}
 
 		left = led_fn(Parse, left, bp)
@@ -93,8 +93,10 @@ func ParsePrimaryExpr(Parse *Parser) ast.Expr {
 			IsTrue: false,
 		}
 	default:
-		panic(fmt.Sprintf("Cannot create primary_expr from %s\n", lexer.TokenTypeToString(Parse.currentTokenKind())))
+		fmt.Print(fmt.Errorf("cannot create primary_expr from %s", lexer.TokenTypeToString(Parse.currentTokenKind())))
 	}
+
+	return nil
 }
 
 func ParseMemberExpr(Parse *Parser, left ast.Expr, bp binding_power) ast.Expr {

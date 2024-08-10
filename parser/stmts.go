@@ -58,13 +58,13 @@ func ParseVarDeclStmt(Parse *Parser) ast.Stmt {
 		Parse.expect(lexer.ASSIGN)
 		assignmentValue = ParseExpr(Parse, assignment)
 	} else if explicitType == nil {
-		panic("Missing explicit type for variable declaration.")
+		fmt.Print(fmt.Errorf("missing explicit type for variable declaration"))
 	}
 
 	Parse.expect(lexer.SEMI_COLON)
 
 	if isConstant && assignmentValue == nil {
-		panic("Cannot define constant variable without providing default value.")
+		fmt.Print(fmt.Errorf("cannot define constant variable without providing default value"))
 	}
 
 	return ast.VarDeclarationStmt{
