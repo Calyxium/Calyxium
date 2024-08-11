@@ -1,12 +1,12 @@
 package main
 
 import (
+	"calyxium/checker"
+	"calyxium/lexer"
+	"calyxium/parser"
+	"calyxium/repl"
 	"fmt"
 	"os"
-	"plutonium/checker"
-	"plutonium/lexer"
-	"plutonium/parser"
-	"plutonium/repl"
 	"time"
 
 	"github.com/sanity-io/litter"

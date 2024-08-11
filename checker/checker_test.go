@@ -1,9 +1,9 @@
 package checker_test
 
 import (
-	"plutonium/ast"
-	"plutonium/checker"
-	"plutonium/lexer"
+	"calyxium/ast"
+	"calyxium/checker"
+	"calyxium/lexer"
 	"testing"
 )
 

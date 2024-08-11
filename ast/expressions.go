@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"plutonium/lexer"
+	"calyxium/lexer"
 )
 
 // --------------------

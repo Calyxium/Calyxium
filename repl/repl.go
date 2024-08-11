@@ -2,11 +2,11 @@ package repl
 
 import (
 	"bufio"
+	"calyxium/checker"
+	"calyxium/lexer"
+	"calyxium/parser"
 	"fmt"
 	"io"
-	"plutonium/checker"
-	"plutonium/lexer"
-	"plutonium/parser"
 	"runtime"
 	"time"
 

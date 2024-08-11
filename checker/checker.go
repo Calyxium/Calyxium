@@ -1,8 +1,8 @@
 package checker
 
 import (
+	"calyxium/ast"
 	"fmt"
-	"plutonium/ast"
 )
 
 type TypeChecker struct {

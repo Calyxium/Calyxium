@@ -1,8 +1,8 @@
 package lexer
 
 import (
+	"calyxium/errors"
 	"fmt"
-	"plutonium/errors"
 )
 
 type Lexer struct {

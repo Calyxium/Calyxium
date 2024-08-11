@@ -1,6 +1,6 @@
 package ast
 
-import "plutonium/helpers"
+import "calyxium/helpers"
 
 type Stmt interface {
 	stmt()

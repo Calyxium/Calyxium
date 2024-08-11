@@ -3,8 +3,8 @@ package parser
 import (
 	"fmt"
 
-	"plutonium/ast"
-	"plutonium/lexer"
+	"calyxium/ast"
+	"calyxium/lexer"
 )
 
 func ParseStmt(Parse *Parser) ast.Stmt {

@@ -3,7 +3,7 @@ package parser
 import (
 	"fmt"
 
-	"plutonium/lexer"
+	"calyxium/lexer"
 )
 
 func (Parse *Parser) currentToken() lexer.Token {

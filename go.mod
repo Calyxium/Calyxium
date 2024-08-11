@@ -1,4 +1,4 @@
-module plutonium
+module calyxium
 
 go 1.21
 

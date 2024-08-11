@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"plutonium/ast"
-	"plutonium/lexer"
+	"calyxium/ast"
+	"calyxium/lexer"
 )
 
 type binding_power int
