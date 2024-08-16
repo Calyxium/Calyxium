@@ -77,27 +77,27 @@ func main() {
 		vm.Push, 5,
 		vm.Push, 3,
 		vm.Add,
-		vm.Print,
+		vm.Print, // 8
 
 		vm.Push, 5,
 		vm.Push, 3,
 		vm.Sub,
-		vm.Print,
+		vm.Print, // 2
 
 		vm.Push, 5,
 		vm.Push, 3,
 		vm.Mul,
-		vm.Print,
+		vm.Print, // 15
 
 		vm.Push, 5,
 		vm.Push, 3,
 		vm.Div,
-		vm.Print,
+		vm.Print, // 1
 
 		vm.Push, 5,
 		vm.Push, 3,
 		vm.Mod,
-		vm.Print,
+		vm.Print, // 2
 	}
 
 	newVM := vm.NewVM(code)

@@ -16,20 +16,13 @@ const (
 )
 
 type VM struct {
-	stack []int
-	pc    int
-	code  []byte
+	stack    []int
+	pc       int
+	code     []byte
+	handlers map[byte]func(*VM)
 }
 
-func NewVM(code []byte) *VM {
-	return &VM{
-		stack: make([]int, 0),
-		pc:    0,
-		code:  code,
-	}
-}
-
-func (vm *VM) push(value int) {
+func (vm *VM) pushResult(value int) {
 	vm.stack = append(vm.stack, value)
 }
 
