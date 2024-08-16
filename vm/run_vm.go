@@ -10,7 +10,7 @@ func (vm *VM) Run() {
 		opcode := vm.code[vm.pc]
 		handler, ok := vm.handlers[opcode]
 		if !ok {
-			fmt.Printf("Error: Unknown opcode %d\n", opcode)
+			fmt.Printf("Error: Unknown opcode %v\n", opcode)
 			os.Exit(1)
 		}
 

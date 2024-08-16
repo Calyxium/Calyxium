@@ -35,24 +35,24 @@ type VM struct {
 func (vm *VM) allocate(value int) *Object {
 	obj := &Object{value: value, refCount: 1}
 	vm.heap = append(vm.heap, obj)
-	fmt.Printf("Allocated object with value %d (refCount: %d)\n", value, obj.refCount)
+	fmt.Printf("Allocated object with value %v (refCount: %v)\n", value, obj.refCount)
 	return obj
 }
 
 // Increment the reference count of an object
 func (vm *VM) retain(obj *Object) {
 	obj.refCount++
-	fmt.Printf("Retained object with value %d (refCount: %d)\n", obj.value, obj.refCount)
+	fmt.Printf("Retained object with value %v (refCount: %v)\n", obj.value, obj.refCount)
 }
 
 // Decrement the reference count of an object and free it if the count reaches zero
 func (vm *VM) release(obj *Object) {
 	obj.refCount--
-	fmt.Printf("Released object with value %d (refCount: %d)\n", obj.value, obj.refCount)
+	fmt.Printf("Released object with value %v (refCount: %v)\n", obj.value, obj.refCount)
 	if obj.refCount == 0 {
 		for i, o := range vm.heap {
 			if o == obj {
-				fmt.Printf("Collecting object with value %d\n", obj.value)
+				fmt.Printf("Collecting object with value %v\n", obj.value)
 				vm.heap = append(vm.heap[:i], vm.heap[i+1:]...)
 				break
 			}
