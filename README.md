@@ -1,5 +1,5 @@
-# Plutonium
-Plutonium is a interpreted language
+# Calyxium
+Calyxium is a interpreted language
 
 - [Installation](#installation)
 - [Getting Started](#getting-started)
@@ -9,16 +9,16 @@ Plutonium is a interpreted language
 - [License](#license)
 
 ## Installation
-To install plutonium, follow these steps:
+To install Calyxium, follow these steps:
 
 1. Ensure you have Go installed on your system. You can download it from [here](https://go.dev/dl)
 
-2. Clone the Plutonium repository:
-`git clone git@github.com:plutonium-lang/Plutonium.git
+2. Clone the Calyxium repository:
+`git clone git@github.com:Calyxium/Calyxium.git
 `
 
 3. Navigate to the cloned directory:
-`cd plutonium`
+`cd Calyxium`
 
 4. Build the project:
 `go build`
@@ -26,16 +26,16 @@ To install plutonium, follow these steps:
 5. The executable will be located in the current directory. You can move it to a directory in your PATH for easier access.
 
 ## Getting Started
-To start using Plutonium, you need to create a script file with the `.pu` extension. Here's a simple example to get you started:
+To start using Calyxium, you need to create a script file with the `.pu` extension. Here's a simple example to get you started:
 ```
-# This is a comment in Plutonium
+# This is a comment in Calyxium
 puts("Hello, world");
 ```
 To run your script, use the following command:
-`./plutonium main.pu`
+`./Calyxium main.pu`
 
 ## Usage
-Plutonium is designed to be easy to learn and use. Here are some basic commands and their usage:
+Calyxium is designed to be easy to learn and use. Here are some basic commands and their usage:
 
 - `puts("Hello, world!");`: Prints a message to the standard output.
 - `let x: int = 10;` Declares a variable `x` and assigns it the value of `int 10`.
@@ -44,7 +44,7 @@ Plutonium is designed to be easy to learn and use. Here are some basic commands 
 For a more indepth tutorial, refer to the [official documentation](#)
 
 ## Examples
-Here are some examples to help you get started with Plutonium:
+Here are some examples to help you get started with Calyxium:
 
 - **Hello, World**:
     ```
@@ -69,8 +69,8 @@ Here are some examples to help you get started with Plutonium:
 
 ## Contributing
 
-Contributions to Plutonium are welcome! If you find a bug or have a feature request, please open an issue on our [GitHub repository](https://github.com/Codezz-ops/Plutonium/issues). If you'd like to contribute code, please fork the repository and submit a pull request.
+Contributions to Calyxium are welcome! If you find a bug or have a feature request, please open an issue on our [GitHub repository](https://github.com/Codezz-ops/Calyxium/issues). If you'd like to contribute code, please fork the repository and submit a pull request.
 
 ## License
 
-Plutonium is licensed under the BSD 3-Clause License. See the [LICENSE](LICENSE) file for more details.
+Calyxium is licensed under the BSD 3-Clause License. See the [LICENSE](LICENSE) file for more details.
