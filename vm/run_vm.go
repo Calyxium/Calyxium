@@ -1,20 +1,16 @@
 package vm
 
-import (
-	"fmt"
-	"os"
-)
+import "log"
 
+// Run executes the bytecode in the VM
 func (vm *VM) Run() {
 	for vm.pc < len(vm.code) {
 		opcode := vm.code[vm.pc]
-		handler, ok := vm.handlers[opcode]
-		if !ok {
-			fmt.Printf("Error: Unknown opcode %v\n", opcode)
-			os.Exit(1)
+		if handler, ok := vm.handlers[opcode]; ok {
+			handler(vm)
+			vm.pc++
+		} else {
+			log.Fatalf("Error: Unknown opcode %v\n", opcode)
 		}
-
-		handler(vm)
-		vm.pc++
 	}
 }
