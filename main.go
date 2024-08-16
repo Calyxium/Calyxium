@@ -74,30 +74,10 @@ func main() {
 
 	// testing the VM
 	code := []byte{
-		vm.Push, 5,
-		vm.Push, 3,
-		vm.Add,
-		vm.Print, // 8
-
-		vm.Push, 5,
-		vm.Push, 3,
-		vm.Sub,
-		vm.Print, // 2
-
-		vm.Push, 5,
-		vm.Push, 3,
-		vm.Mul,
-		vm.Print, // 15
-
-		vm.Push, 5,
-		vm.Push, 3,
-		vm.Div,
-		vm.Print, // 1
-
-		vm.Push, 5,
-		vm.Push, 3,
-		vm.Mod,
-		vm.Print, // 2
+		vm.Push, 10,
+		vm.Push, 2,
+		vm.Power, // 10^2
+		vm.Print, // 100
 	}
 
 	newVM := vm.NewVM(code)
