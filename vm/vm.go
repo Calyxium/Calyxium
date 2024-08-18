@@ -27,6 +27,8 @@ type VM struct {
 	code     []byte
 	heap     []*Object
 	handlers map[byte]func(*VM)
+	line     int
+	pos      int
 }
 
 func (vm *VM) allocate(value int) *Object {
@@ -74,4 +76,12 @@ func (vm *VM) collect(obj *Object) {
 			break
 		}
 	}
+}
+
+func (vm *VM) emitByte(byte byte) {
+	vm.code = append(vm.code, byte)
+}
+
+func (vm *VM) emitBytes(bytes ...byte) {
+	vm.code = append(vm.code, bytes...)
 }

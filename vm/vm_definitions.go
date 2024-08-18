@@ -3,7 +3,7 @@ package vm
 import "fmt"
 
 // NewVM creates a new VM instance with instruction handlers
-func NewVM(code []byte) *VM {
+func NewVM() *VM {
 	handlers := map[byte]func(*VM){
 		Push:  (*VM).push,
 		Dup:   (*VM).dup,
@@ -18,9 +18,11 @@ func NewVM(code []byte) *VM {
 
 	return &VM{
 		stack:    []*Object{},
-		code:     code,
+		code:     []byte{},
 		handlers: handlers,
 		heap:     []*Object{},
+		line:     1,
+		pos:      0,
 	}
 }
 

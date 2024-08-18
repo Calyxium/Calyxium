@@ -1,15 +1,16 @@
 package main
 
 import (
-	// "calyxium/checker"
-	// "calyxium/lexer"
-	// "calyxium/parser"
+	"calyxium/checker"
+	"calyxium/lexer"
+	"calyxium/parser"
 	"calyxium/repl"
 	"calyxium/vm"
 	"fmt"
 	"os"
-	// "time"
-	// "github.com/sanity-io/litter"
+	"time"
+
+	"github.com/sanity-io/litter"
 )
 
 func GetInputFilePath() string {
@@ -42,44 +43,37 @@ func main() {
 		return
 	}
 
-	// content, err := ReadFileContent(filePath)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-
-	// newLexer := lexer.New(string(content))
-	// var tokens []lexer.Token
-
-	// for {
-	// 	tok := newLexer.Consume()
-	// 	if tok.Type == lexer.EOF {
-	// 		break
-	// 	}
-	// 	tokens = append(tokens, tok)
-	// }
-
-	// start := time.Now()
-	// ast := parser.Parse(tokens)
-	// typeChecker := checker.NewTypeChecker()
-	// if err := typeChecker.Check(ast); err != nil {
-	// 	fmt.Println("Type checking failed:", err)
-	// 	return
-	// }
-
-	// fmt.Println("Type checking passed!")
-	// duration := time.Since(start)
-	// litter.Dump(ast)
-	// fmt.Printf("Duration: %v\n", duration)
-
-	// testing the VM
-	code := []byte{
-		vm.Push, 10,
-		vm.Push, 2,
-		vm.Power, // 10^2
-		vm.Print, // 100
+	content, err := ReadFileContent(filePath)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
-	newVM := vm.NewVM(code)
-	newVM.Run()
+	newLexer := lexer.New(string(content))
+	var tokens []lexer.Token
+
+	for {
+		tok := newLexer.Consume()
+		if tok.Type == lexer.EOF {
+			break
+		}
+		tokens = append(tokens, tok)
+	}
+
+	start := time.Now()
+	ast := parser.Parse(tokens)
+	typeChecker := checker.NewTypeChecker()
+	if err := typeChecker.Check(ast); err != nil {
+		fmt.Println("Type checking failed:", err)
+		return
+	}
+
+	litter.Dump(ast)
+
+	vm := vm.NewVM()
+	vm.TraversAst(ast)
+
+	duration := time.Since(start)
+	fmt.Printf("Duration: %v\n", duration)
+
 }

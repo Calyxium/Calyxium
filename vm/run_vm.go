@@ -1,6 +1,8 @@
 package vm
 
-import "log"
+import (
+	"log"
+)
 
 // Run executes the bytecode in the VM
 func (vm *VM) Run() {
@@ -13,6 +15,9 @@ func (vm *VM) Run() {
 			log.Fatalf("Error: Unknown opcode %v\n", opcode)
 		}
 	}
+
+	// print the result before exiting
+	vm.print()
 
 	// clean up the final value on the stack
 	if len(vm.stack) > 0 {
