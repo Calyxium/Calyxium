@@ -13,4 +13,9 @@ func (vm *VM) Run() {
 			log.Fatalf("Error: Unknown opcode %v\n", opcode)
 		}
 	}
+
+	// clean up the final value on the stack
+	if len(vm.stack) > 0 {
+		vm.pop()
+	}
 }
