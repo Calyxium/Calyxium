@@ -1,5 +1,5 @@
 # Calyxium
-Calyxium is a interpreted language
+Calyxium is a low-level compiled memory safe language
 
 - [Installation](#installation)
 - [Getting Started](#getting-started)
@@ -11,19 +11,19 @@ Calyxium is a interpreted language
 ## Installation
 To install Calyxium, follow these steps:
 
-1. Ensure you have Go installed on your system. You can download it from [here](https://go.dev/dl)
+1. Ensure you have OCaml installed on your system. You can download it from [Linux](https://ocaml.org/), [Windows](https://gitlab.com/dkml/distributions/dkml#installing)
 
-2. Clone the Calyxium repository:
-`git clone git@github.com:Calyxium/Calyxium.git
-`
+2. Ensure you have opam installed. Then run:
+`opam install dune ocamllex menhir llvm`
 
-3. Navigate to the cloned directory:
+3. Clone the Calyxium repository:
+`git clone git@github.com:Calyxium/Calyxium.git`
+
+4. Navigate to the cloned directory:
 `cd Calyxium`
 
-4. Build the project:
-`go build`
-
-5. The executable will be located in the current directory. You can move it to a directory in your PATH for easier access.
+5. Build the project:
+`dune build`
 
 ## Getting Started
 To start using Calyxium, you need to create a script file with the `.cx` extension. Here's a simple example to get you started:
@@ -32,7 +32,7 @@ To start using Calyxium, you need to create a script file with the `.cx` extensi
 puts("Hello, world");
 ```
 To run your script, use the following command:
-`./Calyxium main.cx`
+`./calyxium main.cx`
 
 ## Usage
 Calyxium is designed to be easy to learn and use. Here are some basic commands and their usage:
@@ -41,7 +41,7 @@ Calyxium is designed to be easy to learn and use. Here are some basic commands a
 - `let x: int = 10;` Declares a variable `x` and assigns it the value of `int 10`.
 - `if condition { ... }`: Executes a block of code if the condition is true.
 
-For a more indepth tutorial, refer to the [official documentation](#)
+For a more indepth tutorial, refer to the [official documentation](https://calyxium.cc/docs)
 
 ## Examples
 Here are some examples to help you get started with Calyxium:
@@ -60,7 +60,7 @@ Here are some examples to help you get started with Calyxium:
 - **Conditional Statements**:
     ```
     let age: int = 25;
-    if age >= 18 {
+    if (age >= 18) {
         puts("You are an adult.");
     } else {
         puts("You are not an adult.");
@@ -69,7 +69,7 @@ Here are some examples to help you get started with Calyxium:
 
 ## Contributing
 
-Contributions to Calyxium are welcome! If you find a bug or have a feature request, please open an issue on our [GitHub repository](https://github.com/Codezz-ops/Calyxium/issues). If you'd like to contribute code, please fork the repository and submit a pull request.
+Contributions to Calyxium are welcome! If you find a bug or have a feature request, please open an issue on our [GitHub repository](https://github.com/Calyxium/Calyxium/issues). If you'd like to contribute code, please fork the repository and submit a pull request.
 
 ## License
 
