@@ -9,10 +9,11 @@ let () =
     let lexbuf = Lexing.from_channel file_channel in
     try
       let ast_list = Parser.program Lexer.token lexbuf in
-      List.iter (fun ast -> Printf.printf "Parsed AST: %s\n" (to_string ast)) ast_list;
+      List.iter
+        (fun ast -> Printf.printf "Parsed AST: %s\n" (to_string ast))
+        ast_list;
       close_in file_channel
-    with
-    | Parser.Error ->
+    with Parser.Error ->
       Printf.fprintf stderr "Parser error at token: %s\n" (Lexing.lexeme lexbuf);
       close_in file_channel;
       exit (-1)
