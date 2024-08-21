@@ -1,5 +1,5 @@
 (executable
  (name calyxium)
- (modules lexer token calyxium))
+ (modules token lexer calyxium))
 
 (ocamllex lexer)
