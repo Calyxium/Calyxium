@@ -1,10 +1,9 @@
-module Token : sig
-    type token =
+type token =
     (* Operators *)
     | Plus
     | Minus
     | Star
-    | Slash
+    | Slash 
 
     (* Symbols *)
     | LParen
@@ -30,7 +29,7 @@ module Token : sig
     | Eq
     | Neq
     | Geq
-    | Leq
+    | Leq   
 
     (* Assignment *)
     | Assign
@@ -58,14 +57,15 @@ module Token : sig
     | Import
     | Export
     | This
-    | Null
+    | New
+    | Null  
 
     (* Types *)
     | IntType
     | FloatType
     | StringType
     | ByteType
-    | BoolType
+    | BoolType 
 
     (* Literals *)
     | Ident of string
@@ -73,9 +73,26 @@ module Token : sig
     | Float of float
     | String of string
     | Byte of char
-    | Bool of bool
+    | Bool of bool 
 
     | EOF
 
-    val string_of_token : token -> string
-end
+    module Expr : sig
+        module NoBinOP : sig
+          type t =
+            | Int of int
+            | Float of float
+            | BinOp of token * t * t  (* Include BinOp here *)
+            | BinList of t * (token * t) list
+          val reduce : t -> (token * t) list -> t
+        end
+        
+        type t =
+          | Int of int
+          | Float of float
+          | BinOp of token * t * t  (* Represents a binary operation *)
+      
+        val of_no_binop : NoBinOP.t -> t
+        val to_string : t -> string
+      end
+    

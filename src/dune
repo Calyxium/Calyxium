@@ -1,5 +1,8 @@
 (executable
  (name calyxium)
- (modules token lexer calyxium))
+ (modules ast parser lexer calyxium))
 
 (ocamllex lexer)
+
+(menhir
+ (modules parser))

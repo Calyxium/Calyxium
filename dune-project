@@ -1,4 +1,5 @@
 (lang dune 3.14)
+(using menhir 3.0)
 (name Calyxium)
 (version 0.0.1)
 (license BSD 3-Clause)
