@@ -16,6 +16,8 @@ jobs:
       
     - name: Set up OCaml
       uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 5.0.0
     
     - name: Install OPAM dependencies
       run: |
@@ -25,4 +27,4 @@ jobs:
     
     - name: Build with Dune
       run: |
-        dune build
+        dune build @install
