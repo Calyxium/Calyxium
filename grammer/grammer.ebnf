@@ -7,7 +7,6 @@
     | <function_definition>
     | <if_statement>
     | <switch_statement>
-    | <try_catch_statement>
     | <for_statement>
     | <expression_statement>
 
@@ -40,9 +39,6 @@
     case <expression> : <statement_list>
     | default : <expression>
 
-<try_catch_statement> ::= 
-    try { <statement_list> } catch { <statement_list> }
-
 <for_statement> ::=
     for { <statement_list> }
     for (<expression>) { <statement_list> }
@@ -56,7 +52,6 @@
     | <member_access>
     | <binary_expression>
     | <unary_expression>
-    | <parenthesized_expression>
     | <array_access>
 
 <identifier> ::= [a-zA-Z][a-zA-Z0-9]*

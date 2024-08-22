@@ -50,12 +50,9 @@ type token =
   | For
   | True
   | False
-  | Try
-  | Catch
   | Import
   | Export
   | Class
-  | This
   | New
   | Null
   (* Types *)
@@ -84,6 +81,10 @@ module Expr : sig
     | VarExpr of string
     | BinaryExpr of { left : t; operator : token; right : t }
     | CallExpr of { callee : string; arguments : t list }
+    | UnaryExpr of { operator : token; operand : t }
+    | NullExpr
+    | NewExpr of { class_name : string; arguments : t list; }
+    | PropertyAccessExpr of { object_name : t; property_name : string }
   [@@deriving show]
 end
 
@@ -96,21 +97,13 @@ module Stmt : sig
 
   type t =
     | BlockStmt of { body : t list }
-    | VarDeclarationStmt of {
-        identifier : string;
-        constant : bool;
-        assigned_value : Expr.t option;
-        explicit_type : Type.t;
-      }
-    | FunctionDeclStmt of {
-        name : string;
-        parameters : parameter list;
-        return_type : Type.t option;
-        body : t list;
-      }
+    | VarDeclarationStmt of { identifier : string; constant : bool; assigned_value : Expr.t option; explicit_type : Type.t; }
+    | NewVarDeclarationStmt of { identifier : string; constant : bool; assigned_value : Expr.t option; arguments : Expr.t list }
+    | FunctionDeclStmt of { name : string; parameters : parameter list; return_type : Type.t option; body : t list; }
     | ReturnStmt of Expr.t
     | ExprStmt of Expr.t
     | IfStmt of { condition : Expr.t; then_branch : t; else_branch : t option }
     | ForStmt of { init : t option; condition : Expr.t; increment : t option; body : t }
+    | ClassDeclStmt of { name : string; properties : parameter list; methods : t list }
   [@@deriving show]
 end

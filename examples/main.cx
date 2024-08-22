@@ -1,5 +1,14 @@
 const x: int = 10;
 let y: float = 1.5;
+let z: int = 105;
+if (x != y){
+    x += null;
+};
+
+let e: int = null;
+let j: int = -10;
+let k: float = -5.6;
+z -= 105;
 
 if (x <= y) {
     let x: int = 10;
@@ -28,3 +37,14 @@ for (;;) {
 for (let i: int = 10; i < 50; i) {
     return x;
 };
+
+if (!x) {
+    return x;
+};
+
+class Person {
+    let age: int;
+};
+
+let p: new Person;
+p.age = 10;
