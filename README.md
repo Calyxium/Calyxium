@@ -14,7 +14,7 @@ To install Calyxium, follow these steps:
 1. Ensure you have OCaml installed on your system. You can download it from [Linux](https://ocaml.org/), [Windows](https://gitlab.com/dkml/distributions/dkml#installing)
 
 2. Ensure you have opam installed. Then run:
-`opam install dune ocamllex menhir llvm`
+`opam install dune ocamllex menhir llvm ppx_deriving`
 
 3. Clone the Calyxium repository:
 `git clone git@github.com:Calyxium/Calyxium.git`

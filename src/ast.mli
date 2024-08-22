@@ -70,24 +70,30 @@ type token =
   | Bool of bool
   | EOF
 
+val pp_token : Format.formatter -> token -> unit
+
 module Expr : sig
-  module NoBinOP : sig
-    type t =
-      | Int of int
-      | Float of float
-      | BinOp of token * t * t (* Include BinOp here *)
-      | BinList of t * (token * t) list
-
-    val reduce : t -> (token * t) list -> t
-  end
-
   type t =
-    | Int of int
-    | Float of float
-    | BinOp of token * t * t (* Represents a binary operation *)
-    | Var of string
-    | VarDecl of string * token * t option (* Represents `let x: int = 10` *)
+    | IntExpr of { value : int }
+    | FloatExpr of { value : float }
+    | VarExpr of string
+    | BinaryExpr of { left : t; operator : token; right : t }
+  [@@deriving show]
+end
 
-  val of_no_binop : NoBinOP.t -> t
-  val to_string : t -> string
+module Type : sig
+  type t = SymbolType of { value : string } [@@deriving show]
+end
+
+module Stmt : sig
+  type t =
+    | BlockStmt of { body : t list }
+    | VarDeclarationStmt of {
+        identifier : string;
+        constant : bool;
+        assigned_value : Expr.t option;
+        explicit_type : Type.t;
+      }
+    | ExprStmt of Expr.t
+  [@@deriving show]
 end
