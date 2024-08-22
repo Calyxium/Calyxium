@@ -1,5 +1,5 @@
 # Import Standard lib
-import "standard";
+import "System";
 
 # Define Vars
 let x: int = 10;
@@ -11,7 +11,7 @@ function add(x: int, y: int): int {
 };
 
 # Call fucntions
-add(x, y);
+System.Print(add(x, y));
 
 # export Nooo;
 # 

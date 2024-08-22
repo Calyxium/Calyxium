@@ -83,6 +83,7 @@ type_expr:
 
 expr:
     | New Ident { Expr.NewExpr { class_name = $2; arguments = [] } }
+    | expr Dot Ident LParen argument_list RParen { Expr.CallExpr { callee = Expr.PropertyAccessExpr { object_name = $1; property_name = $3 }; arguments = $5 } }
     | expr Dot Ident { Expr.PropertyAccessExpr { object_name = $1; property_name = $3 } }
     | expr Plus expr { Expr.BinaryExpr { left = $1; operator = Plus; right = $3 } }
     | expr Minus expr { Expr.BinaryExpr { left = $1; operator = Minus; right = $3 } }
@@ -106,7 +107,7 @@ expr:
     | Amspersand expr { Expr.UnaryExpr { operator = Amspersand; operand = $2 } }
     | Pipe expr { Expr.UnaryExpr { operator = Pipe; operand = $2 } }
     | Question expr { Expr.UnaryExpr { operator = Question; operand = $2 } }
-    | Ident LParen argument_list RParen { Expr.CallExpr { callee = $1; arguments = $3 } }
+    | Ident LParen argument_list RParen { Expr.CallExpr { callee = Expr.VarExpr $1; arguments = $3 } }
     | Null { Expr.NullExpr }
     | Minus Int { Expr.IntExpr { value = -$2 } }
     | Minus Float { Expr.FloatExpr { value = -. $2 } }

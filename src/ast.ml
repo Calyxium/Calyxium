@@ -146,7 +146,7 @@ module Expr = struct
     | ByteExpr of { value : char }
     | VarExpr of string
     | BinaryExpr of { left : t; operator : token; right : t }
-    | CallExpr of { callee : string; arguments : t list }
+    | CallExpr of { callee : t; arguments : t list }
     | UnaryExpr of { operator : token; operand : t }
     | NullExpr
     | NewExpr of { class_name : string; arguments : t list; }
