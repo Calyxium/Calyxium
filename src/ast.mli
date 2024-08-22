@@ -52,6 +52,7 @@ type token =
   | Catch
   | Import
   | Export
+  | Class
   | This
   | New
   | Null
@@ -76,6 +77,8 @@ module Expr : sig
   type t =
     | IntExpr of { value : int }
     | FloatExpr of { value : float }
+    | StringExpr of { value : string }
+    | ByteExpr of { value : char }
     | VarExpr of string
     | BinaryExpr of { left : t; operator : token; right : t }
     | CallExpr of { callee : string; arguments : t list }

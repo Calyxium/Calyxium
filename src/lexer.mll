@@ -84,6 +84,7 @@ rule token = parse
     | "import"              { column := !column + 6; Import }
     | "export"              { column := !column + 6; Export }
     | "this"                { column := !column + 3; This }
+    | "class"               { column := !column + 5; Class }
     | "new"                 { column := !column + 2; New }
     | "null"                { column := !column + 3; Null }
 

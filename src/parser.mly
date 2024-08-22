@@ -16,7 +16,7 @@
 (* Assignment *)
 %token Assign PlusAssign MinusAssign StarAssign SlashAssign
 (* Keywords *)
-%token Function If Else Var Const Switch Case Break Default For True False Try Catch Import Export This New Null Return
+%token Function If Else Var Const Switch Case Break Default For True False Try Catch Import Export This New Null Return Class
 (* Types *)
 %token IntType FloatType StringType ByteType BoolType
 (* Literals *)
@@ -83,7 +83,7 @@ expr:
     | expr Slash expr { Expr.BinaryExpr { left = $1; operator = Slash; right = $3 } }
     | expr Greater expr { Expr.BinaryExpr { left = $1; operator = Greater; right = $3 } }
     | expr Less expr { Expr.BinaryExpr { left = $1; operator = Less; right = $3 } }
-    | expr LogicalOr expr { Expr.BinaryExpr { left = $1; operator = LogicalAnd; right = $3 } }
+    | expr LogicalOr expr { Expr.BinaryExpr { left = $1; operator = LogicalOr; right = $3 } }
     | expr LogicalAnd expr { Expr.BinaryExpr { left = $1; operator = LogicalAnd; right = $3 } }
     | expr Eq expr { Expr.BinaryExpr { left = $1; operator = Eq; right = $3 } }
     | expr Neq expr { Expr.BinaryExpr { left = $1; operator = Neq; right = $3 } }
@@ -91,6 +91,6 @@ expr:
     | expr Leq expr { Expr.BinaryExpr { left = $1; operator = Leq; right = $3 } }
     | Int   { Expr.IntExpr { value = $1 } }
     | Float { Expr.FloatExpr { value = $1 } }
-    | String { Expr.VarExpr $1 }
-    | Byte { Expr.VarExpr (String.make 1 $1) }
+    | String { Expr.StringExpr { value = $1 } }
+    | Byte { Expr.ByteExpr { value = $1 } }
     | Ident { Expr.VarExpr $1 }

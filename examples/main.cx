@@ -1,9 +1,3 @@
 # testing
 
 const a: float = 10.5;
-
-function main(x: bool, y: int): int {
-    let x: int = 10;
-    let ans: int = x + 10 * a / 2;
-    return x;
-}
