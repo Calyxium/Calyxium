@@ -1,62 +1,75 @@
-import "Yay";
+# Import Standard lib
+import "standard";
 
-export Nooo;
+# Define Vars
+let x: int = 10;
+let y: int = 50;
 
-const ltltlt: bool = true;
-
-const x: int = 10;
-let y: float = 1.5;
-let z: int = 105;
-if (x != y){
-    x += null;
+# Define Function
+function add(x: int, y: int): int {
+    return x + y;
 };
 
-let e: int = null;
-let j: int = -10;
-let k: float = -5.6;
-z -= 105;
+# Call fucntions
+add(x, y);
 
-if (x <= y) {
-    let x: int = 10;
-
-    function add(x: int, y: int): int {
-        return x + y;
-    };
-} else {
-    return xs;
-};
-
-function ee(x: int, t: bool): int {
-    return x;
-};
-
-if (x == t) {
-    return x;
-};
-
-ee(5, true);
-
-for (;;) {
-    return x;
-};
-
-for (let i: int = 10; i < 50; i) {
-    return x;
-};
-
-if (!x) {
-    return x;
-};
-
-class Person {
-    let age: int;
-};
-
-let p: new Person;
-p.age = 10;
-
-let num: []int = {};
-let nume: []int = {1, 2, 3};
-let eeee: []float = {1.5, 6.5, 3.6};
-let eeeeee: []string = {"lele", "lelele"};
-let eeeeeee: []byte = {'g', 't'};
+# export Nooo;
+# 
+# const ltltlt: bool = true;
+# 
+# const x: int = 10;
+# let y: float = 1.5;
+# let z: int = 105;
+# if (x != y){
+    # x += null;
+# };
+# 
+# let e: int = null;
+# let j: int = -10;
+# let k: float = -5.6;
+# z -= 105;
+# 
+# if (x <= y) {
+    # let x: int = 10;
+# 
+    # function add(x: int, y: int): int {
+        # return x + y;
+    # };
+# } else {
+    # return xs;
+# };
+# 
+# function ee(x: int, t: bool): int {
+    # return x;
+# };
+# 
+# if (x == t) {
+    # return x;
+# };
+# 
+# ee(5, true);
+# 
+# for (;;) {
+    # return x;
+# };
+# 
+# for (let i: int = 10; i < 50; i) {
+    # return x;
+# };
+# 
+# if (!x) {
+    # return x;
+# };
+# 
+# class Person {
+    # let age: int;
+# };
+# 
+# let p: new Person;
+# p.age = 10;
+# 
+# let num: []int = {};
+# let nume: []int = {1, 2, 3};
+# let eeee: []float = {1.5, 6.5, 3.6};
+# let eeeeee: []string = {"lele", "lelele"};
+# let eeeeeee: []byte = {'g', 't'};
