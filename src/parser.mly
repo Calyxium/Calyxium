@@ -2,6 +2,9 @@
     open Ast
 %}
 
+%left Plus Minus
+%left Star Slash
+
 (* Operators *)
 %token Plus Minus Star Slash
 (* Groupings *)
