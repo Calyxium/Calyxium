@@ -5,7 +5,6 @@ import (
 	"calyxium/lexer"
 	"calyxium/parser"
 	"calyxium/repl"
-	"calyxium/vm"
 	"fmt"
 	"os"
 	"time"
@@ -70,8 +69,8 @@ func main() {
 
 	litter.Dump(ast)
 
-	vm := vm.NewVM()
-	vm.TraversAst(ast)
+	// vm := vm.NewVM()
+	// vm.TraversAst(ast)
 
 	duration := time.Since(start)
 	fmt.Printf("Duration: %v\n", duration)

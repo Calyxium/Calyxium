@@ -1,1 +1,2 @@
-10 / 2;
+let x: int = 10;
+let y: float = 10.5;
