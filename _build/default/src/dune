@@ -1,8 +1,0 @@
-(executable
- (name calyxium)
- (modules ast parser lexer calyxium))
-
-(ocamllex lexer)
-
-(menhir
- (modules parser))
