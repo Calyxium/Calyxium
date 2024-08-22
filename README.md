@@ -39,7 +39,7 @@ Calyxium is designed to be easy to learn and use. Here are some basic commands a
 
 - `puts("Hello, world!");`: Prints a message to the standard output.
 - `let x: int = 10;` Declares a variable `x` and assigns it the value of `int 10`.
-- `if condition { ... }`: Executes a block of code if the condition is true.
+- `if (condition) { ... }`: Executes a block of code if the condition is true.
 
 For a more indepth tutorial, refer to the [official documentation](https://calyxium.cc/docs)
 
