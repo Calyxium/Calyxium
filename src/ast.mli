@@ -85,6 +85,8 @@ module Expr : sig
     | Int of int
     | Float of float
     | BinOp of token * t * t (* Represents a binary operation *)
+    | Var of string
+    | VarDecl of string * token * t option (* Represents `let x: int = 10` *)
 
   val of_no_binop : NoBinOP.t -> t
   val to_string : t -> string

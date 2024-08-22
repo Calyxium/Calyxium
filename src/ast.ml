@@ -92,6 +92,8 @@ module Expr = struct
     | Int of int
     | Float of float
     | BinOp of token * t * t (* Represents a binary operation *)
+    | Var of string
+    | VarDecl of string * token * t option
 
   (* Function to convert NoBinOP.t to Expr.t *)
   let rec of_no_binop (no_binop_expr : NoBinOP.t) : t =
@@ -115,7 +117,28 @@ module Expr = struct
           | Minus -> "-"
           | Star -> "*"
           | Slash -> "/"
+          | Less -> "<"
+          | Greater -> ">"
+          | Eq -> "=="
+          | Neq -> "!="
+          | Leq -> "<="
+          | Geq -> ">="
           | _ -> "?"
         in
         Printf.sprintf "(%s %s %s)" (to_string lhs) op_str (to_string rhs)
+    | Var name -> name
+    | VarDecl (name, typ, Some value) ->
+        Printf.sprintf "let %s: %s = %s" name (token_to_string typ)
+          (to_string value)
+    | VarDecl (name, typ, None) ->
+        Printf.sprintf "let %s: %s" name (token_to_string typ)
+
+  and token_to_string token =
+    match token with
+    | IntType -> "int"
+    | FloatType -> "float"
+    | StringType -> "string"
+    | ByteType -> "byte"
+    | BoolType -> "bool"
+    | _ -> "unknown"
 end

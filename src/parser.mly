@@ -45,7 +45,26 @@ expr_list:
 expr:
     | Int                   { Expr.Int $1 }
     | Float                 { Expr.Float $1 }
+    | Ident                 { Expr.Var $1 }
     | expr Plus expr        { Expr.BinOp (Plus, $1, $3) }
     | expr Minus expr       { Expr.BinOp (Minus, $1, $3) }
     | expr Star expr        { Expr.BinOp (Star, $1, $3) }
     | expr Slash expr       { Expr.BinOp (Slash, $1, $3) }
+    | expr Less expr        { Expr.BinOp (Less, $1, $3) }
+    | expr Greater expr     { Expr.BinOp (Greater, $1, $3) }
+    | expr Eq expr          { Expr.BinOp (Eq, $1, $3) }
+    | expr Neq expr         { Expr.BinOp (Neq, $1, $3) }
+    | expr Leq expr         { Expr.BinOp (Leq, $1, $3) }
+    | expr Geq expr         { Expr.BinOp (Geq, $1, $3) }
+    | VarDecl               { $1 }
+
+VarDecl:
+    | Var Ident Colon type_expr Assign expr { Expr.VarDecl ($2, $4, Some $6) }
+    | Var Ident Colon type_expr             { Expr.VarDecl ($2, $4, None) }
+
+type_expr:
+    | IntType                      { IntType }
+    | FloatType                    { FloatType }
+    | StringType                   { StringType }
+    | ByteType                     { ByteType }
+    | BoolType                     { BoolType }
