@@ -177,5 +177,6 @@ module Stmt = struct
     | ReturnStmt of Expr.t
     | ExprStmt of Expr.t
     | IfStmt of { condition : Expr.t; then_branch : t; else_branch : t option }
+    | ForStmt of { init : t option; condition : Expr.t; increment : t option; body : t }
   [@@deriving show]
 end

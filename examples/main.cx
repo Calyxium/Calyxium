@@ -18,3 +18,13 @@ function ee(x: int, t: bool): int {
 if (x == t) {
     return x;
 };
+
+ee(5, true);
+
+for (;;) {
+    return x;
+};
+
+for (let i: int = 10; i < 50; i) {
+    return x;
+};

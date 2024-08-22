@@ -49,7 +49,19 @@ stmt:
     | FunctionDeclStmt { $1 }
     | ReturnStmt { $1 }
     | IfStmt { $1 }
+    | ForStmt { $1 }
     | expr { Stmt.ExprStmt $1 }
+
+ForStmt:
+    | For LParen stmt_opt Semi expr_opt Semi stmt_opt RParen LBrace stmt_list RBrace { let default_condition = Expr.VarExpr "true" in Stmt.ForStmt { init = $3; condition = Option.value ~default:default_condition $5; increment = $7; body = Stmt.BlockStmt { body = $10 } } }
+
+stmt_opt:
+    | stmt { Some $1 }
+    | { None }
+
+expr_opt:
+    | expr { Some $1 }
+    | { None }
 
 IfStmt:
     | If LParen expr RParen LBrace stmt_list RBrace Else LBrace stmt_list RBrace {
@@ -107,8 +119,14 @@ expr:
     | expr Neq expr { Expr.BinaryExpr { left = $1; operator = Neq; right = $3 } }
     | expr Geq expr { Expr.BinaryExpr { left = $1; operator = Geq; right = $3 } }
     | expr Leq expr { Expr.BinaryExpr { left = $1; operator = Leq; right = $3 } }
+    | Ident LParen argument_list RParen { Expr.CallExpr { callee = $1; arguments = $3 } }
     | Int { Expr.IntExpr { value = $1 } }
     | Float { Expr.FloatExpr { value = $1 } }
     | String { Expr.StringExpr { value = $1 } }
     | Byte { Expr.ByteExpr { value = $1 } }
     | Ident { Expr.VarExpr $1 }
+
+argument_list:
+    | expr Comma argument_list { $1 :: $3 }
+    | expr { [$1] }
+    | { [] }
