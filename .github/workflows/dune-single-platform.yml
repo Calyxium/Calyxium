@@ -17,6 +17,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install opam
           opam init
+          eval $(opam env --switch=default)
           opam install dune ocamllex menhir llvm ppx_deriving
 
       - name: Build the project
