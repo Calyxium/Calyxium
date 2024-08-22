@@ -48,8 +48,6 @@ type token =
   | Break
   | Default
   | For
-  | True
-  | False
   | Import
   | Export
   | Class
@@ -115,8 +113,6 @@ let pp_token fmt = function
   | Break -> Format.fprintf fmt "Break"
   | Default -> Format.fprintf fmt "Default"
   | For -> Format.fprintf fmt "For"
-  | True -> Format.fprintf fmt "True"
-  | False -> Format.fprintf fmt "False"
   | Import -> Format.fprintf fmt "Import"
   | Export -> Format.fprintf fmt "Export"
   | Class -> Format.fprintf fmt "Class"
@@ -136,7 +132,10 @@ let pp_token fmt = function
   | EOF -> Format.fprintf fmt "EOF"
 
 module Type = struct
-  type t = SymbolType of { value : string } [@@deriving show]
+  type t = 
+    | SymbolType of { value : string }
+    | ArrayType of { element_type : t }
+  [@@deriving show]
 end
 
 module Expr = struct
@@ -152,6 +151,7 @@ module Expr = struct
     | NullExpr
     | NewExpr of { class_name : string; arguments : t list; }
     | PropertyAccessExpr of { object_name : t; property_name : string }
+    | ArrayExpr of { elements : t list }
   [@@deriving show]
 end
 
@@ -168,5 +168,7 @@ module Stmt = struct
     | IfStmt of { condition : Expr.t; then_branch : t; else_branch : t option }
     | ForStmt of { init : t option; condition : Expr.t; increment : t option; body : t }
     | ClassDeclStmt of { name : string; properties : parameter list; methods : t list }
+    | ImportStmt of { module_name : string }
+    | ExportStmt of { identifier : string }
   [@@deriving show]
 end

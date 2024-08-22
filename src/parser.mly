@@ -18,7 +18,7 @@
 (* Assignment *)
 %token Assign PlusAssign MinusAssign StarAssign SlashAssign
 (* Keywords *)
-%token Function If Else Var Const Switch Case Break Default For True False Import Export New Null Return Class
+%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class
 (* Types *)
 %token IntType FloatType StringType ByteType BoolType
 (* Literals *)
@@ -52,6 +52,8 @@ stmt:
     | IfStmt { $1 }
     | ForStmt { $1 }
     | ClassDeclStmt { $1 }
+    | ImportStmt { $1 }
+    | ExportStmt { $1 }
     | expr Assign expr { Stmt.ExprStmt (Expr.BinaryExpr { left = $1; operator = Assign; right = $3 }) }
     | expr { Stmt.ExprStmt $1 }
 
@@ -77,6 +79,7 @@ type_expr:
     | StringType { Type.SymbolType { value = "string" } }
     | ByteType { Type.SymbolType { value = "byte" } }
     | BoolType { Type.SymbolType { value = "bool" } }
+    | LBracket RBracket type_expr { Type.ArrayType { element_type = $3 } }
 
 expr:
     | New Ident { Expr.NewExpr { class_name = $2; arguments = [] } }
@@ -112,6 +115,8 @@ expr:
     | String { Expr.StringExpr { value = $1 } }
     | Byte { Expr.ByteExpr { value = $1 } }
     | Ident { Expr.VarExpr $1 }
+    | LBrace RBrace { Expr.ArrayExpr { elements = [] } }
+    | LBrace argument_list RBrace { Expr.ArrayExpr { elements = $2 } } 
 
 argument_list:
     | expr Comma argument_list { $1 :: $3 }
@@ -125,6 +130,12 @@ class_body:
 class_member:
     | Var Ident Colon type_expr Semi { ([{ Stmt.name = $2; param_type = $4 }], []) }
     | FunctionDeclStmt { ([], [$1]) }
+
+ImportStmt:
+    | Import String { Stmt.ImportStmt { module_name = $2 } }
+
+ExportStmt:
+    | Export Ident { Stmt.ExportStmt { identifier = $2 } }
 
 ClassDeclStmt:
     | Class Ident LBrace class_body RBrace { Stmt.ClassDeclStmt { name = $2; properties = fst $4; methods = snd $4 } }

@@ -48,8 +48,6 @@ type token =
   | Break
   | Default
   | For
-  | True
-  | False
   | Import
   | Export
   | Class
@@ -85,11 +83,15 @@ module Expr : sig
     | NullExpr
     | NewExpr of { class_name : string; arguments : t list; }
     | PropertyAccessExpr of { object_name : t; property_name : string }
+    | ArrayExpr of { elements : t list }
   [@@deriving show]
 end
 
 module Type : sig
-  type t = SymbolType of { value : string } [@@deriving show]
+  type t = 
+    | SymbolType of { value : string }
+    | ArrayType of { element_type : t }
+  [@@deriving show]
 end
 
 module Stmt : sig
@@ -105,5 +107,7 @@ module Stmt : sig
     | IfStmt of { condition : Expr.t; then_branch : t; else_branch : t option }
     | ForStmt of { init : t option; condition : Expr.t; increment : t option; body : t }
     | ClassDeclStmt of { name : string; properties : parameter list; methods : t list }
+    | ImportStmt of { module_name : string }
+    | ExportStmt of { identifier : string }
   [@@deriving show]
 end

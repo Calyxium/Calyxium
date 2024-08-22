@@ -100,8 +100,6 @@ rule token = parse
     | Digits                { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Int (int_of_string lexeme) }
     | '\'' [^'\''] '\''     { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Byte (lexeme.[1]) }
     | '"' [^'"']* '"'       { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; String (String.sub lexeme 1 (String.length lexeme - 2)) }
-    | "true"                { column := !column + 4; Bool true }
-    | "false"               { column := !column + 5; Bool false }
     | eof                   { EOF }
 
 and read_comment = parse
