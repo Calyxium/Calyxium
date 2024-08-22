@@ -13,11 +13,12 @@ let () =
       close_in file_channel
     with
     | Parser.Error ->
-        Printf.fprintf stderr "Parser error at token: %s\n"
-          (Lexing.lexeme lexbuf);
+        Printf.fprintf stderr "Parser error at line %d, column %d: %s\n"
+          (Lexer.get_line ()) (Lexer.get_column ()) (Lexing.lexeme lexbuf);
         close_in file_channel;
         exit (-1)
-    | _ ->
-        Printf.fprintf stderr "An unexpected error occurred.\n";
+    | e ->
+        Printf.fprintf stderr "An unexpected error occurred: %s\n"
+          (Printexc.to_string e);
         close_in file_channel;
         exit (-1)

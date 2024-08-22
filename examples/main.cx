@@ -1,9 +1,9 @@
-# Test file for calyxium
+# testing
 
-let x: int = 10;
-const y: float = 50.5;
-let z: byte = 'a';
-const a: string = "Hello";
-let b: bool = true;
-const c: bool = false;
-let d: int = 10 + 50 * 3 - 1 / 6;
+const a: float = 10.5;
+
+function main(x: bool, y: int): int {
+    let x: int = 10;
+    let ans: int = x + 10 * a / 2;
+    return x;
+}

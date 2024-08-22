@@ -145,10 +145,13 @@ module Expr = struct
     | FloatExpr of { value : float }
     | VarExpr of string
     | BinaryExpr of { left : t; operator : token; right : t }
+    | CallExpr of { callee : string; arguments : t list }
   [@@deriving show]
 end
 
 module Stmt = struct
+  type parameter = { name : string; param_type : Type.t } [@@deriving show]
+
   type t =
     | BlockStmt of { body : t list }
     | VarDeclarationStmt of {
@@ -157,6 +160,13 @@ module Stmt = struct
         assigned_value : Expr.t option;
         explicit_type : Type.t;
       }
+    | FunctionDeclStmt of {
+        name : string;
+        parameters : parameter list;
+        return_type : Type.t option;
+        body : t list;
+      }
+    | ReturnStmt of Expr.t
     | ExprStmt of Expr.t
   [@@deriving show]
 end

@@ -78,6 +78,7 @@ module Expr : sig
     | FloatExpr of { value : float }
     | VarExpr of string
     | BinaryExpr of { left : t; operator : token; right : t }
+    | CallExpr of { callee : string; arguments : t list }
   [@@deriving show]
 end
 
@@ -86,6 +87,8 @@ module Type : sig
 end
 
 module Stmt : sig
+  type parameter = { name : string; param_type : Type.t } [@@deriving show]
+
   type t =
     | BlockStmt of { body : t list }
     | VarDeclarationStmt of {
@@ -94,6 +97,13 @@ module Stmt : sig
         assigned_value : Expr.t option;
         explicit_type : Type.t;
       }
+    | FunctionDeclStmt of {
+        name : string;
+        parameters : parameter list;
+        return_type : Type.t option;
+        body : t list;
+      }
+    | ReturnStmt of Expr.t
     | ExprStmt of Expr.t
   [@@deriving show]
 end
