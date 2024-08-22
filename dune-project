@@ -4,7 +4,7 @@
 (version 0.0.1)
 (license BSD 3-Clause)
 (authors "Calyxium Foundation")
-(maintainers "TheDevConnor Zombii Codezz-ops Iris")
+(maintainers "Codezz-ops TheDevConnor Zombii Iris")
 (source (uri https://github.com/Calyxium/Calyxium))
 (bug_reports "https://github.com/Calyxium/Calyxium/issues")
 (homepage "https://calyxium.cc")
