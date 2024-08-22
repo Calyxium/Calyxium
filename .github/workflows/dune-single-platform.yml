@@ -15,7 +15,7 @@ jobs:
       - name: Install Ocaml and Packages
         run: |
           sudo apt-get update
-          sudo apt-get install opam
+          sudo apt-get install opam ocamllex llvm menhir
           opam init
           eval $(opam env --switch=default)
           opam install dune ocamllex menhir llvm ppx_deriving
