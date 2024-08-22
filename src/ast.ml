@@ -121,7 +121,7 @@ let pp_token fmt = function
   | Import -> Format.fprintf fmt "Import"
   | Export -> Format.fprintf fmt "Export"
   | This -> Format.fprintf fmt "This"
-  | Class -> Format.fprintf fmt  "Class"
+  | Class -> Format.fprintf fmt "Class"
   | New -> Format.fprintf fmt "New"
   | Null -> Format.fprintf fmt "Null"
   | IntType -> Format.fprintf fmt "IntType"
@@ -145,7 +145,7 @@ module Expr = struct
   type t =
     | IntExpr of { value : int }
     | FloatExpr of { value : float }
-    | StringExpr of { value : string}
+    | StringExpr of { value : string }
     | ByteExpr of { value : char }
     | VarExpr of string
     | BinaryExpr of { left : t; operator : token; right : t }
@@ -172,5 +172,6 @@ module Stmt = struct
       }
     | ReturnStmt of Expr.t
     | ExprStmt of Expr.t
+    | IfStmt of { condition : Expr.t; then_branch : t; else_branch : t option }
   [@@deriving show]
 end

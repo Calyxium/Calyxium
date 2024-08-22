@@ -46,7 +46,24 @@ stmt:
     | VarDeclStmt           { $1 }
     | FunctionDeclStmt      { $1 }
     | ReturnStmt            { $1 }
+    | IfStmt                { $1 }
     | expr                  { Stmt.ExprStmt $1 }
+
+IfStmt:
+    | If LParen expr RParen LBrace stmt_list RBrace Else LBrace stmt_list RBrace {
+        Stmt.IfStmt {
+            condition = $3;
+            then_branch = Stmt.BlockStmt { body = $6 };
+            else_branch = Some (Stmt.BlockStmt { body = $10 });
+        }
+    }
+    | If LParen expr RParen LBrace stmt_list RBrace { 
+        Stmt.IfStmt { 
+            condition = $3; 
+            then_branch = Stmt.BlockStmt { body = $6 }; 
+            else_branch = None; 
+        }
+    }
 
 FunctionDeclStmt:
     | Function Ident LParen parameter_list RParen Colon type_expr LBrace stmt_list RBrace { Stmt.FunctionDeclStmt { name = $2; parameters = $4; return_type = Some $7; body = $9; } }
