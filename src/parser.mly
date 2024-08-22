@@ -2,11 +2,13 @@
     open Ast
 %}
 
+(* Prec *)
 %left Plus Minus
-%left Star Slash
+%left Star Slash Mod
+%left Pow
 
 (* Operators *)
-%token Plus Minus Star Slash
+%token Plus Minus Star Slash Mod Pow
 (* Groupings *)
 %token LParen RParen LBracket RBracket LBrace RBrace
 (* Symbols *)
@@ -51,44 +53,17 @@ stmt:
 
 IfStmt:
     | If LParen expr RParen LBrace stmt_list RBrace Else LBrace stmt_list RBrace {
-        Stmt.IfStmt {
-            condition = $3;
-            then_branch = Stmt.BlockStmt { body = $6 };
-            else_branch = Some (Stmt.BlockStmt { body = $10 });
-        }
-    }
+        Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = Some (Stmt.BlockStmt { body = $10 }); } }
     | If LParen expr RParen LBrace stmt_list RBrace Else LBrace stmt_list RBrace {
-        Stmt.IfStmt {
-            condition = $3;
-            then_branch = Stmt.BlockStmt { body = $6 };
-            else_branch = Some (Stmt.BlockStmt { body = $10 });
-        }
-    }
+        Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = Some (Stmt.BlockStmt { body = $10 }); } }
     | If LParen expr RParen LBrace stmt_list RBrace {
-        Stmt.IfStmt {
-            condition = $3;
-            then_branch = Stmt.BlockStmt { body = $6 };
-            else_branch = None;
-        }
-    }
+        Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = None; } }
 
 FunctionDeclStmt:
     | Function Ident LParen parameter_list RParen Colon type_expr LBrace stmt_list RBrace {
-        Stmt.FunctionDeclStmt {
-            name = $2;
-            parameters = $4;
-            return_type = Some $7;
-            body = $9;
-        }
-    }
+        Stmt.FunctionDeclStmt { name = $2; parameters = $4; return_type = Some $7; body = $9; } }
     | Function Ident LParen parameter_list RParen LBrace stmt_list RBrace {
-        Stmt.FunctionDeclStmt {
-            name = $2;
-            parameters = $4;
-            return_type = None;
-            body = $7;
-        }
-    }
+        Stmt.FunctionDeclStmt { name = $2; parameters = $4; return_type = None; body = $7; } }
 
 parameter_list:
     | parameter Comma parameter_list { $1 :: $3 }
@@ -104,29 +79,11 @@ ReturnStmt:
 
 VarDeclStmt:
     | Var Ident Colon type_expr Assign expr {
-        Stmt.VarDeclarationStmt {
-            identifier = $2;
-            constant = false;
-            assigned_value = Some $6;
-            explicit_type = $4;
-        }
-    }
+        Stmt.VarDeclarationStmt { identifier = $2; constant = false; assigned_value = Some $6; explicit_type = $4; } }
     | Const Ident Colon type_expr Assign expr {
-        Stmt.VarDeclarationStmt {
-            identifier = $2;
-            constant = true;
-            assigned_value = Some $6;
-            explicit_type = $4;
-        }
-    }
+        Stmt.VarDeclarationStmt { identifier = $2; constant = true; assigned_value = Some $6; explicit_type = $4; } }
     | Var Ident Colon type_expr {
-        Stmt.VarDeclarationStmt {
-            identifier = $2;
-            constant = false;
-            assigned_value = None;
-            explicit_type = $4;
-        }
-    }
+        Stmt.VarDeclarationStmt { identifier = $2; constant = false; assigned_value = None; explicit_type = $4; } }
 
 type_expr:
     | IntType { Type.SymbolType { value = "int" } }
@@ -140,6 +97,8 @@ expr:
     | expr Minus expr { Expr.BinaryExpr { left = $1; operator = Minus; right = $3 } }
     | expr Star expr { Expr.BinaryExpr { left = $1; operator = Star; right = $3 } }
     | expr Slash expr { Expr.BinaryExpr { left = $1; operator = Slash; right = $3 } }
+    | expr Mod expr { Expr.BinaryExpr { left = $1; operator = Mod; right = $3 } }
+    | expr Pow expr { Expr.BinaryExpr { left = $1; operator = Pow; right = $3 } }
     | expr Greater expr { Expr.BinaryExpr { left = $1; operator = Greater; right = $3 } }
     | expr Less expr { Expr.BinaryExpr { left = $1; operator = Less; right = $3 } }
     | expr LogicalOr expr { Expr.BinaryExpr { left = $1; operator = LogicalOr; right = $3 } }

@@ -4,6 +4,8 @@ type token =
   | Minus
   | Star
   | Slash
+  | Mod
+  | Pow
   (* Symbols *)
   | LParen
   | RParen

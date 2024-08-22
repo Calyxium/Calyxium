@@ -4,6 +4,8 @@ type token =
   | Minus
   | Star
   | Slash
+  | Mod
+  | Pow
   (* Symbols *)
   | LParen
   | RParen
@@ -76,6 +78,8 @@ let pp_token fmt = function
   | Minus -> Format.fprintf fmt "Minus"
   | Star -> Format.fprintf fmt "Star"
   | Slash -> Format.fprintf fmt "Slash"
+  | Mod -> Format.fprintf fmt "Mod"
+  | Pow -> Format.fprintf fmt "Pow"
   | LParen -> Format.fprintf fmt "LParen"
   | RParen -> Format.fprintf fmt "RParen"
   | LBracket -> Format.fprintf fmt "LBracket"

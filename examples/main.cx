@@ -6,7 +6,7 @@ if (x <= y) {
 
     function add(x: int, y: int): int {
         return x + y;
-    }
+    };
 } else {
     return xs;
 };

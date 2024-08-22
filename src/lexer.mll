@@ -53,6 +53,8 @@ rule token = parse
     | "&"                   { token_and_update_column Amspersand }
     | ">"                   { token_and_update_column Greater }
     | "<"                   { token_and_update_column Less }
+    | "^"                   { token_and_update_column Pow }
+    | "%"                   { token_and_update_column Mod }
     | "||"                  { column := !column + 1; LogicalOr }
     | "&&"                  { column := !column + 1; LogicalAnd }
     | "=="                  { column := !column + 1; Eq }
