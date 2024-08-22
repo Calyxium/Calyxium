@@ -1,17 +1,24 @@
-# Import Standard lib
-import "System";
+# Import System lib
+# import "System";
 
 # Define Vars
-let x: int = 10;
-let y: int = 50;
+# let x: int = 10;
+# let y: int = 50;
+
+# Define Array
+# let string_array: []string = {"Hello", "world"};
+let int_array: []int = {1, 2, 3};
+
+System.Print(int_array[1:3]);
+# System.Print([0]string_array + [1]string_array);
 
 # Define Function
-function add(x: int, y: int): int {
-    return x + y;
-};
+# function add(x: int, y: int): int {
+#     return x + y;
+# };
 
 # Call fucntions
-System.Print(add(x, y));
+# System.Print(add(x, y));
 
 # export Nooo;
 # 

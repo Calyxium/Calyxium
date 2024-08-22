@@ -117,7 +117,14 @@ expr:
     | Byte { Expr.ByteExpr { value = $1 } }
     | Ident { Expr.VarExpr $1 }
     | LBrace RBrace { Expr.ArrayExpr { elements = [] } }
-    | LBrace argument_list RBrace { Expr.ArrayExpr { elements = $2 } } 
+    | LBrace expr_list RBrace { Expr.ArrayExpr { elements = $2 } }
+    | Ident LBracket expr RBracket { Expr.IndexExpr { array = Expr.VarExpr $1; index = $3 } }
+    | Ident LBracket expr Colon expr RBracket { Expr.SliceExpr { array = Expr.VarExpr $1; start = $3; end_ = $5 } }
+
+expr_list:
+    | expr Comma expr_list { $1 :: $3 }
+    | expr { [$1] }
+    | { [] }
 
 argument_list:
     | expr Comma argument_list { $1 :: $3 }
