@@ -51,6 +51,8 @@ type token =
   | Import
   | Export
   | Class
+  | True
+  | False
   | New
   | Null
   (* Types *)
@@ -76,6 +78,7 @@ module Expr : sig
     | FloatExpr of { value : float }
     | StringExpr of { value : string }
     | ByteExpr of { value : char }
+    | BoolExpr of { value : bool }
     | VarExpr of string
     | BinaryExpr of { left : t; operator : token; right : t }
     | CallExpr of { callee : t; arguments : t list }

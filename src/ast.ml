@@ -51,6 +51,8 @@ type token =
   | Import
   | Export
   | Class
+  | True
+  | False
   | New
   | Null
   (* Types *)
@@ -116,6 +118,8 @@ let pp_token fmt = function
   | Import -> Format.fprintf fmt "Import"
   | Export -> Format.fprintf fmt "Export"
   | Class -> Format.fprintf fmt "Class"
+  | True -> Format.fprintf fmt "True"
+  | False -> Format.fprintf fmt "False"
   | New -> Format.fprintf fmt "New"
   | Null -> Format.fprintf fmt "Null"
   | IntType -> Format.fprintf fmt "IntType"
@@ -144,6 +148,7 @@ module Expr = struct
     | FloatExpr of { value : float }
     | StringExpr of { value : string }
     | ByteExpr of { value : char }
+    | BoolExpr of { value : bool }
     | VarExpr of string
     | BinaryExpr of { left : t; operator : token; right : t }
     | CallExpr of { callee : t; arguments : t list }

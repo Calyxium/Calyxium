@@ -18,7 +18,7 @@
 (* Assignment *)
 %token Assign PlusAssign MinusAssign StarAssign SlashAssign
 (* Keywords *)
-%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class
+%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class True False
 (* Types *)
 %token IntType FloatType StringType ByteType BoolType
 (* Literals *)
@@ -82,6 +82,8 @@ type_expr:
     | LBracket RBracket type_expr { Type.ArrayType { element_type = $3 } }
 
 expr:
+    | True { Expr.BoolExpr { value = true } }
+    | False { Expr.BoolExpr { value = false } }
     | New Ident { Expr.NewExpr { class_name = $2; arguments = [] } }
     | expr Dot Ident LParen argument_list RParen { Expr.CallExpr { callee = Expr.PropertyAccessExpr { object_name = $1; property_name = $3 }; arguments = $5 } }
     | expr Dot Ident { Expr.PropertyAccessExpr { object_name = $1; property_name = $3 } }
@@ -115,6 +117,7 @@ expr:
     | Float { Expr.FloatExpr { value = $1 } }
     | String { Expr.StringExpr { value = $1 } }
     | Byte { Expr.ByteExpr { value = $1 } }
+    | Bool { Expr.BoolExpr { value = $1 } }
     | Ident { Expr.VarExpr $1 }
     | LBrace RBrace { Expr.ArrayExpr { elements = [] } }
     | LBrace expr_list RBrace { Expr.ArrayExpr { elements = $2 } }

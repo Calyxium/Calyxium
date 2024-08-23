@@ -14,6 +14,7 @@ module TypeChecker = struct
     | Expr.FloatExpr _ -> Type.SymbolType { value = "float" }
     | Expr.StringExpr _ -> Type.SymbolType { value = "string" }
     | Expr.ByteExpr _ -> Type.SymbolType { value = "byte" }
+    | Expr.BoolExpr _ -> Type.SymbolType { value = "bool" }
     | Expr.VarExpr name -> lookup env name
     | _ -> failwith "Unsupported expression"
 

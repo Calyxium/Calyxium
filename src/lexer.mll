@@ -85,6 +85,8 @@ rule token = parse
     | "export"              { column := !column + 6; Export }
     | "class"               { column := !column + 5; Class }
     | "new"                 { column := !column + 2; New }
+    | "true"                { column := !column + 4; True }
+    | "false"               { column := !column + 5; False }
     | "null"                { column := !column + 3; Null }
 
     (*Types *)
