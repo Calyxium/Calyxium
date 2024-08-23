@@ -1,6 +1,7 @@
 # Calyxium
 Calyxium is a low-level compiled memory safe language
 
+
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
@@ -12,6 +13,7 @@ Calyxium is a low-level compiled memory safe language
 To install Calyxium, follow these steps:
 
 1. Ensure you have OCaml installed on your system. You can download it from [Linux](https://ocaml.org/), [Windows](https://gitlab.com/dkml/distributions/dkml#installing)
+
 
 2. Ensure you have opam installed. Then run:
 `opam install dune ocamllex menhir llvm ppx_deriving`
@@ -60,7 +62,7 @@ Here are some examples to help you get started with Calyxium:
 - **Conditional Statements**:
     ```
     let age: int = 25;
-    if (age >= 18) {
+    if age >= 18 {
         puts("You are an adult.");
     } else {
         puts("You are not an adult.");
