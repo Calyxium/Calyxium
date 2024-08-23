@@ -1,5 +1,8 @@
 let x: int = 10;
-let y: float = 10.5;
-let z: string = "Hello";
-let a: byte = 'h';
-let b: bool = true;
+let y: string = "";
+
+function add(x: int, y: int): int {
+    return x + y;
+};
+
+add(x, y);
