@@ -59,12 +59,12 @@ stmt:
 
 stmt_opt:
     | stmt { Some $1 }
-    | { Some (Stmt.ExprStmt (Expr.NullExpr)) }
+    | { None }
 
 expr_opt:
     | expr { Some $1 }
-    | { Some Expr.NullExpr }
-
+    | { None }
+    
 parameter_list:
     | parameter Comma parameter_list { $1 :: $3 }
     | parameter { [$1] }
