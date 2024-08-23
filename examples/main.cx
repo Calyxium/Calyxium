@@ -1,5 +1,7 @@
 # Import System lib
-# import "System";
+import "System";
+
+let x: int = 10;
 
 # Define Vars
 # let x: int = 10;
@@ -10,15 +12,25 @@
 let int_array: []int = {1, 2, 3};
 
 System.Print(int_array[1:3]);
-# System.Print([0]string_array + [1]string_array);
+System.Print(string_array[0] + string_array[1]);
+System.Length();
 
 # Define Function
 # function add(x: int, y: int): int {
 #     return x + y;
 # };
 
+class Person {
+    let age: int;
+    let name: string;
+};
+ 
+let person: new Person;
+person.age = 10;
+person.name = "Azlo";
+
 # Call fucntions
-# System.Print(add(x, y));
+System.Print(add(x, y));
 
 # export Nooo;
 # 
