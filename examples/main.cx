@@ -1,2 +1,18 @@
 let x: int = 10;
+<<<<<<< HEAD
 let y: float = 10.5;
+=======
+let y: int = 15;
+
+if (x != y) {
+    return x;
+} else {
+    return y;
+};
+
+function add(x: int, y: int): int {
+    return x + y;
+};
+
+add(x, y);
+>>>>>>> rewrite
