@@ -47,13 +47,23 @@ module TypeChecker = struct
             failwith ("Argument type mismatch in function call: " ^ func_name)
         ) arguments param_types;
         return_type
-    | Expr.BinaryExpr { left; operator = _; right } ->
+    | Expr.BinaryExpr { left; operator; right } ->
       let left_type = check_expr env left in
       let right_type = check_expr env right in
-      if left_type = right_type then
-        left_type
-      else
-        failwith "Type mismatch in binary expression"
+      (match operator with
+       | Eq | Neq | Less | Greater | Leq | Geq ->
+           if left_type = right_type then
+             Type.SymbolType { value = "bool" }
+           else
+             failwith "Type mismatch in comparison expression"
+       | PlusAssign | MinusAssign | StarAssign | SlashAssign ->
+           failwith "Assignment operation cannot be used as a condition in an if statement"
+       | Plus | Minus | Star | Slash | Mod | Pow ->
+           if left_type = right_type then
+             left_type
+           else
+             failwith "Type mismatch in arithmetic expression"
+      | _ -> failwith "Unsupported operator in binary expression")
     | _ -> failwith "Unsupported expression"
 
   let check_var_decl env identifier explicit_type assigned_value =
@@ -99,6 +109,17 @@ module TypeChecker = struct
     | Stmt.ExprStmt expr ->
       let _ = check_expr env expr in
       env
+    | Stmt.IfStmt { condition; then_branch; else_branch } ->
+      let cond_type = check_expr env condition in
+      if cond_type <> Type.SymbolType { value = "bool" } then
+        failwith "Condition in if statement must be a boolean"
+      else
+        let env_then = check_stmt env ~expected_return_type then_branch in
+        let env_final = match else_branch with
+          | Some else_branch -> check_stmt env_then ~expected_return_type else_branch
+          | None -> env_then
+        in
+        env_final
     | _ -> failwith "Unsupported statement"
 
     and check_block env stmts ~expected_return_type =
