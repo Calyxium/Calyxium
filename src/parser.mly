@@ -183,7 +183,7 @@ VarDeclStmt:
         Stmt.VarDeclarationStmt { identifier = $2; constant = true; assigned_value = Some Expr.NullExpr; explicit_type = $4; } }
 
 NewVarDeclStmt:
-    | Var Ident Colon New Ident {
+    | Var Ident Colon New Ident LParen expr RParen {
         Stmt.NewVarDeclarationStmt { identifier = $2; constant = false; assigned_value = None; arguments = [] }; }
-    | Const Ident Colon New Ident {
+    | Const Ident Colon New Ident LParen expr RParen {
         Stmt.NewVarDeclarationStmt { identifier = $2; constant = true; assigned_value = None; arguments = [] }; } 

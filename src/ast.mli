@@ -96,6 +96,7 @@ module Type : sig
   type t = 
     | SymbolType of { value : string }
     | ArrayType of { element_type : t }
+    | ClassType of { name : string; properties : (string * t) list }
   [@@deriving show]
 end
 

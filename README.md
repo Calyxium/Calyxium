@@ -1,6 +1,7 @@
 # Calyxium
 Calyxium is a low-level compiled memory safe language
 
+- [Prerequisite](#prerequisite)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
@@ -8,13 +9,31 @@ Calyxium is a low-level compiled memory safe language
 - [Contributing](#contributing)
 - [License](#license)
 
+## Prerequisite
+- Visit the Windows SDK Download Page:
+Go to the official [Windows SDK download page](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/).
+
+
+- Download the Installer:
+Select the appropriate version of the SDK for your Windows version (Windows 10 or 11).
+Download the installer and run it.
+
+- Install the SDK:
+During installation, ensure that the "Windows SDK" is selected.
+Follow the on-screen instructions to complete the installation.
+
+- Verify Installation
+After installation, verify that the advapi32.lib file is present. It should be located in a directory similar to:
+`C:\Program Files (x86)\Windows Kits\10\Lib\<version>\um\x64\advapi32.lib
+`
+
 ## Installation
 To install Calyxium, follow these steps:
 
-1. Ensure you have OCaml installed on your system. You can download it from [Linux](https://ocaml.org/), [Windows](https://gitlab.com/dkml/distributions/dkml#installing)
+1. Ensure you have OCaml installed on your system. You can download it from [Linux](https://ocaml.org/install#linux_mac_bsd), [Windows](https://ocaml.org/install#windows)
 
 2. Ensure you have opam installed. Then run:
-`opam install dune ocamllex menhir llvm ppx_deriving`
+`opam install dune menhir llvm ppx_deriving`
 
 3. Clone the Calyxium repository:
 `git clone git@github.com:Calyxium/Calyxium.git`

@@ -1,18 +1,33 @@
-let x: int = 10;
-<<<<<<< HEAD
-let y: float = 10.5;
-=======
-let y: int = 15;
+# import "System";
+# import "String";
+# 
+# let name: string = "Alice";
+# System.Print(String.Concat("Hello", name, "!"));
 
-if (x != y) {
-    return x;
-} else {
-    return y;
+# import "System";
+# 
+# let x: int = 10;
+# let y: int = 15;
+# 
+# if (x != y) {
+    # return x;
+# } else {
+    # return y;
+# };
+# 
+# function add(x: int, y: int): int {
+    # let a: int = 10;
+    # return x + y + a;
+# };
+
+class Person {
+    let x: int;
 };
 
-function add(x: int, y: int): int {
-    return x + y;
-};
+let p: new Person(10);
 
-add(x, y);
->>>>>>> rewrite
+# add(x, y);
+# 
+# let e: int = 10;
+# 
+# export e;
