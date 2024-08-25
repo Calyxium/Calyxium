@@ -50,7 +50,36 @@ module TypeChecker = struct
     | Expr.StringExpr _ -> Type.SymbolType { value = "string" }
     | Expr.ByteExpr _ -> Type.SymbolType { value = "byte" }
     | Expr.BoolExpr _ -> Type.SymbolType { value = "bool" }
+    | Expr.VarExpr "true" | Expr.VarExpr "false" ->
+        Type.SymbolType { value = "bool" }
     | Expr.VarExpr name -> lookup_var env name
+    | Expr.ArrayExpr { elements } -> (
+        match elements with
+        | [] -> failwith "Cannot infer type of an empty array"
+        | first_elem :: _ ->
+            let elem_type = check_expr env first_elem in
+            List.iter
+              (fun elem ->
+                let t = check_expr env elem in
+                if t <> elem_type then
+                  failwith "Type mismatch in array elements")
+              elements;
+            Type.ArrayType { element_type = elem_type })
+    | Expr.IndexExpr { array; index } -> (
+        let array_type = check_expr env array in
+        let index_type = check_expr env index in
+        if index_type <> Type.SymbolType { value = "int" } then
+          failwith "Array index must be an integer";
+        match array_type with
+        | Type.ArrayType { element_type } -> element_type
+        | _ -> failwith "Cannot index non-array type")
+    | Expr.SliceExpr { array; start; end_ } ->
+        let array_type = check_expr env array in
+        let start_type = check_expr env start in
+        let end_type = check_expr env end_ in
+        if start_type <> Type.SymbolType { value = "int" } || end_type <> Type.SymbolType { value = "int" } then
+          failwith "Array slice indices must be integers";
+        array_type
     | Expr.CallExpr { callee; arguments } ->
         let func_name =
           match callee with
@@ -229,6 +258,36 @@ module TypeChecker = struct
             | None -> env_then
           in
           env_final
+    | Stmt.ForStmt { init; condition; increment; body } ->
+        let env = 
+          match init with
+          | Some stmt -> check_stmt env ~expected_return_type:None stmt
+          | None -> env
+        in
+        let _ = 
+          let cond_type = check_expr env condition in
+          if cond_type <> Type.SymbolType { value = "bool" } then
+            failwith "Condition in for statement must be a boolean"
+        in
+        let env = 
+          match increment with
+          | Some stmt -> check_stmt env ~expected_return_type:None stmt
+          | None -> env
+        in
+        check_block env [body] ~expected_return_type
+    | Stmt.SwitchStmt { expr; cases; default_case } ->
+        let switch_type = check_expr env expr in
+        List.iter
+          (fun (case_expr, case_body) ->
+            let case_type = check_expr env case_expr in
+            if case_type <> switch_type then
+              failwith "Case expression type does not match switch expression";
+            ignore (check_block env case_body ~expected_return_type))
+          cases;
+        (match default_case with
+        | Some body -> ignore (check_block env body ~expected_return_type)
+        | None -> ());
+        env
     | Stmt.ImportStmt { module_name } -> check_import env module_name
     | Stmt.ExportStmt { identifier } -> check_export env identifier
     | _ -> failwith "Unsupported statement"

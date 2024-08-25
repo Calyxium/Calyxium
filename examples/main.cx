@@ -1,13 +1,13 @@
-class MyClass {
-    let myNum: int;
-    let myString: string;
+let op: byte = '+';
+
+fn add(x: int, y: int): int {
+    return x + y;
 };
 
-let myObj = new MyClass;
-myObj.myNum = 10;
-myObj.myString = "Hello";
-
-
-# for (let x: int = 10; x < 10; x) {
-#     let y: int = 10;
-# };
+switch op {
+    case '+':
+        add(5, 6);
+        break;
+    default:
+        let x: int = 10;
+};
