@@ -71,16 +71,38 @@ module TypeChecker = struct
         let left_type = check_expr env left in
         let right_type = check_expr env right in
         match operator with
+        | Assign -> (
+            match left with
+            | Expr.PropertyAccessExpr { object_name; property_name } -> (
+                let obj_type = check_expr env object_name in
+                match obj_type with
+                | Type.ClassType { properties; _ } -> (
+                    try
+                      let expected_type = List.assoc property_name properties in
+                      if expected_type <> right_type then
+                        failwith
+                          ("Type mismatch in assignment to property "
+                         ^ property_name)
+                      else left_type
+                    with Not_found ->
+                      failwith ("Undefined property: " ^ property_name))
+                | _ -> failwith "Assignment to non-object property")
+            | Expr.VarExpr name ->
+                let var_type = lookup_var env name in
+                if var_type <> right_type then
+                  failwith ("Type mismatch in assignment to variable " ^ name)
+                else var_type
+            | _ -> failwith "Invalid left-hand side in assignment")
         | Eq | Neq | Less | Greater | Leq | Geq ->
             if left_type = right_type then Type.SymbolType { value = "bool" }
             else failwith "Type mismatch in comparison expression"
+        | Plus | Minus | Star | Slash | Mod | Pow ->
+            if left_type = right_type then left_type
+            else failwith "Type mismatch in arithmetic expression"
         | PlusAssign | MinusAssign | StarAssign | SlashAssign ->
             failwith
               "Assignment operation cannot be used as a condition in an if \
                statement"
-        | Plus | Minus | Star | Slash | Mod | Pow ->
-            if left_type = right_type then left_type
-            else failwith "Type mismatch in arithmetic expression"
         | _ -> failwith "Unsupported operator in binary expression")
     | Expr.PropertyAccessExpr { object_name; property_name } -> (
         let obj_type = check_expr env object_name in
@@ -130,7 +152,6 @@ module TypeChecker = struct
         check_var_decl env identifier explicit_type assigned_value
     | Stmt.NewVarDeclarationStmt
         { identifier; constant = _; assigned_value; arguments } ->
-        (* Ensure the assigned_value is a NewExpr *)
         let class_name =
           match assigned_value with
           | Some (Expr.NewExpr { class_name; _ }) -> class_name
@@ -138,23 +159,26 @@ module TypeChecker = struct
               failwith
                 ("Expected a class instantiation for variable: " ^ identifier)
         in
-        (* Look up the class information *)
         let class_info = lookup_class env class_name in
-        (* Check if arguments are provided for all required properties *)
-        if List.length arguments <> List.length class_info.properties then
+
+        if
+          List.length arguments > 0
+          && List.length arguments <> List.length class_info.properties
+        then
           failwith
             ("Incorrect number of arguments for class instantiation: "
            ^ identifier);
-        (* Validate that the argument types match the property types *)
-        List.iter2
-          (fun arg (prop_name, prop_type) ->
-            let arg_type = check_expr env arg in
-            if arg_type <> prop_type then
-              failwith
-                ("Type mismatch for property " ^ prop_name ^ " in class "
-               ^ class_name))
-          arguments class_info.properties;
-        (* Bind the variable to the class type in the environment *)
+
+        if List.length arguments > 0 then
+          List.iter2
+            (fun arg (prop_name, prop_type) ->
+              let arg_type = check_expr env arg in
+              if arg_type <> prop_type then
+                failwith
+                  ("Type mismatch for property " ^ prop_name ^ " in class "
+                 ^ class_name))
+            arguments class_info.properties;
+
         {
           env with
           var_type = Env.add identifier class_info.class_type env.var_type;

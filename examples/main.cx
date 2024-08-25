@@ -1,10 +1,12 @@
-let x: int = 15;
-
-class E {
-    let age: int;
+class MyClass {
+    let myNum: int;
+    let myString: string;
 };
 
-let p: new E(10);
+let myObj = new MyClass;
+myObj.myNum = 10;
+myObj.myString = "Hello";
+
 
 # for (let x: int = 10; x < 10; x) {
 #     let y: int = 10;
