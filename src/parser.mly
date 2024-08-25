@@ -54,8 +54,26 @@ stmt:
     | ClassDeclStmt { $1 }
     | ImportStmt { $1 }
     | ExportStmt { $1 }
+    | SwitchStmt { $1 }
     | expr Assign expr { Stmt.ExprStmt (Expr.BinaryExpr { left = $1; operator = Assign; right = $3 }) }
     | expr { Stmt.ExprStmt $1 }
+
+SwitchStmt:
+    | Switch expr LBrace case_list default_opt RBrace {
+        Stmt.SwitchStmt { expr = $2; cases = $4; default_case = $5 }
+    }
+
+case_list:
+    | Case expr Colon stmt_list break_opt case_list { ($2, $4) :: $6 }
+    | Case expr Colon stmt_list break_opt { [($2, $4)] }
+
+default_opt:
+    | Default Colon stmt_list { Some $3 }
+    | { None }
+
+break_opt:
+    | Break Semi { Some Stmt.BreakStmt }
+    | { None }
 
 stmt_opt:
     | stmt { Some $1 }
@@ -157,8 +175,6 @@ ForStmt:
 IfStmt:
     | If LParen expr RParen LBrace stmt_list RBrace Else LBrace stmt_list RBrace {
         Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = Some (Stmt.BlockStmt { body = $10 }); } }
-    | If LParen expr RParen LBrace stmt_list RBrace Else LBrace stmt_list RBrace {
-        Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = Some (Stmt.BlockStmt { body = $10 }); } }
     | If LParen expr RParen LBrace stmt_list RBrace {
         Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = None; } }
 
@@ -177,10 +193,6 @@ VarDeclStmt:
         Stmt.VarDeclarationStmt { identifier = $2; constant = false; assigned_value = Some $6; explicit_type = $4; } }
     | Const Ident Colon type_expr Assign expr {
         Stmt.VarDeclarationStmt { identifier = $2; constant = true; assigned_value = Some $6; explicit_type = $4; } }
-    | Var Ident Colon type_expr Assign Null {
-        Stmt.VarDeclarationStmt { identifier = $2; constant = false; assigned_value = Some Expr.NullExpr; explicit_type = $4; } }
-    | Const Ident Colon type_expr Assign Null {
-        Stmt.VarDeclarationStmt { identifier = $2; constant = true; assigned_value = Some Expr.NullExpr; explicit_type = $4; } }
 
 NewVarDeclStmt:
     | Var Ident Colon New Ident LParen expr RParen {

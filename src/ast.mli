@@ -115,5 +115,7 @@ module Stmt : sig
     | ClassDeclStmt of { name : string; properties : parameter list; methods : t list }
     | ImportStmt of { module_name : string }
     | ExportStmt of { identifier : string }
+    | SwitchStmt of { expr : Expr.t; cases : (Expr.t * t list) list; default_case : t list option}
+    | BreakStmt
   [@@deriving show]
 end

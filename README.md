@@ -13,7 +13,6 @@ Calyxium is a low-level compiled memory safe language
 - Visit the Windows SDK Download Page:
 Go to the official [Windows SDK download page](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/).
 
-
 - Download the Installer:
 Select the appropriate version of the SDK for your Windows version (Windows 10 or 11).
 Download the installer and run it.
@@ -32,23 +31,25 @@ To install Calyxium, follow these steps:
 
 1. Ensure you have OCaml installed on your system. You can download it from [Linux](https://ocaml.org/install#linux_mac_bsd), [Windows](https://ocaml.org/install#windows)
 
-2. Ensure you have opam installed. Then run:
+2. Run `eval $(opam env)` on linux, on windows run `(& opam env ) - split '\r?\n' | >> ForEach-Object { Invoke-Expression $_ }`
+
+3. Ensure you have opam installed. Then run:
 `opam install dune menhir llvm ppx_deriving`
 
-3. Clone the Calyxium repository:
+4. Clone the Calyxium repository:
 `git clone git@github.com:Calyxium/Calyxium.git`
 
-4. Navigate to the cloned directory:
+5. Navigate to the cloned directory:
 `cd Calyxium`
 
-5. Build the project:
+6. Build the project:
 `dune build`
 
 ## Getting Started
 To start using Calyxium, you need to create a script file with the `.cx` extension. Here's a simple example to get you started:
 ```
 # This is a comment in Calyxium
-puts("Hello, world");
+System.Print("Hello, world");
 ```
 To run your script, use the following command:
 `./calyxium main.cx`
@@ -56,7 +57,7 @@ To run your script, use the following command:
 ## Usage
 Calyxium is designed to be easy to learn and use. Here are some basic commands and their usage:
 
-- `puts("Hello, world!");`: Prints a message to the standard output.
+- `System.Print("Hello, world!");`: Prints a message to the standard output.
 - `let x: int = 10;` Declares a variable `x` and assigns it the value of `int 10`.
 - `if (condition) { ... }`: Executes a block of code if the condition is true.
 
@@ -67,22 +68,25 @@ Here are some examples to help you get started with Calyxium:
 
 - **Hello, World**:
     ```
-    puts("Hello, World!");
+    import "System";
+    System.Print("Hello, World!");
     ```
 
 - **Variable Declaration and Printing**:
     ```
+    import "System";
+    import "String";
     let name: string = "Alice";
-    puts("Hello, " + name + "!");
+    System.Print(String.Concat("Hello, ", name, "!"));
     ```
 
 - **Conditional Statements**:
     ```
     let age: int = 25;
     if (age >= 18) {
-        puts("You are an adult.");
+        System.Print("You are an adult.");
     } else {
-        puts("You are not an adult.");
+        System.Print("You are not an adult.");
     }
     ```
 

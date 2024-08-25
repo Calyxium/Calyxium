@@ -1,3 +1,21 @@
+let e: byte = null;
+
+function add(x: int, y: int): int {
+    return x + y;
+};
+
+switch e {
+    case '+':
+        add(5, 5);
+        break;
+    default:
+        let t: byte = 10;
+};
+
+if (x <= e) {
+    let x: int = 10;
+};
+
 # import "System";
 # import "String";
 # 
@@ -20,11 +38,11 @@
     # return x + y + a;
 # };
 
-class Person {
-    let x: int;
-};
-
-let p: new Person(10);
+# class Person {
+#     let x: int;
+# };
+# 
+# let p: new Person(10);
 
 # add(x, y);
 # 
