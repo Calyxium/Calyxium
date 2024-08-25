@@ -1,5 +1,11 @@
+let x: int = 15;
+
 class E {
     let age: int;
 };
 
 let p: new E(10);
+
+# for (let x: int = 10; x < 10; x) {
+#     let y: int = 10;
+# };

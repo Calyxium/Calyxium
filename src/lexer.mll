@@ -70,7 +70,7 @@ rule token = parse
     | "/="                  { column := !column + 1; SlashAssign }
 
     (* Keywords *)
-    | "function"            { column := !column + 7; Function }
+    | "fn"                  { column := !column + 2; Function }
     | "if"                  { column := !column + 1; If }
     | "else"                { column := !column + 3; Else }
     | "let"                 { column := !column + 2; Var }
