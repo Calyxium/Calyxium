@@ -1,33 +1,26 @@
 module TypeChecker = struct
   open Ast
+  module Env = Map.Make (String)
 
-  module Env = Map.Make(String)
-
-  type func_sig = {
-    param_types: Type.t list;
-    return_type: Type.t;
-  }
-
-  type class_info = {
-    class_type: Type.t;
-    properties: (string * Type.t) list;
-  }
+  type func_sig = { param_types : Type.t list; return_type : Type.t }
+  type class_info = { class_type : Type.t; properties : (string * Type.t) list }
 
   type env = {
-    var_type: Type.t Env.t;
-    func_env: func_sig Env.t;
-    class_env: class_info Env.t;
-    modules: string list;
-    exports: string list;
+    var_type : Type.t Env.t;
+    func_env : func_sig Env.t;
+    class_env : class_info Env.t;
+    modules : string list;
+    exports : string list;
   }
 
-  let empty_env = {
-    var_type = Env.empty;
-    func_env = Env.empty;
-    class_env = Env.empty;
-    modules = [];
-    exports = [];
-  }
+  let empty_env =
+    {
+      var_type = Env.empty;
+      func_env = Env.empty;
+      class_env = Env.empty;
+      modules = [];
+      exports = [];
+    }
 
   let lookup_var env name =
     try Env.find name env.var_type
@@ -44,14 +37,12 @@ module TypeChecker = struct
   let check_import env module_name =
     if List.mem module_name env.modules then
       failwith ("Module " ^ module_name ^ " already imported")
-    else
-      { env with modules = module_name :: env.modules }
+    else { env with modules = module_name :: env.modules }
 
   let check_export env identifier =
     if Env.mem identifier env.var_type then
       { env with exports = identifier :: env.exports }
-    else
-      failwith ("Cannot export undefined identifier: " ^ identifier)
+    else failwith ("Cannot export undefined identifier: " ^ identifier)
 
   let rec check_expr env = function
     | Expr.IntExpr _ -> Type.SymbolType { value = "int" }
@@ -61,43 +52,43 @@ module TypeChecker = struct
     | Expr.BoolExpr _ -> Type.SymbolType { value = "bool" }
     | Expr.VarExpr name -> lookup_var env name
     | Expr.CallExpr { callee; arguments } ->
-        let func_name = match callee with
+        let func_name =
+          match callee with
           | Expr.VarExpr name -> name
           | _ -> failwith "Unsupported function call"
         in
         let { param_types; return_type } = lookup_func env func_name in
         if List.length arguments <> List.length param_types then
           failwith ("Incorrect number of arguments for function: " ^ func_name);
-        List.iter2 (fun arg param_type ->
-          let arg_type = check_expr env arg in
-          if arg_type <> param_type then
-            failwith ("Argument type mismatch in function call: " ^ func_name)
-        ) arguments param_types;
+        List.iter2
+          (fun arg param_type ->
+            let arg_type = check_expr env arg in
+            if arg_type <> param_type then
+              failwith ("Argument type mismatch in function call: " ^ func_name))
+          arguments param_types;
         return_type
-    | Expr.BinaryExpr { left; operator; right } ->
+    | Expr.BinaryExpr { left; operator; right } -> (
         let left_type = check_expr env left in
         let right_type = check_expr env right in
-        (match operator with
-         | Eq | Neq | Less | Greater | Leq | Geq ->
-             if left_type = right_type then
-               Type.SymbolType { value = "bool" }
-             else
-               failwith "Type mismatch in comparison expression"
-         | PlusAssign | MinusAssign | StarAssign | SlashAssign ->
-             failwith "Assignment operation cannot be used as a condition in an if statement"
-         | Plus | Minus | Star | Slash | Mod | Pow ->
-             if left_type = right_type then
-               left_type
-             else
-               failwith "Type mismatch in arithmetic expression"
-         | _ -> failwith "Unsupported operator in binary expression")
-    | Expr.PropertyAccessExpr { object_name; property_name } ->
+        match operator with
+        | Eq | Neq | Less | Greater | Leq | Geq ->
+            if left_type = right_type then Type.SymbolType { value = "bool" }
+            else failwith "Type mismatch in comparison expression"
+        | PlusAssign | MinusAssign | StarAssign | SlashAssign ->
+            failwith
+              "Assignment operation cannot be used as a condition in an if \
+               statement"
+        | Plus | Minus | Star | Slash | Mod | Pow ->
+            if left_type = right_type then left_type
+            else failwith "Type mismatch in arithmetic expression"
+        | _ -> failwith "Unsupported operator in binary expression")
+    | Expr.PropertyAccessExpr { object_name; property_name } -> (
         let obj_type = check_expr env object_name in
-        (match obj_type with
-         | Type.ClassType { properties; _ } ->
-             (try List.assoc property_name properties
-              with Not_found -> failwith ("Undefined property: " ^ property_name))
-         | _ -> failwith "Property access on non-object type")
+        match obj_type with
+        | Type.ClassType { properties; _ } -> (
+            try List.assoc property_name properties
+            with Not_found -> failwith ("Undefined property: " ^ property_name))
+        | _ -> failwith "Property access on non-object type")
     | _ -> failwith "Unsupported expression"
 
   let check_var_decl env identifier explicit_type assigned_value =
@@ -106,59 +97,98 @@ module TypeChecker = struct
         let value_type = check_expr env expr in
         if value_type = explicit_type then
           { env with var_type = Env.add identifier explicit_type env.var_type }
-        else
-          failwith ("Type mismatch in variable declaration: " ^ identifier)
+        else failwith ("Type mismatch in variable declaration: " ^ identifier)
     | None -> failwith ("Variable " ^ identifier ^ " has no value assigned")
 
   let rec check_func_decl env name parameters return_type body =
-    let param_types = List.map (fun param -> param.Stmt.param_type) parameters in
-    let var_env = List.fold_left (fun var_env param ->
-      Env.add param.Stmt.name param.Stmt.param_type var_env
-    ) env.var_type parameters in
+    let param_types =
+      List.map (fun param -> param.Stmt.param_type) parameters
+    in
+    let var_env =
+      List.fold_left
+        (fun var_env param ->
+          Env.add param.Stmt.name param.Stmt.param_type var_env)
+        env.var_type parameters
+    in
     let func_sig = { param_types; return_type } in
     let func_env = Env.add name func_sig env.func_env in
-    let new_env = { var_type = var_env; func_env; class_env = env.class_env; modules = env.modules; exports = env.exports } in
+    let new_env =
+      {
+        var_type = var_env;
+        func_env;
+        class_env = env.class_env;
+        modules = env.modules;
+        exports = env.exports;
+      }
+    in
     let _ = check_block new_env body ~expected_return_type:(Some return_type) in
     { env with func_env }
 
   and check_stmt env ~expected_return_type = function
-    | Stmt.VarDeclarationStmt { identifier; constant = _; assigned_value; explicit_type } ->
+    | Stmt.VarDeclarationStmt
+        { identifier; constant = _; assigned_value; explicit_type } ->
         check_var_decl env identifier explicit_type assigned_value
-    | Stmt.NewVarDeclarationStmt { identifier; constant = _; assigned_value = _; arguments } ->
+    | Stmt.NewVarDeclarationStmt
+        { identifier; constant = _; assigned_value; arguments } ->
+        (* Ensure the assigned_value is a NewExpr *)
+        let class_name =
+          match assigned_value with
+          | Some (Expr.NewExpr { class_name; _ }) -> class_name
+          | _ ->
+              failwith
+                ("Expected a class instantiation for variable: " ^ identifier)
+        in
         (* Look up the class information *)
-        let class_info = lookup_class env "Person" in
+        let class_info = lookup_class env class_name in
         (* Check if arguments are provided for all required properties *)
         if List.length arguments <> List.length class_info.properties then
-          failwith ("Incorrect number of arguments for class instantiation: " ^ identifier);
+          failwith
+            ("Incorrect number of arguments for class instantiation: "
+           ^ identifier);
         (* Validate that the argument types match the property types *)
-        List.iter2 (fun arg (prop_name, prop_type) ->
-          let arg_type = check_expr env arg in
-          if arg_type <> prop_type then
-            failwith ("Type mismatch for property " ^ prop_name ^ " in class Person")
-        ) arguments class_info.properties;
+        List.iter2
+          (fun arg (prop_name, prop_type) ->
+            let arg_type = check_expr env arg in
+            if arg_type <> prop_type then
+              failwith
+                ("Type mismatch for property " ^ prop_name ^ " in class "
+               ^ class_name))
+          arguments class_info.properties;
         (* Bind the variable to the class type in the environment *)
-        { env with var_type = Env.add identifier class_info.class_type env.var_type }
+        {
+          env with
+          var_type = Env.add identifier class_info.class_type env.var_type;
+        }
     | Stmt.FunctionDeclStmt { name; parameters; return_type; body } ->
-        let return_type = match return_type with
+        let return_type =
+          match return_type with
           | Some t -> t
           | None -> failwith ("Function " ^ name ^ " must have a return type")
         in
         check_func_decl env name parameters return_type body
     | Stmt.ClassDeclStmt { name; properties; methods = _ } ->
-        let prop_list = List.map (fun param -> (param.Stmt.name, param.param_type)) properties in
-        let class_info = { class_type = Type.ClassType { name; properties = prop_list }; properties = prop_list } in
+        let prop_list =
+          List.map (fun param -> (param.Stmt.name, param.param_type)) properties
+        in
+        let class_info =
+          {
+            class_type = Type.ClassType { name; properties = prop_list };
+            properties = prop_list;
+          }
+        in
         let class_env = Env.add name class_info env.class_env in
         { env with class_env }
-    | Stmt.BlockStmt { body } ->
-        check_block env body ~expected_return_type
-    | Stmt.ReturnStmt expr ->
+    | Stmt.BlockStmt { body } -> check_block env body ~expected_return_type
+    | Stmt.ReturnStmt expr -> (
         let return_type = check_expr env expr in
-        (match expected_return_type with
-         | Some expected_type ->
-             if return_type <> expected_type then
-               failwith ("Return type mismatch: expected " ^ (Type.show expected_type) ^ ", got " ^ (Type.show return_type))
-             else env
-         | None -> env)
+        match expected_return_type with
+        | Some expected_type ->
+            if return_type <> expected_type then
+              failwith
+                ("Return type mismatch: expected " ^ Type.show expected_type
+               ^ ", got " ^ Type.show return_type)
+            else env
+        | None -> env)
     | Stmt.ExprStmt expr ->
         let _ = check_expr env expr in
         env
@@ -168,18 +198,19 @@ module TypeChecker = struct
           failwith "Condition in if statement must be a boolean"
         else
           let env_then = check_stmt env ~expected_return_type then_branch in
-          let env_final = match else_branch with
-            | Some else_branch -> check_stmt env_then ~expected_return_type else_branch
+          let env_final =
+            match else_branch with
+            | Some else_branch ->
+                check_stmt env_then ~expected_return_type else_branch
             | None -> env_then
           in
           env_final
-    | Stmt.ImportStmt { module_name } ->
-        check_import env module_name
-    | Stmt.ExportStmt { identifier } ->
-        check_export env identifier
+    | Stmt.ImportStmt { module_name } -> check_import env module_name
+    | Stmt.ExportStmt { identifier } -> check_export env identifier
     | _ -> failwith "Unsupported statement"
 
   and check_block env stmts ~expected_return_type =
-    List.fold_left (fun env stmt -> check_stmt env stmt ~expected_return_type) env stmts
-
+    List.fold_left
+      (fun env stmt -> check_stmt env stmt ~expected_return_type)
+      env stmts
 end

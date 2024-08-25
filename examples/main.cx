@@ -1,51 +1,5 @@
-let e: byte = null;
-
-function add(x: int, y: int): int {
-    return x + y;
+class E {
+    let age: int;
 };
 
-switch e {
-    case '+':
-        add(5, 5);
-        break;
-    default:
-        let t: byte = 10;
-};
-
-if (x <= e) {
-    let x: int = 10;
-};
-
-# import "System";
-# import "String";
-# 
-# let name: string = "Alice";
-# System.Print(String.Concat("Hello", name, "!"));
-
-# import "System";
-# 
-# let x: int = 10;
-# let y: int = 15;
-# 
-# if (x != y) {
-    # return x;
-# } else {
-    # return y;
-# };
-# 
-# function add(x: int, y: int): int {
-    # let a: int = 10;
-    # return x + y + a;
-# };
-
-# class Person {
-#     let x: int;
-# };
-# 
-# let p: new Person(10);
-
-# add(x, y);
-# 
-# let e: int = 10;
-# 
-# export e;
+let p: new E(10);

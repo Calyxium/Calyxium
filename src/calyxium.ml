@@ -13,10 +13,12 @@ let () =
       Printf.printf "Parsed AST:\n%s\n" (show ast);
 
       let initial_env = TypeChecker.empty_env in
-      
-      let _ = TypeChecker.check_block initial_env [ast] ~expected_return_type:None in
+
+      let _ =
+        TypeChecker.check_block initial_env [ ast ] ~expected_return_type:None
+      in
       Printf.printf "Type checking successful!\n";
-      
+
       close_in file_channel
     with
     | Parser.Error ->
