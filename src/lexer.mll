@@ -14,8 +14,9 @@
       incr line;
       column := 0
 
-    let token_and_update_column t = 
-      update_column ();
+    let token_and_update_column t lexbuf =
+      let token_length = Lexing.lexeme_end lexbuf - Lexing.lexeme_start lexbuf in
+      column := !column + token_length;
       t
 }
 
@@ -29,67 +30,67 @@ rule token = parse
     | "#"                   { read_comment lexbuf }
 
     (* Operators *)
-    | "+"                   { token_and_update_column Plus }
-    | "-"                   { token_and_update_column Minus }
-    | "*"                   { token_and_update_column Star }
-    | "/"                   { token_and_update_column Slash }
+    | "+"                   { token_and_update_column Plus lexbuf }
+    | "-"                   { token_and_update_column Minus lexbuf }
+    | "*"                   { token_and_update_column Star lexbuf }
+    | "/"                   { token_and_update_column Slash lexbuf }
 
     (* Groupings *)
-    | "("                   { token_and_update_column LParen }
-    | ")"                   { token_and_update_column RParen }
-    | "["                   { token_and_update_column LBracket }
-    | "]"                   { token_and_update_column RBracket }
-    | "{"                   { token_and_update_column LBrace }
-    | "}"                   { token_and_update_column RBrace }
+    | "("                   { token_and_update_column LParen lexbuf }
+    | ")"                   { token_and_update_column RParen lexbuf }
+    | "["                   { token_and_update_column LBracket lexbuf }
+    | "]"                   { token_and_update_column RBracket lexbuf }
+    | "{"                   { token_and_update_column LBrace lexbuf }
+    | "}"                   { token_and_update_column RBrace lexbuf }
 
     (* Symbols *)
-    | "."                   { token_and_update_column Dot }
-    | "?"                   { token_and_update_column Question }
-    | ":"                   { token_and_update_column Colon }
-    | ";"                   { token_and_update_column Semi }
-    | ","                   { token_and_update_column Comma }
-    | "!"                   { token_and_update_column Not }
-    | "|"                   { token_and_update_column Pipe }
-    | "&"                   { token_and_update_column Amspersand }
-    | ">"                   { token_and_update_column Greater }
-    | "<"                   { token_and_update_column Less }
-    | "^"                   { token_and_update_column Pow }
-    | "%"                   { token_and_update_column Mod }
-    | "||"                  { column := !column + 1; LogicalOr }
-    | "&&"                  { column := !column + 1; LogicalAnd }
-    | "=="                  { column := !column + 1; Eq }
-    | "!="                  { column := !column + 1; Neq }
-    | ">="                  { column := !column + 1; Geq }
-    | "<="                  { column := !column + 1; Leq }
+    | "."                   { token_and_update_column Dot lexbuf }
+    | "?"                   { token_and_update_column Question lexbuf }
+    | ":"                   { token_and_update_column Colon lexbuf }
+    | ";"                   { token_and_update_column Semi lexbuf }
+    | ","                   { token_and_update_column Comma lexbuf }
+    | "!"                   { token_and_update_column Not lexbuf }
+    | "|"                   { token_and_update_column Pipe lexbuf }
+    | "&"                   { token_and_update_column Amspersand lexbuf }
+    | ">"                   { token_and_update_column Greater lexbuf }
+    | "<"                   { token_and_update_column Less lexbuf }
+    | "^"                   { token_and_update_column Pow lexbuf }
+    | "%"                   { token_and_update_column Mod lexbuf }
+    | "||"                  { column := !column + 2; LogicalOr }
+    | "&&"                  { column := !column + 2; LogicalAnd }
+    | "=="                  { column := !column + 2; Eq }
+    | "!="                  { column := !column + 2; Neq }
+    | ">="                  { column := !column + 2; Geq }
+    | "<="                  { column := !column + 2; Leq }
 
     (* Assign *)
-    | "="                   { token_and_update_column Assign }
-    | "+="                  { column := !column + 1; PlusAssign }
-    | "-="                  { column := !column + 1; MinusAssign }
-    | "*="                  { column := !column + 1; StarAssign }
-    | "/="                  { column := !column + 1; SlashAssign }
+    | "="                   { token_and_update_column Assign lexbuf }
+    | "+="                  { column := !column + 2; PlusAssign }
+    | "-="                  { column := !column + 2; MinusAssign }
+    | "*="                  { column := !column + 2; StarAssign }
+    | "/="                  { column := !column + 2; SlashAssign }
 
     (* Keywords *)
     | "fn"                  { column := !column + 2; Function }
-    | "if"                  { column := !column + 1; If }
-    | "else"                { column := !column + 3; Else }
-    | "let"                 { column := !column + 2; Var }
-    | "const"               { column := !column + 4; Const }
-    | "switch"              { column := !column + 6; Switch }
-    | "case"                { column := !column + 3; Case }
-    | "break"               { column := !column + 4; Break }
-    | "default"             { column := !column + 7; Default }
-    | "return"              { column := !column + 6; Return}
-    | "for"                 { column := !column + 2; For }
-    | "import"              { column := !column + 6; Import }
-    | "export"              { column := !column + 6; Export }
-    | "class"               { column := !column + 5; Class }
-    | "new"                 { column := !column + 2; New }
+    | "if"                  { column := !column + 2; If }
+    | "else"                { column := !column + 4; Else }
+    | "let"                 { column := !column + 3; Var }
+    | "const"               { column := !column + 5; Const }
+    | "switch"              { column := !column + 7; Switch }
+    | "case"                { column := !column + 4; Case }
+    | "break"               { column := !column + 5; Break }
+    | "default"             { column := !column + 8; Default }
+    | "return"              { column := !column + 7; Return}
+    | "for"                 { column := !column + 3; For }
+    | "import"              { column := !column + 7; Import }
+    | "export"              { column := !column + 7; Export }
+    | "class"               { column := !column + 6; Class }
+    | "new"                 { column := !column + 3; New }
     | "true"                { column := !column + 4; True }
     | "false"               { column := !column + 5; False }
-    | "null"                { column := !column + 3; Null }
+    | "null"                { column := !column + 4; Null }
 
-    (*Types *)
+    (* Types *)
     | "int"                 { column := !column + 3; IntType }
     | "float"               { column := !column + 5; FloatType }
     | "string"              { column := !column + 6; StringType }
@@ -107,4 +108,4 @@ rule token = parse
 and read_comment = parse
     | '\n'                 { incr line; column := 0; token lexbuf }
     | _                    { read_comment lexbuf }
-    | eof                  { EOF }  
+    | eof                  { EOF }

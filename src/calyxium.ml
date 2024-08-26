@@ -1,6 +1,25 @@
 open Ast.Stmt
 open Typechecker
 
+let print_error_position filename _lexbuf =
+  let line_num = Lexer.get_line () in
+  let col_num = Lexer.get_column () in
+
+  let file_channel = open_in filename in
+  let rec read_lines i =
+    try
+      let line = input_line file_channel in
+      if i = line_num then Some line else read_lines (i + 1)
+    with End_of_file -> None
+  in
+  let line_content = match read_lines 1 with
+    | Some line -> line
+    | None -> ""
+  in
+  close_in file_channel;
+  
+  Printf.printf "Parser Error at Line %d, Column %d\n-> %s\n" line_num col_num line_content
+
 let () =
   if Array.length Sys.argv <> 2 then
     Printf.printf "Usage: %s <filename>\n" Sys.argv.(0)
@@ -22,12 +41,12 @@ let () =
       close_in file_channel
     with
     | Parser.Error ->
-        Printf.fprintf stderr "Parser error at line %d, column %d: %s\n"
-          (Lexer.get_line ()) (Lexer.get_column ()) (Lexing.lexeme lexbuf);
+        print_error_position filename lexbuf;
+        Printf.fprintf stderr "Missing ';' at the end of the statement.\n";
         close_in file_channel;
         exit (-1)
     | Failure msg ->
-        Printf.fprintf stderr "Type checking error: %s\n" msg;
+        Printf.fprintf stderr "Error: %s\n" msg;
         close_in file_channel;
         exit (-1)
     | e ->

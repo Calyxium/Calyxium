@@ -1,13 +1,5 @@
-let op: byte = '+';
-
-fn add(x: int, y: int): int {
-    return x + y;
+fn fib(x: int): int {
+    return x;
 };
 
-switch op {
-    case '+':
-        add(5, 6);
-        break;
-    default:
-        let x: int = 10;
-};
+fib(10);

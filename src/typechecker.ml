@@ -77,8 +77,10 @@ module TypeChecker = struct
         let array_type = check_expr env array in
         let start_type = check_expr env start in
         let end_type = check_expr env end_ in
-        if start_type <> Type.SymbolType { value = "int" } || end_type <> Type.SymbolType { value = "int" } then
-          failwith "Array slice indices must be integers";
+        if
+          start_type <> Type.SymbolType { value = "int" }
+          || end_type <> Type.SymbolType { value = "int" }
+        then failwith "Array slice indices must be integers";
         array_type
     | Expr.CallExpr { callee; arguments } ->
         let func_name =
@@ -259,22 +261,22 @@ module TypeChecker = struct
           in
           env_final
     | Stmt.ForStmt { init; condition; increment; body } ->
-        let env = 
+        let env =
           match init with
           | Some stmt -> check_stmt env ~expected_return_type:None stmt
           | None -> env
         in
-        let _ = 
+        let _ =
           let cond_type = check_expr env condition in
           if cond_type <> Type.SymbolType { value = "bool" } then
             failwith "Condition in for statement must be a boolean"
         in
-        let env = 
+        let env =
           match increment with
           | Some stmt -> check_stmt env ~expected_return_type:None stmt
           | None -> env
         in
-        check_block env [body] ~expected_return_type
+        check_block env [ body ] ~expected_return_type
     | Stmt.SwitchStmt { expr; cases; default_case } ->
         let switch_type = check_expr env expr in
         List.iter
