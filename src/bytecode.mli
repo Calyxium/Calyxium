@@ -1,6 +1,7 @@
 type opcode =
   | LOAD_INT of int
   | LOAD_FLOAT of float
+  | POW
   | MOD
   | FADD
   | FSUB

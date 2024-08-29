@@ -62,6 +62,8 @@ rule token = parse
     | "!="                  { column := !column + 2; Neq }
     | ">="                  { column := !column + 2; Geq }
     | "<="                  { column := !column + 2; Leq }
+    | "--"                  { column := !column + 2; Dec }
+    | "++"                  { column := !column + 2; Inc }
 
     (* Assign *)
     | "="                   { token_and_update_column Assign lexbuf }

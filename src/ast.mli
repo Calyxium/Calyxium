@@ -27,6 +27,8 @@ type token =
   | Neq
   | Geq
   | Leq
+  | Dec
+  | Inc
   | Assign
   | PlusAssign
   | MinusAssign

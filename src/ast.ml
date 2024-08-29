@@ -27,6 +27,8 @@ type token =
   | Neq
   | Geq
   | Leq
+  | Dec
+  | Inc
   | Assign
   | PlusAssign
   | MinusAssign
@@ -92,6 +94,8 @@ let pp_token fmt = function
   | Neq -> Format.fprintf fmt "Neq"
   | Geq -> Format.fprintf fmt "Geq"
   | Leq -> Format.fprintf fmt "Leq"
+  | Dec -> Format.fprintf fmt "Dec"
+  | Inc -> Format.fprintf fmt "Inc"
   | Assign -> Format.fprintf fmt "Assign"
   | PlusAssign -> Format.fprintf fmt "PlusAssign"
   | MinusAssign -> Format.fprintf fmt "MinusAssign"

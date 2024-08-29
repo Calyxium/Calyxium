@@ -2,19 +2,18 @@
     open Ast
 %}
 
-(* Prec *)
+(* Precedence and Associativity *)
 %left Plus Minus
 %left Star Slash Mod
 %left Pow
 
-%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class True False Plus Minus Star Slash Mod Pow LParen RParen LBracket RBracket LBrace RBrace Dot Question Colon Semi Comma Not Pipe Amspersand Greater Less LogicalOr LogicalAnd Eq Neq Geq Leq IntType FloatType StringType ByteType BoolType Assign PlusAssign MinusAssign StarAssign SlashAssign
+%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class True False Plus Minus Star Slash Mod Pow LParen RParen LBracket RBracket LBrace RBrace Dot Question Colon Semi Comma Not Pipe Amspersand Greater Less LogicalOr LogicalAnd Eq Neq Geq Leq Dec Inc IntType FloatType StringType ByteType BoolType Assign PlusAssign MinusAssign StarAssign SlashAssign
 %token <string> Ident
 %token <int> Int
 %token <float> Float
 %token <string> String
 %token <char> Byte
 %token <bool> Bool
-(* EOF *)
 %token EOF
 
 %start program
@@ -62,12 +61,13 @@ break_opt:
 
 stmt_opt:
     | stmt { Some $1 }
+    | expr { Some (Stmt.ExprStmt $1) } (* Convert Expr.t to Stmt.t *)
     | { None }
 
 expr_opt:
     | expr { Some $1 }
     | { None }
-    
+
 parameter_list:
     | parameter Comma parameter_list { $1 :: $3 }
     | parameter { [$1] }
@@ -122,6 +122,8 @@ expr:
     | Byte { Expr.ByteExpr { value = $1 } }
     | Bool { Expr.BoolExpr { value = $1 } }
     | Ident { Expr.VarExpr $1 }
+    | expr Inc { Expr.UnaryExpr { operator = Inc; operand = $1 } }  (* Handle i++ *)
+    | expr Dec { Expr.UnaryExpr { operator = Dec; operand = $1 } }
     | LBrace RBrace { Expr.ArrayExpr { elements = [] } }
     | LBrace expr_list RBrace { Expr.ArrayExpr { elements = $2 } }
     | Ident LBracket expr RBracket { Expr.IndexExpr { array = Expr.VarExpr $1; index = $3 } }
@@ -155,24 +157,57 @@ ClassDeclStmt:
     | Class Ident LBrace class_body RBrace { Stmt.ClassDeclStmt { name = $2; properties = fst $4; methods = snd $4 } }
 
 ForStmt:
-    | For LParen stmt_opt Semi expr_opt Semi stmt_opt RParen LBrace stmt_list RBrace { let default_condition = Expr.VarExpr "true" in Stmt.ForStmt { init = $3; condition = Option.value ~default:default_condition $5; increment = $7; body = Stmt.BlockStmt { body = $10 } } }
+    | For LParen stmt_opt Semi expr_opt Semi stmt_opt RParen LBrace stmt_list RBrace {
+        let default_condition = Expr.VarExpr "true" in
+        let increment_stmt = match $7 with
+            | None -> (match $3 with
+                | Some (Stmt.VarDeclarationStmt { identifier; _ }) -> 
+                    Some (Stmt.ExprStmt (Expr.UnaryExpr { operator = Inc; operand = Expr.VarExpr identifier }))
+                | Some (Stmt.ExprStmt (Expr.VarExpr var_name)) -> 
+                    Some (Stmt.ExprStmt (Expr.UnaryExpr { operator = Inc; operand = Expr.VarExpr var_name }))
+                | _ -> None)
+            | Some (Stmt.ExprStmt expr) -> Some (Stmt.ExprStmt expr)
+            | Some _ -> None in
+        Stmt.ForStmt { 
+            init = $3;
+            condition = Option.value ~default:default_condition $5;
+            increment = increment_stmt;
+            body = Stmt.BlockStmt { body = $10 };
+        }
+    }
 
 IfStmt:
-    | If LParen expr RParen LBrace stmt_list RBrace Else LBrace stmt_list RBrace { Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = Some (Stmt.BlockStmt { body = $10 }); } }
-    | If LParen expr RParen LBrace stmt_list RBrace { Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = None; } }
+    | If LParen expr RParen LBrace stmt_list RBrace Else LBrace stmt_list RBrace { 
+        Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = Some (Stmt.BlockStmt { body = $10 }); } 
+    }
+    | If LParen expr RParen LBrace stmt_list RBrace { 
+        Stmt.IfStmt { condition = $3; then_branch = Stmt.BlockStmt { body = $6 }; else_branch = None; } 
+    }
 
 FunctionDeclStmt:
-    | Function Ident LParen parameter_list RParen Colon type_expr LBrace stmt_list RBrace { Stmt.FunctionDeclStmt { name = $2; parameters = $4; return_type = Some $7; body = $9; } }
-    | Function Ident LParen parameter_list RParen LBrace stmt_list RBrace { Stmt.FunctionDeclStmt { name = $2; parameters = $4; return_type = None; body = $7; } }
+    | Function Ident LParen parameter_list RParen Colon type_expr LBrace stmt_list RBrace { 
+        Stmt.FunctionDeclStmt { name = $2; parameters = $4; return_type = Some $7; body = $9; } 
+    }
+    | Function Ident LParen parameter_list RParen LBrace stmt_list RBrace { 
+        Stmt.FunctionDeclStmt { name = $2; parameters = $4; return_type = None; body = $7; } 
+    }
 
 ReturnStmt:
     | Return expr { Stmt.ReturnStmt $2 }
     | Return { Stmt.ReturnStmt (Expr.VarExpr "") }
 
 VarDeclStmt:
-    | Var Ident Colon type_expr Assign expr { Stmt.VarDeclarationStmt { identifier = $2; constant = false; assigned_value = Some $6; explicit_type = $4; } }
-    | Const Ident Colon type_expr Assign expr { Stmt.VarDeclarationStmt { identifier = $2; constant = true; assigned_value = Some $6; explicit_type = $4; } }
+    | Var Ident Colon type_expr Assign expr { 
+        Stmt.VarDeclarationStmt { identifier = $2; constant = false; assigned_value = Some $6; explicit_type = $4; } 
+    }
+    | Const Ident Colon type_expr Assign expr { 
+        Stmt.VarDeclarationStmt { identifier = $2; constant = true; assigned_value = Some $6; explicit_type = $4; } 
+    }
 
 NewVarDeclStmt:
-    | Var Ident Assign New Ident { Stmt.NewVarDeclarationStmt { identifier = $2; constant = false; assigned_value = Some (Expr.NewExpr { class_name = $5; arguments = [] }); arguments = [] } }
-    | Const Ident Assign New Ident { Stmt.NewVarDeclarationStmt { identifier = $2; constant = true; assigned_value = Some (Expr.NewExpr { class_name = $5; arguments = [] }); arguments = [] } }
+    | Var Ident Assign New Ident { 
+        Stmt.NewVarDeclarationStmt { identifier = $2; constant = false; assigned_value = Some (Expr.NewExpr { class_name = $5; arguments = [] }); arguments = [] } 
+    }
+    | Const Ident Assign New Ident { 
+        Stmt.NewVarDeclarationStmt { identifier = $2; constant = true; assigned_value = Some (Expr.NewExpr { class_name = $5; arguments = [] }); arguments = [] } 
+    }

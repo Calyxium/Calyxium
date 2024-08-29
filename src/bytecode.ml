@@ -3,6 +3,7 @@ open Ast
 type opcode =
   | LOAD_INT of int
   | LOAD_FLOAT of float
+  | POW
   | MOD
   | FADD
   | FSUB
@@ -15,6 +16,7 @@ type opcode =
 let pp_opcode fmt = function
   | LOAD_INT value -> Format.fprintf fmt "LOAD_INT %d" value
   | LOAD_FLOAT value -> Format.fprintf fmt "LOAD_FLOAT %f" value
+  | POW -> Format.fprintf fmt "POW"
   | MOD -> Format.fprintf fmt "MOD"
   | FADD -> Format.fprintf fmt "FADD"
   | FSUB -> Format.fprintf fmt "FSUB"
@@ -44,13 +46,14 @@ let rec compile_expr = function
           | Plus -> [ FADD ]
           | Minus -> [ FSUB ]
           | _ -> failwith "Unsupported operator")
-      | Star | Slash | Mod -> (
+      | Star | Slash | Mod | Pow -> (
           left_bytecode @ right_bytecode
           @
           match operator with
           | Star -> [ FMUL ]
           | Slash -> [ FDIV ]
           | Mod -> [ MOD ]
+          | Pow -> [ POW ]
           | _ -> failwith "Unsupported operator")
       | _ -> failwith "Unsupported operator")
   | _ -> failwith "Unsupported expression"
