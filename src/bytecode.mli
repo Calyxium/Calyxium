@@ -2,10 +2,10 @@ type opcode =
   | LOAD_INT of int
   | LOAD_FLOAT of float
   | MOD
-  | FADD  
+  | FADD
   | FSUB
-  | FMUL  
-  | FDIV  
+  | FMUL
+  | FDIV
   | POP
   | HALT
   | RETURN

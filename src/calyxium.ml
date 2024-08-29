@@ -14,13 +14,11 @@ let print_error_position filename _lexbuf =
       if i = line_num then Some line else read_lines (i + 1)
     with End_of_file -> None
   in
-  let line_content = match read_lines 1 with
-    | Some line -> line
-    | None -> ""
-  in
+  let line_content = match read_lines 1 with Some line -> line | None -> "" in
   close_in file_channel;
-  
-  Printf.printf "Parser Error at Line %d, Column %d\n-> %s\n" line_num col_num line_content
+
+  Printf.printf "Parser Error at Line %d, Column %d\n-> %s\n" line_num col_num
+    line_content
 
 let () =
   if Array.length Sys.argv <> 2 then
@@ -41,11 +39,12 @@ let () =
       Printf.printf "Type checking successful!\n";
 
       let bytecode = compile_stmt ast in
-      List.iter (fun op ->
-        Bytecode.pp_opcode Format.str_formatter op;
-        let opcode_str = Format.flush_str_formatter () in
-        Printf.printf "Generated opcode: %s\n" opcode_str
-      ) bytecode;
+      List.iter
+        (fun op ->
+          Bytecode.pp_opcode Format.str_formatter op;
+          let opcode_str = Format.flush_str_formatter () in
+          Printf.printf "Generated opcode: %s\n" opcode_str)
+        bytecode;
       let result = run bytecode in
       Printf.printf "Result: %f\n" result;
 

@@ -4,8 +4,23 @@ module TypeChecker = struct
 
   type func_sig = { param_types : Type.t list; return_type : Type.t }
   type class_info = { class_type : Type.t; properties : (string * Type.t) list }
-  type env = { var_type : Type.t Env.t; func_env : func_sig Env.t; class_env : class_info Env.t; modules : string list; exports : string list; }
-  let empty_env = { var_type = Env.empty; func_env = Env.empty; class_env = Env.empty; modules = []; exports = []; }
+
+  type env = {
+    var_type : Type.t Env.t;
+    func_env : func_sig Env.t;
+    class_env : class_info Env.t;
+    modules : string list;
+    exports : string list;
+  }
+
+  let empty_env =
+    {
+      var_type = Env.empty;
+      func_env = Env.empty;
+      class_env = Env.empty;
+      modules = [];
+      exports = [];
+    }
 
   let lookup_var env name =
     try Env.find name env.var_type
@@ -150,7 +165,14 @@ module TypeChecker = struct
     in
     let func_sig = { param_types; return_type } in
     let func_env = Env.add name func_sig env.func_env in
-    let new_env = { var_type = var_env; func_env; class_env = env.class_env; modules = env.modules; exports = env.exports; }
+    let new_env =
+      {
+        var_type = var_env;
+        func_env;
+        class_env = env.class_env;
+        modules = env.modules;
+        exports = env.exports;
+      }
     in
     let _ = check_block new_env body ~expected_return_type:(Some return_type) in
     { env with func_env }
