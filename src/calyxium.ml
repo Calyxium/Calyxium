@@ -1,5 +1,7 @@
-open Ast.Stmt
+open Ast
 open Typechecker
+open Bytecode
+open Interpreter
 
 let print_error_position filename _lexbuf =
   let line_num = Lexer.get_line () in
@@ -29,7 +31,7 @@ let () =
     let lexbuf = Lexing.from_channel file_channel in
     try
       let ast = Parser.program Lexer.token lexbuf in
-      Printf.printf "Parsed AST:\n%s\n" (show ast);
+      Printf.printf "Parsed AST:\n%s\n" (Stmt.show ast);
 
       let initial_env = TypeChecker.empty_env in
 
@@ -37,6 +39,15 @@ let () =
         TypeChecker.check_block initial_env [ ast ] ~expected_return_type:None
       in
       Printf.printf "Type checking successful!\n";
+
+      let bytecode = compile_stmt ast in
+      List.iter (fun op ->
+        Bytecode.pp_opcode Format.str_formatter op;
+        let opcode_str = Format.flush_str_formatter () in
+        Printf.printf "Generated opcode: %s\n" opcode_str
+      ) bytecode;
+      let result = run bytecode in
+      Printf.printf "Result: %f\n" result;
 
       close_in file_channel
     with
