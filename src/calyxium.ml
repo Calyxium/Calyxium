@@ -2,6 +2,7 @@ open Ast
 open Typechecker
 open Bytecode
 open Interpreter
+open Repl
 
 let print_error_position filename _lexbuf =
   let line_num = Lexer.get_line () in
@@ -21,9 +22,7 @@ let print_error_position filename _lexbuf =
     line_content
 
 let () =
-  if Array.length Sys.argv <> 2 then
-    Printf.printf "Usage: %s <filename>\n" Sys.argv.(0)
-  else
+  if Array.length Sys.argv = 2 then
     let filename = Sys.argv.(1) in
     let file_channel = open_in filename in
     let lexbuf = Lexing.from_channel file_channel in
@@ -64,3 +63,5 @@ let () =
           (Printexc.to_string e);
         close_in file_channel;
         exit (-1)
+  else
+    repl()

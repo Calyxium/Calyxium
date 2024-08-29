@@ -1,6 +1,6 @@
 (executable
  (name calyxium)
- (modules bytecode interpreter typechecker ast parser lexer calyxium)
+ (modules repl bytecode interpreter typechecker ast parser lexer calyxium)
  (libraries ppx_deriving.show)
  (preprocess
   (pps ppx_deriving.show))
