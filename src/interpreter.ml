@@ -38,11 +38,11 @@ let rec execute_bytecode instructions stack pc =
           (mod_float b a :: List.tl (List.tl stack))
           (pc + 1)
     | POW ->
-      let a = List.hd stack in
-      let b = List.hd (List.tl stack) in
-      execute_bytecode instructions
-      ((b ** a) :: List.tl (List.tl stack))
-      (pc + 1)
+        let a = List.hd stack in
+        let b = List.hd (List.tl stack) in
+        execute_bytecode instructions
+          ((b ** a) :: List.tl (List.tl stack))
+          (pc + 1)
     | POP -> execute_bytecode instructions (List.tl stack) (pc + 1)
     | RETURN -> List.hd stack
     | HALT -> List.hd stack
