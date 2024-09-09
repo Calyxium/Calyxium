@@ -23,16 +23,13 @@ let eval_input input =
         Printf.printf "Generated opcode: %s\n" opcode_str)
       bytecode;
     let result = run bytecode in
-    Printf.printf "Result: %f\n" result;
+    Printf.printf "Result: %f\n" result
+  with e ->
+    Printf.printf "An unexpected error occurred: %s\n" (Printexc.to_string e)
 
-  with
-  | e ->
-      Printf.printf "An unexpected error occurred: %s\n" (Printexc.to_string e)
+let get_version () = "0.0.1"
 
-let get_version () =
-    "0.0.1"
-
-let rec repl () =
+let print_repl_info () =
   let version = get_version () in
   let platform =
     match Sys.os_type with
@@ -40,11 +37,14 @@ let rec repl () =
     | "Win32" -> "Windows"
     | _ -> "Unknown"
   in
-  Printf.printf "Calyxium %s on %s\n" version platform;
+  Printf.printf "Calyxium %s on %s\n" version platform
+
+let rec repl () =
   Printf.printf ">> ";
   let input = read_line () in
   if input <> "exit" then (
     eval_input input;
-    repl ()
-  ) else
-    Printf.printf "Exiting REPL.\n"
+    repl ())
+  else Printf.printf "Exiting REPL.\n"
+
+let () = print_repl_info ()

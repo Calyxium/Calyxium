@@ -22,7 +22,7 @@ let print_error_position filename _lexbuf =
     line_content
 
 let () =
-  if Array.length Sys.argv = 2 then
+  if Array.length Sys.argv = 2 then (
     let filename = Sys.argv.(1) in
     let file_channel = open_in filename in
     let lexbuf = Lexing.from_channel file_channel in
@@ -62,6 +62,5 @@ let () =
         Printf.fprintf stderr "An unexpected error occurred: %s\n"
           (Printexc.to_string e);
         close_in file_channel;
-        exit (-1)
-  else
-    repl()
+        exit (-1))
+  else repl ()
