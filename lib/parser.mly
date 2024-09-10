@@ -61,7 +61,6 @@ break_opt:
 
 stmt_opt:
     | stmt { Some $1 }
-    | expr { Some (Stmt.ExprStmt $1) }  
     | { None }
 
 expr_opt:

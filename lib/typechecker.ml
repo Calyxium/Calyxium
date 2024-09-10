@@ -142,7 +142,8 @@ module TypeChecker = struct
             try List.assoc property_name properties
             with Not_found -> failwith ("Undefined property: " ^ property_name))
         | _ -> failwith "Property access on non-object type")
-    | _ -> failwith "Unsupported expression"
+    | expr ->
+        failwith ("Unsupported expression: " ^ (Expr.show expr))
 
   let check_var_decl env identifier explicit_type assigned_value =
     match assigned_value with
@@ -292,7 +293,8 @@ module TypeChecker = struct
         env
     | Stmt.ImportStmt { module_name } -> check_import env module_name
     | Stmt.ExportStmt { identifier } -> check_export env identifier
-    | _ -> failwith "Unsupported statement"
+    | stmt ->
+        failwith ("Unsupported statement: " ^ (Stmt.show stmt))
 
   and check_block env stmts ~expected_return_type =
     List.fold_left

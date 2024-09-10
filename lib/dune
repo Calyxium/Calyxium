@@ -3,7 +3,7 @@
  (modules ast bytecode interpreter lexer parser repl typechecker)
  (libraries ppx_deriving.show)
  (preprocess (pps ppx_deriving.show))
- (flags :standard -w -02)
+ (flags :standard -w -03)
  (modes native))
 
 (ocamllex lexer)
