@@ -40,11 +40,10 @@ let print_repl_info () =
   Printf.printf "Calyxium %s on %s\n" version platform
 
 let rec repl () =
+  print_repl_info ();
   Printf.printf ">> ";
   let input = read_line () in
   if input <> "exit" then (
     eval_input input;
     repl ())
   else Printf.printf "Exiting REPL.\n"
-
-let () = print_repl_info ()
