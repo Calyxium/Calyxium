@@ -1,5 +1,3 @@
-(* lib/bytecode.ml *)
-
 open Ast
 
 type opcode =
