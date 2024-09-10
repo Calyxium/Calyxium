@@ -3,10 +3,19 @@
  (modules ast bytecode interpreter lexer parser repl typechecker)
  (libraries ppx_deriving.show)
  (preprocess (pps ppx_deriving.show))
- (flags :standard -w -03)
+ (flags :standard)
  (modes native))
 
 (ocamllex lexer)
 
 (menhir
  (modules parser))
+
+(documentation
+ (package calyxium))
+
+(env
+ (dev
+  (flags (:standard)))
+ (release  
+  (flags (:standard -w -03))))

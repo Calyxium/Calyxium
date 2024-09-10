@@ -1,8 +1,9 @@
 param (
-    [string]$platform
+    [string]$platform,
+    [string]$env
 )
 
-$requiredPackages = @("dune", "menhir", "llvm", "ppx_deriving")
+$requiredPackages = @("dune", "menhir", "llvm", "ppx_deriving", "odoc")
 
 function Check-OpamEnvLinux {
     $opamEnv = $(opam var root)
@@ -37,8 +38,21 @@ function Ensure-Packages {
 }
 
 function Build-Project {
-    Write-Host "Building the project using 'dune build'..."
-    & dune build
+    switch ($env) {
+        "dev" {
+            $profile = "dev"
+        }
+        "release" {
+            $profile = "release"
+        }
+        default {
+            Write-Host "Unknown environment. Use 'dev' or 'release' as the environment."
+            exit 1
+        }
+    }
+
+    Write-Host "Building the project using 'dune build --profile $profile'..."
+    & dune build --profile $profile
 
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Project build successful."
