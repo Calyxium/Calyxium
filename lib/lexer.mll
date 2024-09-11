@@ -1,23 +1,24 @@
 {
-    open Parser
+  open Parser
 
-    let line = ref 1
-    let column = ref 0
+  let line = ref 1
+  let column = ref 0
 
-    let get_line () = !line
-    let get_column () = !column
+  let get_line () = !line
 
-    let update_column () =
-      incr column
+  let get_column () = !column
 
-    let update_line () =
-      incr line;
-      column := 0
+  let update_column () =
+    incr column
 
-    let token_and_update_column t lexbuf =
-      let token_length = Lexing.lexeme_end lexbuf - Lexing.lexeme_start lexbuf in
-      column := !column + token_length;
-      t
+  let update_line () =
+    incr line;
+    column := 0
+
+  let token_and_update_column t lexbuf =
+    let token_length = Lexing.lexeme_end lexbuf - Lexing.lexeme_start lexbuf in
+    column := !column + token_length;
+    t
 }
 
 let Identifier = ['a'-'z' 'A'-'Z' '_']*
@@ -29,13 +30,11 @@ rule token = parse
     | '\n'                  { update_line (); token lexbuf }
     | "#"                   { read_comment lexbuf }
 
-    (* Operators *)
     | "+"                   { token_and_update_column Plus lexbuf }
     | "-"                   { token_and_update_column Minus lexbuf }
     | "*"                   { token_and_update_column Star lexbuf }
     | "/"                   { token_and_update_column Slash lexbuf }
 
-    (* Groupings *)
     | "("                   { token_and_update_column LParen lexbuf }
     | ")"                   { token_and_update_column RParen lexbuf }
     | "["                   { token_and_update_column LBracket lexbuf }
@@ -43,7 +42,6 @@ rule token = parse
     | "{"                   { token_and_update_column LBrace lexbuf }
     | "}"                   { token_and_update_column RBrace lexbuf }
 
-    (* Symbols *)
     | "."                   { token_and_update_column Dot lexbuf }
     | "?"                   { token_and_update_column Question lexbuf }
     | ":"                   { token_and_update_column Colon lexbuf }
@@ -65,14 +63,12 @@ rule token = parse
     | "--"                  { column := !column + 2; Dec }
     | "++"                  { column := !column + 2; Inc }
 
-    (* Assign *)
     | "="                   { token_and_update_column Assign lexbuf }
     | "+="                  { column := !column + 2; PlusAssign }
     | "-="                  { column := !column + 2; MinusAssign }
     | "*="                  { column := !column + 2; StarAssign }
     | "/="                  { column := !column + 2; SlashAssign }
 
-    (* Keywords *)
     | "fn"                  { column := !column + 2; Function }
     | "if"                  { column := !column + 2; If }
     | "else"                { column := !column + 4; Else }
@@ -92,14 +88,12 @@ rule token = parse
     | "false"               { column := !column + 5; False }
     | "null"                { column := !column + 4; Null }
 
-    (* Types *)
     | "int"                 { column := !column + 3; IntType }
     | "float"               { column := !column + 5; FloatType }
     | "string"              { column := !column + 6; StringType }
     | "byte"                { column := !column + 4; ByteType }
     | "bool"                { column := !column + 4; BoolType }
 
-    (* Literals *)
     | Identifier            { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Ident lexeme }
     | Floats                { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Float (float_of_string lexeme) }
     | Digits                { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Int (int_of_string lexeme) }

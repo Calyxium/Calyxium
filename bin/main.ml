@@ -1,9 +1,3 @@
-open Calyxium.Ast
-open Calyxium.Typechecker
-open Calyxium.Bytecode
-open Calyxium.Interpreter
-open Calyxium.Repl
-
 let print_error_position filename _lexbuf =
   let line_num = Calyxium.Lexer.get_line () in
   let col_num = Calyxium.Lexer.get_column () in
@@ -28,23 +22,24 @@ let () =
     let lexbuf = Lexing.from_channel file_channel in
     try
       let ast = Calyxium.Parser.program Calyxium.Lexer.token lexbuf in
-      Printf.printf "Parsed AST:\n%s\n" (Stmt.show ast);
+      Printf.printf "Parsed AST:\n%s\n" (Calyxium.Ast.Stmt.show ast);
 
-      let initial_env = TypeChecker.empty_env in
+      let initial_env = Calyxium.Typechecker.TypeChecker.empty_env in
 
       let _ =
-        TypeChecker.check_block initial_env [ ast ] ~expected_return_type:None
+        Calyxium.Typechecker.TypeChecker.check_block initial_env [ ast ]
+          ~expected_return_type:None
       in
       Printf.printf "Type checking successful!\n";
 
-      let bytecode = compile_stmt ast in
+      let bytecode = Calyxium.Bytecode.compile_stmt ast in
       List.iter
         (fun op ->
           Calyxium.Bytecode.pp_opcode Format.str_formatter op;
           let opcode_str = Format.flush_str_formatter () in
           Printf.printf "Generated opcode: %s\n" opcode_str)
         bytecode;
-      let result = run bytecode in
+      let result = Calyxium.Interpreter.run bytecode in
       Printf.printf "Result: %f\n" result;
 
       close_in file_channel
@@ -62,7 +57,5 @@ let () =
         Printf.fprintf stderr "An unexpected error occurred: %s\n"
           (Printexc.to_string e);
         close_in file_channel;
-        exit (-1)
-  ) else (
-    repl ()
-  )
+        exit (-1))
+  else Calyxium.Repl.repl ()

@@ -2,7 +2,8 @@
  (name calyxium)
  (modules ast bytecode interpreter lexer parser repl typechecker)
  (libraries ppx_deriving.show)
- (preprocess (pps ppx_deriving.show))
+ (preprocess
+  (pps ppx_deriving.show))
  (flags :standard)
  (modes native))
 
@@ -11,11 +12,13 @@
 (menhir
  (modules parser))
 
-(documentation
- (package calyxium))
+(documentation)
 
 (env
  (dev
-  (flags (:standard)))
- (release  
-  (flags (:standard -w -03))))
+  (flags
+   (:standard -w +a-42-4)))
+ ; Removing Warnings for 'Compiler version'
+ (release
+  (flags
+   (:standard -w -03))))

@@ -1,5 +1,3 @@
-open Ast
-
 type opcode =
   | LOAD_INT of int
   | LOAD_FLOAT of float
@@ -27,36 +25,31 @@ let pp_opcode fmt = function
   | HALT -> Format.fprintf fmt "HALT"
 
 let rec compile_expr = function
-  | Expr.IntExpr { value } -> [ LOAD_INT value ]
-  | Expr.FloatExpr { value } -> [ LOAD_FLOAT value ]
-  | Expr.BinaryExpr { left; operator; right } -> (
+  | Ast.Expr.IntExpr { value } -> [ LOAD_INT value ]
+  | Ast.Expr.FloatExpr { value } -> [ LOAD_FLOAT value ]
+  | Ast.Expr.StringExpr _ -> failwith "StringExpr not supported"
+  | Ast.Expr.ByteExpr _ -> failwith "ByteExpr not supported"
+  | Ast.Expr.BoolExpr _ -> failwith "BoolExpr not supported"
+  | Ast.Expr.VarExpr _ -> failwith "VarExpr not supported"
+  | Ast.Expr.BinaryExpr { left; operator; right } -> (
       let left_bytecode = compile_expr left in
       let right_bytecode = compile_expr right in
       match operator with
-      | Plus | Minus -> (
-          let compiled_right =
-            match right with
-            | Expr.BinaryExpr { operator = Star | Slash | Mod; _ } ->
-                compile_expr right
-            | _ -> right_bytecode
-          in
-          left_bytecode @ compiled_right
-          @
-          match operator with
-          | Plus -> [ FADD ]
-          | Minus -> [ FSUB ]
-          | _ -> failwith "Unsupported operator")
-      | Star | Slash | Mod | Pow -> (
-          left_bytecode @ right_bytecode
-          @
-          match operator with
-          | Star -> [ FMUL ]
-          | Slash -> [ FDIV ]
-          | Mod -> [ MOD ]
-          | Pow -> [ POW ]
-          | _ -> failwith "Unsupported operator")
+      | Ast.Plus -> left_bytecode @ right_bytecode @ [ FADD ]
+      | Ast.Minus -> left_bytecode @ right_bytecode @ [ FSUB ]
+      | Ast.Star -> left_bytecode @ right_bytecode @ [ FMUL ]
+      | Ast.Slash -> left_bytecode @ right_bytecode @ [ FDIV ]
+      | Ast.Mod -> left_bytecode @ right_bytecode @ [ MOD ]
+      | Ast.Pow -> left_bytecode @ right_bytecode @ [ POW ]
       | _ -> failwith "Unsupported operator")
-  | _ -> failwith "Unsupported expression"
+  | Ast.Expr.CallExpr _ -> failwith "CallExpr not supported"
+  | Ast.Expr.UnaryExpr _ -> failwith "UnaryExpr not supported"
+  | Ast.Expr.NullExpr -> failwith "NullExpr not supported"
+  | Ast.Expr.NewExpr _ -> failwith "NewExpr not supported"
+  | Ast.Expr.PropertyAccessExpr _ -> failwith "PropertyAccessExpr not supported"
+  | Ast.Expr.ArrayExpr _ -> failwith "ArrayExpr not supported"
+  | Ast.Expr.IndexExpr _ -> failwith "IndexExpr not supported"
+  | Ast.Expr.SliceExpr _ -> failwith "SliceExpr not supported"
 
 let rec compile_stmt = function
   | Ast.Stmt.ExprStmt expr -> compile_expr expr
@@ -68,4 +61,14 @@ let rec compile_stmt = function
       in
       compile_body body
   | Ast.Stmt.ReturnStmt expr -> compile_expr expr @ [ RETURN ]
-  | _ -> failwith "Unsupported statement"
+  | Ast.Stmt.IfStmt _ -> failwith "IfStmt not supported"
+  | Ast.Stmt.ForStmt _ -> failwith "ForStmt not supported"
+  | Ast.Stmt.VarDeclarationStmt _ -> failwith "VarDeclarationStmt not supported"
+  | Ast.Stmt.NewVarDeclarationStmt _ ->
+      failwith "NewVarDeclarationStmt not supported"
+  | Ast.Stmt.FunctionDeclStmt _ -> failwith "FunctionDeclStmt not supported"
+  | Ast.Stmt.ClassDeclStmt _ -> failwith "ClassDeclStmt not supported"
+  | Ast.Stmt.ImportStmt _ -> failwith "ImportStmt not supported"
+  | Ast.Stmt.ExportStmt _ -> failwith "ExportStmt not supported"
+  | Ast.Stmt.SwitchStmt _ -> failwith "SwitchStmt not supported"
+  | Ast.Stmt.BreakStmt -> failwith "BreakStmt not supported"
