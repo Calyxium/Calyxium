@@ -15,7 +15,7 @@ depends: [
   "menhir"
   "llvm"
   "ppx_deriving"
-  "odoc" {with-doc}
+  "odoc"
 ]
 build: [
   ["dune" "subst"] {dev}

@@ -31,18 +31,15 @@ To install Calyxium, follow these steps:
 
 1. Ensure you have OCaml installed on your system. You can download it from [Linux](https://ocaml.org/install#linux_mac_bsd), [Windows](https://ocaml.org/install#windows)
 
-2. Run `eval $(opam env)` on linux, on windows run `(& opam env ) - split '\r?\n' | >> ForEach-Object { Invoke-Expression $_ }`
+2. Run the build powershell script on linux `pwsh ./build/build linux dev || release`, on windows `./build/build.ps1 windows dev || release`
 
-3. Ensure you have opam installed. Then run:
-`opam install dune menhir llvm ppx_deriving`
-
-4. Clone the Calyxium repository:
+3. Clone the Calyxium repository:
 `git clone git@github.com:Calyxium/Calyxium.git`
 
-5. Navigate to the cloned directory:
+4. Navigate to the cloned directory:
 `cd Calyxium`
 
-6. Build the project:
+5. Build the project:
 `dune build`
 
 ## Getting Started
