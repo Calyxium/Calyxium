@@ -3,7 +3,7 @@
 %left Star Slash Mod
 %left Pow
 
-%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class True False Plus Minus Star Slash Mod Pow LParen RParen LBracket RBracket LBrace RBrace Dot Question Colon Semi Comma Not Pipe Amspersand Greater Less LogicalOr LogicalAnd Eq Neq Geq Leq Dec Inc IntType FloatType StringType ByteType BoolType Assign PlusAssign MinusAssign StarAssign SlashAssign
+%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class True False Plus Minus Star Slash Mod Pow LParen RParen LBracket RBracket LBrace RBrace Dot Question Colon Carot Semi Comma Not Pipe Amspersand Greater Less LogicalOr LogicalAnd Eq Neq Geq Leq Dec Inc IntType FloatType StringType ByteType BoolType Assign PlusAssign MinusAssign StarAssign SlashAssign
 %token <string> Ident
 %token <int> Int
 %token <float> Float

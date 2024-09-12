@@ -15,6 +15,11 @@
     incr line;
     column := 0
 
+  let update_column_with_lexeme lexbuf =
+    let lexeme = Lexing.lexeme lexbuf in
+    column := !column + String.length lexeme;
+    lexeme
+
   let token_and_update_column t lexbuf =
     let token_length = Lexing.lexeme_end lexbuf - Lexing.lexeme_start lexbuf in
     column := !column + token_length;
@@ -52,8 +57,9 @@ rule token = parse
     | "&"                   { token_and_update_column Amspersand lexbuf }
     | ">"                   { token_and_update_column Greater lexbuf }
     | "<"                   { token_and_update_column Less lexbuf }
-    | "^"                   { token_and_update_column Pow lexbuf }
+    | "^"                   { token_and_update_column Carot lexbuf }
     | "%"                   { token_and_update_column Mod lexbuf }
+    | "**"                  { column := !column + 2; Pow }
     | "||"                  { column := !column + 2; LogicalOr }
     | "&&"                  { column := !column + 2; LogicalAnd }
     | "=="                  { column := !column + 2; Eq }
@@ -69,30 +75,30 @@ rule token = parse
     | "*="                  { column := !column + 2; StarAssign }
     | "/="                  { column := !column + 2; SlashAssign }
 
-    | "fn"                  { column := !column + 2; Function }
-    | "if"                  { column := !column + 2; If }
-    | "else"                { column := !column + 4; Else }
-    | "let"                 { column := !column + 3; Var }
-    | "const"               { column := !column + 5; Const }
-    | "switch"              { column := !column + 7; Switch }
-    | "case"                { column := !column + 4; Case }
-    | "break"               { column := !column + 5; Break }
-    | "default"             { column := !column + 8; Default }
-    | "return"              { column := !column + 7; Return}
-    | "for"                 { column := !column + 3; For }
-    | "import"              { column := !column + 7; Import }
-    | "export"              { column := !column + 7; Export }
-    | "class"               { column := !column + 6; Class }
-    | "new"                 { column := !column + 3; New }
-    | "true"                { column := !column + 4; True }
-    | "false"               { column := !column + 5; False }
-    | "null"                { column := !column + 4; Null }
+    | "fn"                  { ignore (update_column_with_lexeme lexbuf); Function }
+    | "if"                  { ignore (update_column_with_lexeme lexbuf); If }
+    | "else"                { ignore (update_column_with_lexeme lexbuf); Else }
+    | "let"                 { ignore (update_column_with_lexeme lexbuf); Var }
+    | "const"               { ignore (update_column_with_lexeme lexbuf); Const }
+    | "switch"              { ignore (update_column_with_lexeme lexbuf); Switch }
+    | "case"                { ignore (update_column_with_lexeme lexbuf); Case }
+    | "break"               { ignore (update_column_with_lexeme lexbuf); Break }
+    | "default"             { ignore (update_column_with_lexeme lexbuf); Default }
+    | "return"              { ignore (update_column_with_lexeme lexbuf); Return}
+    | "for"                 { ignore (update_column_with_lexeme lexbuf); For }
+    | "import"              { ignore (update_column_with_lexeme lexbuf); Import }
+    | "export"              { ignore (update_column_with_lexeme lexbuf); Export }
+    | "class"               { ignore (update_column_with_lexeme lexbuf); Class }
+    | "new"                 { ignore (update_column_with_lexeme lexbuf); New }
+    | "true"                { ignore (update_column_with_lexeme lexbuf); True }
+    | "false"               { ignore (update_column_with_lexeme lexbuf); False }
+    | "null"                { ignore (update_column_with_lexeme lexbuf); Null }
 
-    | "int"                 { column := !column + 3; IntType }
-    | "float"               { column := !column + 5; FloatType }
-    | "string"              { column := !column + 6; StringType }
-    | "byte"                { column := !column + 4; ByteType }
-    | "bool"                { column := !column + 4; BoolType }
+    | "int"                 { ignore (update_column_with_lexeme lexbuf); IntType }
+    | "float"               { ignore (update_column_with_lexeme lexbuf); FloatType }
+    | "string"              { ignore (update_column_with_lexeme lexbuf); StringType }
+    | "byte"                { ignore (update_column_with_lexeme lexbuf); ByteType }
+    | "bool"                { ignore (update_column_with_lexeme lexbuf); BoolType }
 
     | Identifier            { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Ident lexeme }
     | Floats                { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Float (float_of_string lexeme) }

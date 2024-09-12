@@ -2,6 +2,7 @@ let print_error_position filename _lexbuf =
   let line_num = Calyxium.Lexer.get_line () in
   let col_num = Calyxium.Lexer.get_column () in
 
+  
   let file_channel = open_in filename in
   let rec read_lines i =
     try
