@@ -17,7 +17,7 @@
 (env
  (dev
   (flags
-   (:standard -w +a-42-4)))
+   (:standard -w +a-4)))
  ; Removing Warnings for 'Compiler version'
  (release
   (flags

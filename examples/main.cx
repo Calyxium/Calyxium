@@ -1,1 +1,4 @@
-10.0 + 10.0 / 1.0 * 5.0 % 3.0;
+let x: int = 10;
+let y: int = 10;
+let z: int = 5;
+x + y - y / x * z;

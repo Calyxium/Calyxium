@@ -1,6 +1,8 @@
 type opcode =
   | LOAD_INT of int
   | LOAD_FLOAT of float
+  | LOAD_VAR of string
+  | STORE_VAR of string
   | POW
   | MOD
   | FADD
@@ -14,6 +16,8 @@ type opcode =
 let pp_opcode fmt = function
   | LOAD_INT value -> Format.fprintf fmt "LOAD_INT %d" value
   | LOAD_FLOAT value -> Format.fprintf fmt "LOAD_FLOAT %f" value
+  | LOAD_VAR name -> Format.fprintf fmt "LOAD_VAR %s" name
+  | STORE_VAR name -> Format.fprintf fmt "STORE_VAR %s" name
   | POW -> Format.fprintf fmt "POW"
   | MOD -> Format.fprintf fmt "MOD"
   | FADD -> Format.fprintf fmt "FADD"
@@ -30,7 +34,7 @@ let rec compile_expr = function
   | Ast.Expr.StringExpr _ -> failwith "StringExpr not supported"
   | Ast.Expr.ByteExpr _ -> failwith "ByteExpr not supported"
   | Ast.Expr.BoolExpr _ -> failwith "BoolExpr not supported"
-  | Ast.Expr.VarExpr _ -> failwith "VarExpr not supported"
+  | Ast.Expr.VarExpr name -> [ LOAD_VAR name ]
   | Ast.Expr.BinaryExpr { left; operator; right } -> (
       let left_bytecode = compile_expr left in
       let right_bytecode = compile_expr right in
@@ -57,13 +61,20 @@ let rec compile_stmt = function
       let rec compile_body = function
         | [] -> []
         | [ stmt ] -> compile_stmt stmt
-        | stmt :: rest -> compile_stmt stmt @ [ POP ] @ compile_body rest
+        | stmt :: rest -> compile_stmt stmt @ compile_body rest
       in
       compile_body body
   | Ast.Stmt.ReturnStmt expr -> compile_expr expr @ [ RETURN ]
   | Ast.Stmt.IfStmt _ -> failwith "IfStmt not supported"
   | Ast.Stmt.ForStmt _ -> failwith "ForStmt not supported"
-  | Ast.Stmt.VarDeclarationStmt _ -> failwith "VarDeclarationStmt not supported"
+  | Ast.Stmt.VarDeclarationStmt
+      { identifier; constant = _; assigned_value; explicit_type = _ } ->
+      let expr_bytecode =
+        match assigned_value with
+        | Some expr -> compile_expr expr
+        | None -> [ LOAD_INT 0 ]
+      in
+      expr_bytecode @ [ STORE_VAR identifier ]
   | Ast.Stmt.NewVarDeclarationStmt _ ->
       failwith "NewVarDeclarationStmt not supported"
   | Ast.Stmt.FunctionDeclStmt _ -> failwith "FunctionDeclStmt not supported"

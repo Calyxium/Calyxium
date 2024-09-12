@@ -1,6 +1,8 @@
 type opcode =
   | LOAD_INT of int
   | LOAD_FLOAT of float
+  | LOAD_VAR of string
+  | STORE_VAR of string
   | POW
   | MOD
   | FADD
