@@ -30,6 +30,7 @@ type opcode =
   | JUMP of int
   | JUMP_IF_FALSE of int
   | PRINT
+  | LEN
 
 val pp_opcode : Format.formatter -> opcode -> unit
 val compile_expr : Ast.Expr.t -> opcode list

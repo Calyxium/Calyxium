@@ -1,9 +1,9 @@
 let string_table = Hashtbl.create 10
 
 let add_string str =
-    let id = Hashtbl.hash str in
-    Hashtbl.add string_table id str;
-    id
+  let id = Hashtbl.hash str in
+  Hashtbl.add string_table id str;
+  id
 
 let replace_newline str =
   let buffer = Buffer.create (String.length str) in
@@ -180,27 +180,39 @@ let rec execute_bytecode instructions stack env pc =
             else Printf.printf "%f" value;
             execute_bytecode instructions rest env (pc + 1)
         | [] -> failwith "Runtime Error: Stack underflow during PRINT")
-        | Bytecode.CONCAT -> (
-    match stack with
-    | a :: b :: rest ->
-        let int_value1 = int_of_float a in
-        let int_value2 = int_of_float b in
-        let str_a =
-          if Hashtbl.mem string_table int_value1 then
-            Hashtbl.find string_table int_value1
-          else
-            failwith "Runtime Error: Stack value for CONCAT is not a string"
-        in
-        let str_b =
-          if Hashtbl.mem string_table int_value2 then
-            Hashtbl.find string_table int_value2
-          else
-            failwith "Runtime Error: Stack value for CONCAT is not a string"
-        in
-        let concatenated_str = str_b ^ str_a in
-        let new_id = add_string concatenated_str in
-        execute_bytecode instructions (float_of_int new_id :: rest) env (pc + 1)
-    | _ -> failwith "Runtime Error: Stack underflow during CONCAT")
+    | Bytecode.CONCAT -> (
+        match stack with
+        | a :: b :: rest ->
+            let int_value1 = int_of_float a in
+            let int_value2 = int_of_float b in
+            let str_a =
+              if Hashtbl.mem string_table int_value1 then
+                Hashtbl.find string_table int_value1
+              else
+                failwith "Runtime Error: Stack value for CONCAT is not a string"
+            in
+            let str_b =
+              if Hashtbl.mem string_table int_value2 then
+                Hashtbl.find string_table int_value2
+              else
+                failwith "Runtime Error: Stack value for CONCAT is not a string"
+            in
+            let concatenated_str = str_b ^ str_a in
+            let new_id = add_string concatenated_str in
+            execute_bytecode instructions
+              (float_of_int new_id :: rest)
+              env (pc + 1)
+        | _ -> failwith "Runtime Error: Stack underflow during CONCAT")
+    | Bytecode.LEN -> (
+        match stack with
+        | value :: rest ->
+            let int_value = int_of_float value in
+            if Hashtbl.mem string_table int_value then
+              let str = Hashtbl.find string_table int_value in
+              let length = float_of_int (String.length str) in
+              execute_bytecode instructions (length :: rest) env (pc + 1)
+            else failwith "Runtime Error: Stack value for LEN is not a string"
+        | [] -> failwith "Runtime Error: Stack underflow during LEN")
     | Bytecode.HALT -> (
         match stack with
         | [] -> failwith "Runtime Error: Stack is empty during HALT"

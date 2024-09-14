@@ -22,10 +22,17 @@ module TypeChecker = struct
     exports : string list;
   }
 
+  let len_func_sig =
+    {
+      param_types = [ Ast.Type.SymbolType { value = "string" } ];
+      return_type = Ast.Type.SymbolType { value = "int" };
+    }
+  
   let empty_env =
     {
       var_type = Env.empty;
-      func_env = Env.add "print" print_func_sig Env.empty;
+      func_env = Env.add "print" print_func_sig
+                  (Env.add "len" len_func_sig Env.empty);
       class_env = Env.empty;
       modules = [];
       exports = [];
@@ -150,11 +157,14 @@ module TypeChecker = struct
             if left_type = right_type then left_type
             else failwith "TypeChecker: Type mismatch in arithmetic expression"
         | Ast.Carot ->
-            if left_type = Ast.Type.SymbolType { value = "string" } 
-               && right_type = Ast.Type.SymbolType { value = "string" } then
-              Ast.Type.SymbolType { value = "string" }
+            if
+              left_type = Ast.Type.SymbolType { value = "string" }
+              && right_type = Ast.Type.SymbolType { value = "string" }
+            then Ast.Type.SymbolType { value = "string" }
             else
-              failwith "TypeChecker: Type mismatch in string concatenation, both operands must be strings"
+              failwith
+                "TypeChecker: Type mismatch in string concatenation, both \
+                 operands must be strings"
         | Ast.PlusAssign | Ast.MinusAssign | Ast.StarAssign | Ast.SlashAssign ->
             failwith
               "TypeChecker: Assignment operation cannot be used as a condition \

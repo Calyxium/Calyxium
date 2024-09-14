@@ -30,6 +30,7 @@ type opcode =
   | JUMP of int
   | JUMP_IF_FALSE of int
   | PRINT
+  | LEN
 
 let pp_opcode fmt = function
   | LOAD_INT value -> Format.fprintf fmt "LOAD_INT %d" value
@@ -63,6 +64,7 @@ let pp_opcode fmt = function
   | JUMP label -> Format.fprintf fmt "JUMP %d" label
   | JUMP_IF_FALSE label -> Format.fprintf fmt "JUMP_IF_FALSE %d" label
   | PRINT -> Format.fprintf fmt "PRINT"
+  | LEN -> Format.fprintf fmt "LEN"
 
 let rec compile_expr = function
   | Ast.Expr.IntExpr { value } -> [ LOAD_INT value ]
@@ -98,6 +100,11 @@ let rec compile_expr = function
             List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
           in
           args_bytecode @ [ PRINT ]
+      | Ast.Expr.VarExpr "len" ->
+        let args_bytecode =
+          List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
+        in
+        args_bytecode @ [ LEN ]
       | _ -> failwith "Unsupported function call")
   | Ast.Expr.UnaryExpr { operator; operand } -> (
       let operand_bytecode = compile_expr operand in

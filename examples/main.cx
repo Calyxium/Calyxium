@@ -1,1 +1,3 @@
-print("Hello, " ^ "World!" ^ "\n");
+let str: string = "Hello, world!";
+print(len(str));
+print("\n");
