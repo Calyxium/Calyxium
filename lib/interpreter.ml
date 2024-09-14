@@ -189,13 +189,15 @@ let rec execute_bytecode instructions stack env pc =
               if Hashtbl.mem string_table int_value1 then
                 Hashtbl.find string_table int_value1
               else
-                failwith "Runtime Error: Stack value for CONCAT is not a string"
+                failwith
+                  "Runtime Error: First operand for CONCAT is not a string"
             in
             let str_b =
               if Hashtbl.mem string_table int_value2 then
                 Hashtbl.find string_table int_value2
               else
-                failwith "Runtime Error: Stack value for CONCAT is not a string"
+                failwith
+                  "Runtime Error: Second operand for CONCAT is not a string"
             in
             let concatenated_str = str_b ^ str_a in
             let new_id = add_string concatenated_str in
@@ -213,6 +215,55 @@ let rec execute_bytecode instructions stack env pc =
               execute_bytecode instructions (length :: rest) env (pc + 1)
             else failwith "Runtime Error: Stack value for LEN is not a string"
         | [] -> failwith "Runtime Error: Stack underflow during LEN")
+    | Bytecode.TOSTRING -> (
+        match stack with
+        | value :: rest ->
+            let str_value =
+              if Hashtbl.mem string_table (int_of_float value) then
+                Hashtbl.find string_table (int_of_float value)
+              else if floor value = value then
+                string_of_int (int_of_float value)
+              else string_of_float value
+            in
+            let new_id = add_string str_value in
+            execute_bytecode instructions
+              (float_of_int new_id :: rest)
+              env (pc + 1)
+        | _ -> failwith "Runtime Error: Stack underflow during TOSTRING")
+    | Bytecode.TOINT -> (
+        match stack with
+        | value :: rest ->
+            let int_value =
+              if Hashtbl.mem string_table (int_of_float value) then
+                let str = Hashtbl.find string_table (int_of_float value) in
+                try int_of_string str
+                with Failure _ ->
+                  failwith "Runtime Error: Invalid integer string"
+              else
+                try int_of_float value
+                with Failure _ ->
+                  failwith
+                    "Runtime Error: Stack value for TOINT is not a valid number"
+            in
+            execute_bytecode instructions
+              (float_of_int int_value :: rest)
+              env (pc + 1)
+        | _ -> failwith "Runtime Error: Stack underflow during TOINT")
+    | Bytecode.TOFLOAT -> (
+        match stack with
+        | value :: rest ->
+            let float_value =
+              if Hashtbl.mem string_table (int_of_float value) then
+                let str = Hashtbl.find string_table (int_of_float value) in
+                try float_of_string str
+                with Failure _ ->
+                  failwith "Runtime Error: Invalid float string"
+              else if snd (modf value) = 0.0 then
+                float_of_int (int_of_float value)
+              else value
+            in
+            execute_bytecode instructions (float_value :: rest) env (pc + 1)
+        | _ -> failwith "Runtime Error: Stack underflow during TOFLOAT")
     | Bytecode.HALT -> (
         match stack with
         | [] -> failwith "Runtime Error: Stack is empty during HALT"

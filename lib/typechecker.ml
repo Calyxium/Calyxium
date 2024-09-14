@@ -28,11 +28,33 @@ module TypeChecker = struct
       return_type = Ast.Type.SymbolType { value = "int" };
     }
 
+  let to_string_func_sig =
+    {
+      param_types = [ Ast.Type.Any ];
+      return_type = Ast.Type.SymbolType { value = "string" };
+    }
+
+  let to_int_func_sig =
+    {
+      param_types = [ Ast.Type.SymbolType { value = "float" } ];
+      return_type = Ast.Type.SymbolType { value = "int" };
+    }
+
+  let to_float_func_sig =
+    {
+      param_types = [ Ast.Type.SymbolType { value = "int" } ];
+      return_type = Ast.Type.SymbolType { value = "float" };
+    }
+
   let empty_env =
     {
       var_type = Env.empty;
       func_env =
-        Env.add "print" print_func_sig (Env.add "len" len_func_sig Env.empty);
+        Env.add "ToString" to_string_func_sig
+          (Env.add "len" len_func_sig
+             (Env.add "print" print_func_sig
+                (Env.add "ToInt" to_int_func_sig
+                   (Env.add "ToFloat" to_float_func_sig Env.empty))));
       class_env = Env.empty;
       modules = [];
       exports = [];
@@ -113,7 +135,16 @@ module TypeChecker = struct
         List.iter2
           (fun arg param_type ->
             let arg_type = check_expr env arg in
-            if param_type <> Ast.Type.Any && arg_type <> param_type then
+            if
+              param_type <> Ast.Type.Any
+              && not
+                   ((* Allow int-to-float conversion and vice-versa *)
+                    param_type = Ast.Type.SymbolType { value = "float" }
+                    && arg_type = Ast.Type.SymbolType { value = "int" }
+                   || param_type = Ast.Type.SymbolType { value = "int" }
+                      && arg_type = Ast.Type.SymbolType { value = "float" }
+                   || param_type = arg_type)
+            then
               failwith
                 ("TypeChecker: Argument type mismatch in function call: "
                ^ func_name))

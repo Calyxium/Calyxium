@@ -1,3 +1,17 @@
 let str: string = "Hello, world!";
-print(len(str));
+let a: int = 10;
+let b: float = 15.0;
+
+# print(ToFloat(a) + 5.0);
+# print("\n");
+# print(ToString(len(str)) ^ "\n");
+# print(ToInt(b) + 10);
+# print("\n");
+print(ToInt(b) + a);
 print("\n");
+# print("The length of string Hello, world! is: " ^ ToString(len(str)));
+# print("\n");
+
+# for (let i: int = 1; i <= 10; i++) {
+    # print("Yay for loops work");
+# };

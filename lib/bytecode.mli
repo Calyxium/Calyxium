@@ -31,6 +31,9 @@ type opcode =
   | JUMP_IF_FALSE of int
   | PRINT
   | LEN
+  | TOSTRING
+  | TOINT
+  | TOFLOAT
 
 val pp_opcode : Format.formatter -> opcode -> unit
 val compile_expr : Ast.Expr.t -> opcode list

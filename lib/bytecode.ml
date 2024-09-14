@@ -31,6 +31,9 @@ type opcode =
   | JUMP_IF_FALSE of int
   | PRINT
   | LEN
+  | TOSTRING
+  | TOINT
+  | TOFLOAT
 
 let pp_opcode fmt = function
   | LOAD_INT value -> Format.fprintf fmt "LOAD_INT %d" value
@@ -65,6 +68,9 @@ let pp_opcode fmt = function
   | JUMP_IF_FALSE label -> Format.fprintf fmt "JUMP_IF_FALSE %d" label
   | PRINT -> Format.fprintf fmt "PRINT"
   | LEN -> Format.fprintf fmt "LEN"
+  | TOSTRING -> Format.fprintf fmt "TOSTRING"
+  | TOINT -> Format.fprintf fmt "TOINT"
+  | TOFLOAT -> Format.fprintf fmt "TOFLOAT"
 
 let rec compile_expr = function
   | Ast.Expr.IntExpr { value } -> [ LOAD_INT value ]
@@ -105,6 +111,21 @@ let rec compile_expr = function
             List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
           in
           args_bytecode @ [ LEN ]
+      | Ast.Expr.VarExpr "ToString" ->
+          let args_bytecode =
+            List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
+          in
+          args_bytecode @ [ TOSTRING ]
+      | Ast.Expr.VarExpr "ToInt" ->
+          let args_bytecode =
+            List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
+          in
+          args_bytecode @ [ TOINT ]
+      | Ast.Expr.VarExpr "ToFloat" ->
+          let args_bytecode =
+            List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
+          in
+          args_bytecode @ [ TOFLOAT ]
       | _ -> failwith "Unsupported function call")
   | Ast.Expr.UnaryExpr { operator; operand } -> (
       let operand_bytecode = compile_expr operand in
