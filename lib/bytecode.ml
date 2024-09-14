@@ -101,10 +101,10 @@ let rec compile_expr = function
           in
           args_bytecode @ [ PRINT ]
       | Ast.Expr.VarExpr "len" ->
-        let args_bytecode =
-          List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
-        in
-        args_bytecode @ [ LEN ]
+          let args_bytecode =
+            List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
+          in
+          args_bytecode @ [ LEN ]
       | _ -> failwith "Unsupported function call")
   | Ast.Expr.UnaryExpr { operator; operand } -> (
       let operand_bytecode = compile_expr operand in

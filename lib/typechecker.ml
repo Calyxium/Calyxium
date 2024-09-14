@@ -27,12 +27,12 @@ module TypeChecker = struct
       param_types = [ Ast.Type.SymbolType { value = "string" } ];
       return_type = Ast.Type.SymbolType { value = "int" };
     }
-  
+
   let empty_env =
     {
       var_type = Env.empty;
-      func_env = Env.add "print" print_func_sig
-                  (Env.add "len" len_func_sig Env.empty);
+      func_env =
+        Env.add "print" print_func_sig (Env.add "len" len_func_sig Env.empty);
       class_env = Env.empty;
       modules = [];
       exports = [];
