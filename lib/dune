@@ -18,7 +18,6 @@
  (dev
   (flags
    (:standard -w +a-4)))
- ; Removing Warnings for 'Compiler version'
  (release
   (flags
    (:standard -w -03))))

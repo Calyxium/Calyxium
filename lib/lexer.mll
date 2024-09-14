@@ -75,7 +75,7 @@ rule token = parse
     | "*="                  { column := !column + 2; StarAssign }
     | "/="                  { column := !column + 2; SlashAssign }
 
-    | "fn"                  { ignore (update_column_with_lexeme lexbuf); Function }
+    | "fun"                 { ignore (update_column_with_lexeme lexbuf); Function }
     | "if"                  { ignore (update_column_with_lexeme lexbuf); If }
     | "else"                { ignore (update_column_with_lexeme lexbuf); Else }
     | "let"                 { ignore (update_column_with_lexeme lexbuf); Var }
@@ -88,11 +88,11 @@ rule token = parse
     | "for"                 { ignore (update_column_with_lexeme lexbuf); For }
     | "import"              { ignore (update_column_with_lexeme lexbuf); Import }
     | "export"              { ignore (update_column_with_lexeme lexbuf); Export }
-    | "class"               { ignore (update_column_with_lexeme lexbuf); Class }
+    | "struct"              { ignore (update_column_with_lexeme lexbuf); Class }
     | "new"                 { ignore (update_column_with_lexeme lexbuf); New }
     | "true"                { ignore (update_column_with_lexeme lexbuf); True }
     | "false"               { ignore (update_column_with_lexeme lexbuf); False }
-    | "null"                { ignore (update_column_with_lexeme lexbuf); Null }
+    | "nil"                 { ignore (update_column_with_lexeme lexbuf); Null }
 
     | "int"                 { ignore (update_column_with_lexeme lexbuf); IntType }
     | "float"               { ignore (update_column_with_lexeme lexbuf); FloatType }

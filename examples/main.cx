@@ -1,1 +1,3 @@
-5 ** 2;
+let x: int = 10;
+let y: int = 15;
+x + y;

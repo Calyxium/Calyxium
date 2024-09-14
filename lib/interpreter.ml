@@ -7,12 +7,12 @@ let rec execute_bytecode instructions stack env pc =
         execute_bytecode instructions (float_of_int value :: stack) env (pc + 1)
     | Bytecode.LOAD_FLOAT value ->
         execute_bytecode instructions (value :: stack) env (pc + 1)
-        | Bytecode.LOAD_VAR name ->
-            let value =
-              try List.assoc name env
-              with Not_found -> failwith ("Error: Variable " ^ name ^ " not found")
-            in
-            execute_bytecode instructions (value :: stack) env (pc + 1)
+    | Bytecode.LOAD_VAR name ->
+        let value =
+          try List.assoc name env
+          with Not_found -> failwith ("Error: Variable " ^ name ^ " not found")
+        in
+        execute_bytecode instructions (value :: stack) env (pc + 1)
     | Bytecode.STORE_VAR name -> (
         match stack with
         | [] -> failwith "Error: Stack is empty when trying to store variable"
