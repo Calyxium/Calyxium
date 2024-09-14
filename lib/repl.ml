@@ -2,7 +2,6 @@ let eval_input input =
   let lexbuf = Lexing.from_string input in
   try
     let ast = Parser.program Lexer.token lexbuf in
-    Printf.printf "Parsed AST:\n%s\n" (Ast.Stmt.show ast);
 
     let initial_env = Typechecker.TypeChecker.empty_env in
 
@@ -21,7 +20,7 @@ let eval_input input =
     let result = Interpreter.run bytecode in
     Printf.printf "Result: %f\n" result
   with e ->
-    Printf.printf "An unexpected error occurred: %s\n" (Printexc.to_string e)
+    Printf.printf "Repl: An unexpected error occurred: %s\n" (Printexc.to_string e)
 
 let get_version () = "0.0.1"
 

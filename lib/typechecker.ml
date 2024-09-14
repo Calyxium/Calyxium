@@ -27,15 +27,15 @@ module TypeChecker = struct
 
   let lookup_var env name =
     try Env.find name env.var_type
-    with Not_found -> failwith ("Unbound variable: " ^ name)
+    with Not_found -> failwith ("TypeChecker: Unbound variable: " ^ name)
 
   let lookup_func env name =
     try Env.find name env.func_env
-    with Not_found -> failwith ("Unbound function: " ^ name)
+    with Not_found -> failwith ("TypeChecker: Unbound function: " ^ name)
 
   let lookup_class env name =
     try Env.find name env.class_env
-    with Not_found -> failwith ("Unbound class: " ^ name)
+    with Not_found -> failwith ("TypeChecker: Unbound class: " ^ name)
 
   let check_import env module_name =
     if List.mem module_name env.modules then
@@ -45,7 +45,7 @@ module TypeChecker = struct
   let check_export env identifier =
     if Env.mem identifier env.var_type then
       { env with exports = identifier :: env.exports }
-    else failwith ("Cannot export undefined identifier: " ^ identifier)
+    else failwith ("TypeChecker: Cannot export undefined identifier: " ^ identifier)
 
   let rec check_expr env = function
     | Ast.Expr.IntExpr _ -> Ast.Type.SymbolType { value = "int" }
@@ -58,24 +58,24 @@ module TypeChecker = struct
     | Ast.Expr.VarExpr name -> lookup_var env name
     | Ast.Expr.ArrayExpr { elements } -> (
         match elements with
-        | [] -> failwith "Cannot infer type of an empty array"
+        | [] -> failwith "TypeChecker: Cannot infer type of an empty array"
         | first_elem :: _ ->
             let elem_type = check_expr env first_elem in
             List.iter
               (fun elem ->
                 let t = check_expr env elem in
                 if t <> elem_type then
-                  failwith "Type mismatch in array elements")
+                  failwith "TypeChecker: Type mismatch in array elements")
               elements;
             Ast.Type.ArrayType { element_type = elem_type })
     | Ast.Expr.IndexExpr { array; index } -> (
         let array_type = check_expr env array in
         let index_type = check_expr env index in
         if index_type <> Ast.Type.SymbolType { value = "int" } then
-          failwith "Array index must be an integer";
+          failwith "TypeChecker: Array index must be an integer";
         match array_type with
         | Ast.Type.ArrayType { element_type } -> element_type
-        | _ -> failwith "Cannot index non-array type")
+        | _ -> failwith "TypeChecker: Cannot index non-array type")
     | Ast.Expr.SliceExpr { array; start; end_ } ->
         let array_type = check_expr env array in
         let start_type = check_expr env start in
@@ -83,22 +83,22 @@ module TypeChecker = struct
         if
           start_type <> Ast.Type.SymbolType { value = "int" }
           || end_type <> Ast.Type.SymbolType { value = "int" }
-        then failwith "Array slice indices must be integers";
+        then failwith "TypeChecker: Array slice indices must be integers";
         array_type
     | Ast.Expr.CallExpr { callee; arguments } ->
         let func_name =
           match callee with
           | Ast.Expr.VarExpr name -> name
-          | _ -> failwith "Unsupported function call"
+          | _ -> failwith "TypeChecker: Unsupported function call"
         in
         let { param_types; return_type } = lookup_func env func_name in
         if List.length arguments <> List.length param_types then
-          failwith ("Incorrect number of arguments for function: " ^ func_name);
+          failwith ("TypeChecker: Incorrect number of arguments for function: " ^ func_name);
         List.iter2
           (fun arg param_type ->
             let arg_type = check_expr env arg in
             if arg_type <> param_type then
-              failwith ("Argument type mismatch in function call: " ^ func_name))
+              failwith ("TypeChecker: Argument type mismatch in function call: " ^ func_name))
           arguments param_types;
         return_type
     | Ast.Expr.BinaryExpr { left; operator; right } -> (
@@ -115,38 +115,38 @@ module TypeChecker = struct
                       let expected_type = List.assoc property_name properties in
                       if expected_type <> right_type then
                         failwith
-                          ("Type mismatch in assignment to property "
+                          ("TypeChecker: Type mismatch in assignment to property "
                          ^ property_name)
                       else left_type
                     with Not_found ->
-                      failwith ("Undefined property: " ^ property_name))
-                | _ -> failwith "Assignment to non-object property")
+                      failwith ("TypeChecker: Undefined property: " ^ property_name))
+                | _ -> failwith "TypeChecker: Assignment to non-object property")
             | Ast.Expr.VarExpr name ->
                 let var_type = lookup_var env name in
                 if var_type <> right_type then
-                  failwith ("Type mismatch in assignment to variable " ^ name)
+                  failwith ("TypeChecker: Type mismatch in assignment to variable " ^ name)
                 else var_type
-            | _ -> failwith "Invalid left-hand side in assignment")
+            | _ -> failwith "TypeChecker: Invalid left-hand side in assignment")
         | Ast.Eq | Ast.Neq | Ast.Less | Ast.Greater | Ast.Leq | Ast.Geq ->
             if left_type = right_type then
               Ast.Type.SymbolType { value = "bool" }
-            else failwith "Type mismatch in comparison expression"
+            else failwith "TypeChecker: Type mismatch in comparison expression"
         | Ast.Plus | Ast.Minus | Ast.Star | Ast.Slash | Ast.Mod | Ast.Pow ->
             if left_type = right_type then left_type
-            else failwith "Type mismatch in arithmetic expression"
+            else failwith "TypeChecker: Type mismatch in arithmetic expression"
         | Ast.PlusAssign | Ast.MinusAssign | Ast.StarAssign | Ast.SlashAssign ->
             failwith
-              "Assignment operation cannot be used as a condition in an if \
+              "TypeChecker: Assignment operation cannot be used as a condition in an if \
                statement"
-        | _ -> failwith "Unsupported operator in binary expression")
+        | _ -> failwith "TypeChecker: Unsupported operator in binary expression")
     | Ast.Expr.PropertyAccessExpr { object_name; property_name } -> (
         let obj_type = check_expr env object_name in
         match obj_type with
         | Ast.Type.ClassType { properties; _ } -> (
             try List.assoc property_name properties
-            with Not_found -> failwith ("Undefined property: " ^ property_name))
-        | _ -> failwith "Property access on non-object type")
-    | expr -> failwith ("Unsupported expression: " ^ Ast.Expr.show expr)
+            with Not_found -> failwith ("TypeChecker: Undefined property: " ^ property_name))
+        | _ -> failwith "TypeChecker: Property access on non-object type")
+    | expr -> failwith ("TypeChecker: Unsupported expression: " ^ Ast.Expr.show expr)
 
   let check_var_decl env identifier explicit_type assigned_value =
     match assigned_value with
@@ -154,7 +154,7 @@ module TypeChecker = struct
         let value_type = check_expr env expr in
         if value_type = explicit_type then
           { env with var_type = Env.add identifier explicit_type env.var_type }
-        else failwith ("Type mismatch in variable declaration: " ^ identifier)
+        else failwith ("TypeChecker: Type mismatch in variable declaration: " ^ identifier)
     | None -> failwith ("Variable " ^ identifier ^ " has no value assigned")
 
   let rec check_func_decl env name parameters return_type body =
@@ -192,7 +192,7 @@ module TypeChecker = struct
           | Some (Ast.Expr.NewExpr { class_name; _ }) -> class_name
           | _ ->
               failwith
-                ("Expected a class instantiation for variable: " ^ identifier)
+                ("TypeChecker: Expected a class instantiation for variable: " ^ identifier)
         in
         let class_info = lookup_class env class_name in
 
@@ -201,7 +201,7 @@ module TypeChecker = struct
           && List.length arguments <> List.length class_info.properties
         then
           failwith
-            ("Incorrect number of arguments for class instantiation: "
+            ("TypeChecker: Incorrect number of arguments for class instantiation: "
            ^ identifier);
 
         if List.length arguments > 0 then
@@ -210,7 +210,7 @@ module TypeChecker = struct
               let arg_type = check_expr env arg in
               if arg_type <> prop_type then
                 failwith
-                  ("Type mismatch for property " ^ prop_name ^ " in class "
+                  ("TypeChecker: Type mismatch for property " ^ prop_name ^ " in class "
                  ^ class_name))
             arguments class_info.properties;
 
@@ -222,7 +222,7 @@ module TypeChecker = struct
         let return_type =
           match return_type with
           | Some t -> t
-          | None -> failwith ("Function " ^ name ^ " must have a return type")
+          | None -> failwith ("TypeChecker: Function " ^ name ^ " must have a return type")
         in
         check_func_decl env name parameters return_type body
     | Ast.Stmt.ClassDeclStmt { name; properties; methods = _ } ->
@@ -246,7 +246,7 @@ module TypeChecker = struct
         | Some expected_type ->
             if return_type <> expected_type then
               failwith
-                ("Return type mismatch: expected "
+                ("TypeChecker: Return type mismatch: expected "
                 ^ Ast.Type.show expected_type
                 ^ ", got " ^ Ast.Type.show return_type)
             else env
@@ -257,7 +257,7 @@ module TypeChecker = struct
     | Ast.Stmt.IfStmt { condition; then_branch; else_branch } ->
         let cond_type = check_expr env condition in
         if cond_type <> Ast.Type.SymbolType { value = "bool" } then
-          failwith "Condition in if statement must be a boolean"
+          failwith "TypeChecker: Condition in if statement must be a boolean"
         else
           let env_then = check_stmt env ~expected_return_type then_branch in
           let env_final =
@@ -276,7 +276,7 @@ module TypeChecker = struct
         let _ =
           let cond_type = check_expr env condition in
           if cond_type <> Ast.Type.SymbolType { value = "bool" } then
-            failwith "Condition in for statement must be a boolean"
+            failwith "TypeChecker: Condition in for statement must be a boolean"
         in
         let env =
           match increment with
@@ -290,7 +290,7 @@ module TypeChecker = struct
           (fun (case_expr, case_body) ->
             let case_type = check_expr env case_expr in
             if case_type <> switch_type then
-              failwith "Case expression type does not match switch expression";
+              failwith "TypeChecker: Case expression type does not match switch expression";
             ignore (check_block env case_body ~expected_return_type))
           cases;
         (match default_case with
@@ -299,7 +299,7 @@ module TypeChecker = struct
         env
     | Ast.Stmt.ImportStmt { module_name } -> check_import env module_name
     | Ast.Stmt.ExportStmt { identifier } -> check_export env identifier
-    | stmt -> failwith ("Unsupported statement: " ^ Ast.Stmt.show stmt)
+    | stmt -> failwith ("TypeChecker: Unsupported statement: " ^ Ast.Stmt.show stmt)
 
   and check_block env stmts ~expected_return_type =
     List.fold_left

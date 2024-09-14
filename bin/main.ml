@@ -22,7 +22,6 @@ let () =
     let lexbuf = Lexing.from_channel file_channel in
     try
       let ast = Calyxium.Parser.program Calyxium.Lexer.token lexbuf in
-      Printf.printf "Parsed AST:\n%s\n" (Calyxium.Ast.Stmt.show ast);
 
       let initial_env = Calyxium.Typechecker.TypeChecker.empty_env in
 
@@ -30,7 +29,6 @@ let () =
         Calyxium.Typechecker.TypeChecker.check_block initial_env [ ast ]
           ~expected_return_type:None
       in
-      Printf.printf "Type checking successful!\n";
 
       let bytecode = Calyxium.Bytecode.compile_stmt ast in
       List.iter
@@ -50,7 +48,7 @@ let () =
         close_in file_channel;
         exit (-1)
     | Failure msg ->
-        Printf.fprintf stderr "Error: %s\n" msg;
+        Printf.fprintf stderr "%s\n" msg;
         close_in file_channel;
         exit (-1)
     | e ->
