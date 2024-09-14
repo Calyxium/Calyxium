@@ -37,8 +37,7 @@ let () =
           let opcode_str = Format.flush_str_formatter () in
           Printf.printf "Generated opcode: %s\n" opcode_str)
         bytecode;
-      let result = Calyxium.Interpreter.run bytecode in
-      Printf.printf "Result: %f\n" result;
+      let _result = Calyxium.Interpreter.run bytecode in
 
       close_in file_channel
     with

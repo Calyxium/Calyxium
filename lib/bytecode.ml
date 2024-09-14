@@ -3,8 +3,12 @@ type opcode =
   | LOAD_FLOAT of float
   | LOAD_VAR of string
   | STORE_VAR of string
+  | LOAD_STRING of string
+  | LOAD_BYTE of char
+  | LOAD_BOOL of bool
   | POW
   | MOD
+  | CONCAT
   | FADD
   | FSUB
   | FMUL
@@ -12,14 +16,32 @@ type opcode =
   | POP
   | HALT
   | RETURN
+  | AND
+  | OR
+  | NOT
+  | EQUAL
+  | NOT_EQUAL
+  | GREATER_EQUAL
+  | LESS_EQUAL
+  | GREATER
+  | LESS
+  | INC
+  | DEC
+  | JUMP of int
+  | JUMP_IF_FALSE of int
+  | PRINT
 
 let pp_opcode fmt = function
   | LOAD_INT value -> Format.fprintf fmt "LOAD_INT %d" value
   | LOAD_FLOAT value -> Format.fprintf fmt "LOAD_FLOAT %f" value
   | LOAD_VAR name -> Format.fprintf fmt "LOAD_VAR %s" name
   | STORE_VAR name -> Format.fprintf fmt "STORE_VAR %s" name
+  | LOAD_STRING value -> Format.fprintf fmt "LOAD_STRING %s" value
+  | LOAD_BYTE value -> Format.fprintf fmt "LOAD_BYTE %c" value
+  | LOAD_BOOL value -> Format.fprintf fmt "LOAD_BOOL %b" value
   | POW -> Format.fprintf fmt "POW"
   | MOD -> Format.fprintf fmt "MOD"
+  | CONCAT -> Format.fprintf fmt "CONCAT"
   | FADD -> Format.fprintf fmt "FADD"
   | FSUB -> Format.fprintf fmt "FSUB"
   | FMUL -> Format.fprintf fmt "FMUL"
@@ -27,13 +49,28 @@ let pp_opcode fmt = function
   | POP -> Format.fprintf fmt "POP"
   | RETURN -> Format.fprintf fmt "RETURN"
   | HALT -> Format.fprintf fmt "HALT"
+  | AND -> Format.fprintf fmt "AND"
+  | OR -> Format.fprintf fmt "OR"
+  | NOT -> Format.fprintf fmt "NOT"
+  | EQUAL -> Format.fprintf fmt "EQUAL"
+  | NOT_EQUAL -> Format.fprintf fmt "NOT_EQUAL"
+  | GREATER_EQUAL -> Format.fprintf fmt "GREATER_EQUAL"
+  | LESS_EQUAL -> Format.fprintf fmt "LESS_EQUAL"
+  | GREATER -> Format.fprintf fmt "GREATER"
+  | INC -> Format.fprintf fmt "INC"
+  | DEC -> Format.fprintf fmt "DEC"
+  | LESS -> Format.fprintf fmt "LESS"
+  | JUMP label -> Format.fprintf fmt "JUMP %d" label
+  | JUMP_IF_FALSE label -> Format.fprintf fmt "JUMP_IF_FALSE %d" label
+  | PRINT -> Format.fprintf fmt "PRINT"
 
 let rec compile_expr = function
   | Ast.Expr.IntExpr { value } -> [ LOAD_INT value ]
   | Ast.Expr.FloatExpr { value } -> [ LOAD_FLOAT value ]
-  | Ast.Expr.StringExpr _ -> failwith "StringExpr not supported"
-  | Ast.Expr.ByteExpr _ -> failwith "ByteExpr not supported"
-  | Ast.Expr.BoolExpr _ -> failwith "BoolExpr not supported"
+  | Ast.Expr.StringExpr { value } -> [ LOAD_STRING value ]
+  | Ast.Expr.ByteExpr { value } -> [ LOAD_BYTE value ]
+  | Ast.Expr.BoolExpr { value } ->
+      if value then [ LOAD_BOOL true ] else [ LOAD_BOOL false ]
   | Ast.Expr.VarExpr name -> [ LOAD_VAR name ]
   | Ast.Expr.BinaryExpr { left; operator; right } -> (
       let left_bytecode = compile_expr left in
@@ -45,9 +82,30 @@ let rec compile_expr = function
       | Ast.Slash -> left_bytecode @ right_bytecode @ [ FDIV ]
       | Ast.Mod -> left_bytecode @ right_bytecode @ [ MOD ]
       | Ast.Pow -> left_bytecode @ right_bytecode @ [ POW ]
+      | Ast.Carot -> left_bytecode @ right_bytecode @ [ CONCAT ]
+      | Ast.LogicalAnd -> left_bytecode @ right_bytecode @ [ AND ]
+      | Ast.LogicalOr -> left_bytecode @ right_bytecode @ [ OR ]
+      | Ast.Greater -> left_bytecode @ right_bytecode @ [ GREATER ]
+      | Ast.Less -> left_bytecode @ right_bytecode @ [ LESS ]
+      | Ast.Eq -> left_bytecode @ right_bytecode @ [ EQUAL ]
+      | Ast.Geq -> left_bytecode @ right_bytecode @ [ GREATER_EQUAL ]
+      | Ast.Leq -> left_bytecode @ right_bytecode @ [ LESS_EQUAL ]
       | _ -> failwith "Unsupported operator")
-  | Ast.Expr.CallExpr _ -> failwith "CallExpr not supported"
-  | Ast.Expr.UnaryExpr _ -> failwith "UnaryExpr not supported"
+  | Ast.Expr.CallExpr { callee; arguments } -> (
+      match callee with
+      | Ast.Expr.VarExpr "print" ->
+          let args_bytecode =
+            List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
+          in
+          args_bytecode @ [ PRINT ]
+      | _ -> failwith "Unsupported function call")
+  | Ast.Expr.UnaryExpr { operator; operand } -> (
+      let operand_bytecode = compile_expr operand in
+      match operator with
+      | Ast.Not -> operand_bytecode @ [ NOT ]
+      | Ast.Inc -> operand_bytecode @ [ INC ]
+      | Ast.Dec -> operand_bytecode @ [ DEC ]
+      | _ -> failwith "Unsupported unary operator")
   | Ast.Expr.NullExpr -> failwith "NullExpr not supported"
   | Ast.Expr.NewExpr _ -> failwith "NewExpr not supported"
   | Ast.Expr.PropertyAccessExpr _ -> failwith "PropertyAccessExpr not supported"

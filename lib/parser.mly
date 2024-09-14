@@ -1,9 +1,9 @@
 (** Precedence and Associativity *)
-%left Plus Minus
+%left Plus Minus Carot
 %left Star Slash Mod
 %left Pow
 
-%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class True False Plus Minus Star Slash Mod Pow LParen RParen LBracket RBracket LBrace RBrace Dot Question Colon Carot Semi Comma Not Pipe Amspersand Greater Less LogicalOr LogicalAnd Eq Neq Geq Leq Dec Inc IntType FloatType StringType ByteType BoolType Assign PlusAssign MinusAssign StarAssign SlashAssign
+%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class True False Plus Minus Star Slash Mod Pow LParen RParen LBracket RBracket LBrace RBrace Dot Colon Carot Semi Comma Not Greater Less LogicalOr LogicalAnd Eq Neq Geq Leq Dec Inc IntType FloatType StringType ByteType BoolType Assign PlusAssign MinusAssign StarAssign SlashAssign
 %token <string> Ident
 %token <int> Int
 %token <float> Float
@@ -86,6 +86,7 @@ expr:
     | expr Dot Ident LParen argument_list RParen { Ast.Expr.CallExpr { callee = Ast.Expr.PropertyAccessExpr { object_name = $1; property_name = $3 }; arguments = $5 } }
     | expr Dot Ident { Ast.Expr.PropertyAccessExpr { object_name = $1; property_name = $3 } }
     | expr Plus expr { Ast.Expr.BinaryExpr { left = $1; operator = Ast.Plus; right = $3 } }
+    | expr Carot expr { Ast.Expr.BinaryExpr { left = $1; operator = Ast.Carot; right = $3 } }
     | expr Minus expr { Ast.Expr.BinaryExpr { left = $1; operator = Ast.Minus; right = $3 } }
     | expr Star expr { Ast.Expr.BinaryExpr { left = $1; operator = Ast.Star; right = $3 } }
     | expr Slash expr { Ast.Expr.BinaryExpr { left = $1; operator = Ast.Slash; right = $3 } }
@@ -104,9 +105,6 @@ expr:
     | expr StarAssign expr { Ast.Expr.BinaryExpr { left = $1; operator = Ast.StarAssign; right = $3 } }
     | expr SlashAssign expr { Ast.Expr.BinaryExpr { left = $1; operator = Ast.SlashAssign; right = $3 } }
     | Not expr { Ast.Expr.UnaryExpr { operator = Ast.Not; operand = $2 } }
-    | Amspersand expr { Ast.Expr.UnaryExpr { operator = Ast.Amspersand; operand = $2 } }
-    | Pipe expr { Ast.Expr.UnaryExpr { operator = Ast.Pipe; operand = $2 } }
-    | Question expr { Ast.Expr.UnaryExpr { operator = Ast.Question; operand = $2 } }
     | Ident LParen argument_list RParen { Ast.Expr.CallExpr { callee = Ast.Expr.VarExpr $1; arguments = $3 } }
     | Null { Ast.Expr.NullExpr }
     | Minus Int { Ast.Expr.IntExpr { value = -$2 } }

@@ -20,7 +20,8 @@ let eval_input input =
     let result = Interpreter.run bytecode in
     Printf.printf "Result: %f\n" result
   with e ->
-    Printf.printf "Repl: An unexpected error occurred: %s\n" (Printexc.to_string e)
+    Printf.printf "Repl: An unexpected error occurred: %s\n"
+      (Printexc.to_string e)
 
 let get_version () = "0.0.1"
 

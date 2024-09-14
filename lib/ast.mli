@@ -5,6 +5,7 @@ type token =
   | Slash
   | Mod
   | Pow
+  | Carot
   | LParen
   | RParen
   | LBracket
@@ -92,6 +93,7 @@ module Type : sig
     | SymbolType of { value : string }
     | ArrayType of { element_type : t }
     | ClassType of { name : string; properties : (string * t) list }
+    | Any
   [@@deriving show]
 end
 

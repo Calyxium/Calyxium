@@ -5,6 +5,7 @@ type token =
   | Slash
   | Mod
   | Pow
+  | Carot
   | LParen
   | RParen
   | LBracket
@@ -72,6 +73,7 @@ let pp_token fmt = function
   | Slash -> Format.fprintf fmt "Slash"
   | Mod -> Format.fprintf fmt "Mod"
   | Pow -> Format.fprintf fmt "Pow"
+  | Carot -> Format.fprintf fmt "Carot"
   | LParen -> Format.fprintf fmt "LParen"
   | RParen -> Format.fprintf fmt "RParen"
   | LBracket -> Format.fprintf fmt "LBracket"
@@ -137,6 +139,7 @@ module Type = struct
     | SymbolType of { value : string }
     | ArrayType of { element_type : t }
     | ClassType of { name : string; properties : (string * t) list }
+    | Any
   [@@deriving show]
 end
 

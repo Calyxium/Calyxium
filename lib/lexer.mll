@@ -48,13 +48,10 @@ rule token = parse
     | "}"                   { token_and_update_column RBrace lexbuf }
 
     | "."                   { token_and_update_column Dot lexbuf }
-    | "?"                   { token_and_update_column Question lexbuf }
     | ":"                   { token_and_update_column Colon lexbuf }
     | ";"                   { token_and_update_column Semi lexbuf }
     | ","                   { token_and_update_column Comma lexbuf }
     | "!"                   { token_and_update_column Not lexbuf }
-    | "|"                   { token_and_update_column Pipe lexbuf }
-    | "&"                   { token_and_update_column Amspersand lexbuf }
     | ">"                   { token_and_update_column Greater lexbuf }
     | "<"                   { token_and_update_column Less lexbuf }
     | "^"                   { token_and_update_column Carot lexbuf }

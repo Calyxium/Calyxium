@@ -1,4 +1,1 @@
-let x: int = 10;
-let y: int = 15;
-let z: int = x + y;
-z;
+print("Hello, " ^ "World!" ^ "\n");
