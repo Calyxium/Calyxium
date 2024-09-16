@@ -1,11 +1,7 @@
 # Calyxium
 Calyxium is a split memory safe language
 
-<<<<<<< HEAD
-
-=======
 - [Prerequisite](#prerequisite)
->>>>>>> experimental
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
