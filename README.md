@@ -86,13 +86,8 @@ Here are some examples to help you get started with Calyxium:
 - **Conditional Statements**:
     ```
     let age: int = 25;
-<<<<<<< HEAD
     if age >= 18 {
-        puts("You are an adult.");
-=======
-    if (age >= 18) {
         println("You are an adult.");
->>>>>>> experimental
     } else {
         println("You are not an adult.");
     };
