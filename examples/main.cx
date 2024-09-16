@@ -1,14 +1,9 @@
-let x: int = 10;
-let y: int = 15;
+let str: string = "Hello, world!";
+let a: int = 10;
+let b: int = 10;
 
-if (x != y) {
-    return x;
-} else {
-    return y;
-};
-
-function add(x: int, y: int): int {
-    return x + y;
-};
-
-add(x, y);
+println("The answer is: " ^ ToString(ToFloat(a) + 5.5));
+println("The answer is: " ^ ToString(len(str)));
+println("The answer is: " ^ ToString(ToInt(b) + 10));
+println("The answer is: " ^ ToString(ToInt(b) + a));
+println("The length of string Hello, world! is: " ^ ToString(len(str)));
