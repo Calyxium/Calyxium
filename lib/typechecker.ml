@@ -62,15 +62,15 @@ module TypeChecker = struct
 
   let lookup_var env name =
     try Env.find name env.var_type
-    with Not_found -> failwith ("TypeChecker: Unbound variable: " ^ name)
+    with Not_found -> failwith ("TypeChecker: Unbound variable " ^ name)
 
   let lookup_func env name =
     try Env.find name env.func_env
-    with Not_found -> failwith ("TypeChecker: Unbound function: " ^ name)
+    with Not_found -> failwith ("TypeChecker: Unbound function " ^ name)
 
   let lookup_class env name =
     try Env.find name env.class_env
-    with Not_found -> failwith ("TypeChecker: Unbound class: " ^ name)
+    with Not_found -> failwith ("TypeChecker: Unbound class " ^ name)
 
   let check_import env module_name =
     if List.mem module_name env.modules then
@@ -81,7 +81,7 @@ module TypeChecker = struct
     if Env.mem identifier env.var_type then
       { env with exports = identifier :: env.exports }
     else
-      failwith ("TypeChecker: Cannot export undefined identifier: " ^ identifier)
+      failwith ("TypeChecker: Cannot export undefined identifier " ^ identifier)
 
   let rec check_expr env = function
     | Ast.Expr.IntExpr _ -> Ast.Type.SymbolType { value = "int" }
@@ -130,7 +130,7 @@ module TypeChecker = struct
         let { param_types; return_type } = lookup_func env func_name in
         if List.length arguments <> List.length param_types then
           failwith
-            ("TypeChecker: Incorrect number of arguments for function: "
+            ("TypeChecker: Incorrect number of arguments for function "
            ^ func_name);
         List.iter2
           (fun arg param_type ->
@@ -138,15 +138,14 @@ module TypeChecker = struct
             if
               param_type <> Ast.Type.Any
               && not
-                   ((* Allow int-to-float conversion and vice-versa *)
-                    param_type = Ast.Type.SymbolType { value = "float" }
+                   (param_type = Ast.Type.SymbolType { value = "float" }
                     && arg_type = Ast.Type.SymbolType { value = "int" }
                    || param_type = Ast.Type.SymbolType { value = "int" }
                       && arg_type = Ast.Type.SymbolType { value = "float" }
                    || param_type = arg_type)
             then
               failwith
-                ("TypeChecker: Argument type mismatch in function call: "
+                ("TypeChecker: Argument type mismatch in function call "
                ^ func_name))
           arguments param_types;
         return_type

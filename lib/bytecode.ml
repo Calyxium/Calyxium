@@ -98,7 +98,8 @@ let rec compile_expr = function
       | Ast.Eq -> left_bytecode @ right_bytecode @ [ EQUAL ]
       | Ast.Geq -> left_bytecode @ right_bytecode @ [ GREATER_EQUAL ]
       | Ast.Leq -> left_bytecode @ right_bytecode @ [ LESS_EQUAL ]
-      | _ -> failwith "Unsupported operator")
+      | Ast.Neq -> left_bytecode @ right_bytecode @ [ NOT_EQUAL ]
+      | _ -> failwith "ByteCode: Unsupported operator")
   | Ast.Expr.CallExpr { callee; arguments } -> (
       match callee with
       | Ast.Expr.VarExpr "print" ->
@@ -126,7 +127,7 @@ let rec compile_expr = function
             List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
           in
           args_bytecode @ [ TOFLOAT ]
-      | _ -> failwith "Unsupported function call")
+      | _ -> failwith "ByteCode: Unsupported function call")
   | Ast.Expr.UnaryExpr { operator; operand } -> (
       let operand_bytecode = compile_expr operand in
       match operator with

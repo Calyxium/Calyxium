@@ -11,7 +11,7 @@ let replace_newline str =
     if i < String.length str then
       if i < String.length str - 1 && str.[i] = '\\' && str.[i + 1] = 'n' then (
         Buffer.add_char buffer '\n';
-        process_chars (i + 2) (* Skip the next 'n' *))
+        process_chars (i + 2))
       else (
         Buffer.add_char buffer str.[i];
         process_chars (i + 1))
@@ -41,7 +41,7 @@ let rec execute_bytecode instructions stack env pc =
           ((if value then 1.0 else 0.0) :: stack)
           env (pc + 1)
     | Bytecode.LOAD_VAR name ->
-        let value =
+        let value, _ =
           try List.assoc name env
           with Not_found ->
             failwith ("Runtime Error: Variable " ^ name ^ " not found")
@@ -53,7 +53,7 @@ let rec execute_bytecode instructions stack env pc =
             failwith
               "Runtime Error: Stack is empty when trying to store variable"
         | value :: rest ->
-            let env = (name, value) :: List.remove_assoc name env in
+            let env = (name, (value, true)) :: List.remove_assoc name env in
             execute_bytecode instructions rest env (pc + 1))
     | Bytecode.FADD -> (
         match stack with
@@ -161,7 +161,7 @@ let rec execute_bytecode instructions stack env pc =
         | value :: rest ->
             if value = 0.0 then execute_bytecode instructions rest env label
             else execute_bytecode instructions rest env (pc + 1)
-        | [] -> failwith "Runtime Error: Stack underflow during JUMP_IF_FALSE")
+        | _ -> failwith "Runtime Error: Stack underflow during JUMP_IF_FALSE")
     | Bytecode.JUMP label -> execute_bytecode instructions stack env label
     | Bytecode.RETURN -> (
         match stack with
