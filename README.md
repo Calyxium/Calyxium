@@ -1,5 +1,5 @@
 # Calyxium
-Calyxium is a low-level compiled memory safe language
+Calyxium is a split memory safe language
 
 - [Prerequisite](#prerequisite)
 - [Installation](#installation)
@@ -31,22 +31,19 @@ To install Calyxium, follow these steps:
 
 1. Ensure you have OCaml installed on your system. You can download it from [Linux](https://ocaml.org/install#linux_mac_bsd), [Windows](https://ocaml.org/install#windows)
 
-2. Run the build powershell script on linux `pwsh ./build/build linux dev || release`, on windows `./build/build.ps1 windows dev || release`
-
-3. Clone the Calyxium repository:
+2. Clone the Calyxium repository:
 `git clone git@github.com:Calyxium/Calyxium.git`
 
-4. Navigate to the cloned directory:
+3. Navigate to the cloned directory:
 `cd Calyxium`
 
-5. Build the project:
-`dune build`
+4. Run the build powershell script on linux `pwsh ./build/build linux dev or release`, on windows `.\build\build.ps1 windows dev or release`
 
 ## Getting Started
 To start using Calyxium, you need to create a script file with the `.cx` extension. Here's a simple example to get you started:
 ```
 # This is a comment in Calyxium
-System.Print("Hello, world");
+println("Hello, world");
 ```
 To run your script, use the following command:
 `./calyxium main.cx`
@@ -54,9 +51,9 @@ To run your script, use the following command:
 ## Usage
 Calyxium is designed to be easy to learn and use. Here are some basic commands and their usage:
 
-- `System.Print("Hello, world!");`: Prints a message to the standard output.
+- `println("Hello, world!");`: Prints a message to the standard output.
 - `let x: int = 10;` Declares a variable `x` and assigns it the value of `int 10`.
-- `if (condition) { ... }`: Executes a block of code if the condition is true.
+- `if (condition) { ... };`: Executes a block of code if the condition is true.
 
 For a more indepth tutorial, refer to the [official documentation](https://calyxium.cc/docs)
 
@@ -65,26 +62,23 @@ Here are some examples to help you get started with Calyxium:
 
 - **Hello, World**:
     ```
-    import "System";
-    System.Print("Hello, World!");
+    println("Hello, World!");
     ```
 
 - **Variable Declaration and Printing**:
     ```
-    import "System";
-    import "String";
     let name: string = "Alice";
-    System.Print(String.Concat("Hello, ", name, "!"));
+    print("Hello, " ^ name ^ "!");
     ```
 
 - **Conditional Statements**:
     ```
     let age: int = 25;
     if (age >= 18) {
-        System.Print("You are an adult.");
+        println("You are an adult.");
     } else {
-        System.Print("You are not an adult.");
-    }
+        println("You are not an adult.");
+    };
     ```
 
 ## Contributing
