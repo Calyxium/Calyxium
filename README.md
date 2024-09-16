@@ -37,7 +37,7 @@ To install Calyxium, follow these steps:
 3. Navigate to the cloned directory:
 `cd Calyxium`
 
-4. Run the build powershell script on linux `pwsh ./build/build linux dev or release`, on windows `.\build\build.ps1 windows dev or release`
+4. Run the build powershell script on linux `pwsh ./build/build-install.ps1 linux dev or release`, on windows `.\build\build-install.ps1 windows dev or release`
 
 ## Getting Started
 To start using Calyxium, you need to create a script file with the `.cx` extension. Here's a simple example to get you started:
