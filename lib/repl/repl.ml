@@ -1,3 +1,6 @@
+open Semantics
+open Syntax
+
 let eval_input input =
   let lexbuf = Lexing.from_string input in
   try

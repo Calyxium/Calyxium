@@ -1,3 +1,5 @@
+open Syntax
+
 type opcode =
   | LOAD_INT of int
   | LOAD_FLOAT of float

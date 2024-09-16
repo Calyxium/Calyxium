@@ -1,3 +1,5 @@
+open Syntax
+
 module TypeChecker = struct
   module Env = Map.Make (String)
 

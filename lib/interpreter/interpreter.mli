@@ -1,3 +1,5 @@
+
+
 val string_table : (int, string) Hashtbl.t
 val add_string : string -> int
 val replace_newline : string -> string

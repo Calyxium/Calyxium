@@ -1,16 +1,10 @@
 (library
  (name calyxium)
- (modules ast bytecode interpreter lexer parser repl typechecker)
- (libraries ppx_deriving.show)
+ (libraries syntax bytecode semantics repl interpreter)
  (preprocess
   (pps ppx_deriving.show))
  (flags :standard)
  (modes native))
-
-(ocamllex lexer)
-
-(menhir
- (modules parser))
 
 (documentation)
 

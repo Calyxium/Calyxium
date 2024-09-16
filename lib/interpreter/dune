@@ -1,0 +1,8 @@
+(library
+ (name interpreter)
+ (modules interpreter)
+ (libraries ppx_deriving.show syntax bytecode)
+ (preprocess
+  (pps ppx_deriving.show))
+ (flags :standard)
+ (modes native))

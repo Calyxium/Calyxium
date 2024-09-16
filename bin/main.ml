@@ -1,6 +1,9 @@
+open Semantics
+open Syntax
+
 let print_error_position filename _lexbuf =
-  let line_num = Calyxium.Lexer.get_line () in
-  let col_num = Calyxium.Lexer.get_column () in
+  let line_num = Lexer.get_line () in
+  let col_num = Lexer.get_column () in
 
   let file_channel = open_in filename in
   let rec read_lines i =
@@ -21,23 +24,23 @@ let () =
     let file_channel = open_in filename in
     let lexbuf = Lexing.from_channel file_channel in
     try
-      let ast = Calyxium.Parser.program Calyxium.Lexer.token lexbuf in
+      let ast = Parser.program Lexer.token lexbuf in
 
-      let initial_env = Calyxium.Typechecker.TypeChecker.empty_env in
+      let initial_env = Typechecker.TypeChecker.empty_env in
 
       let _ =
-        Calyxium.Typechecker.TypeChecker.check_block initial_env [ ast ]
+        Typechecker.TypeChecker.check_block initial_env [ ast ]
           ~expected_return_type:None
       in
 
-      let bytecode = Calyxium.Bytecode.compile_stmt ast in
+      let bytecode = Bytecode.compile_stmt ast in
       List.iter
         (fun op ->
-          Calyxium.Bytecode.pp_opcode Format.str_formatter op;
+          Bytecode.pp_opcode Format.str_formatter op;
           let opcode_str = Format.flush_str_formatter () in
           Printf.printf "Generated opcode: %s\n" opcode_str)
         bytecode;
-      let _result = Calyxium.Interpreter.run bytecode in
+      let _result = Interpreter.run bytecode in
 
       close_in file_channel
     with
@@ -55,4 +58,4 @@ let () =
           (Printexc.to_string e);
         close_in file_channel;
         exit (-1))
-  else Calyxium.Repl.repl ()
+  else Repl.repl ()

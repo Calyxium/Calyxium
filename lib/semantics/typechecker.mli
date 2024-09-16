@@ -1,3 +1,5 @@
+open Syntax
+
 module TypeChecker : sig
   module Env : sig
     type key = String.t

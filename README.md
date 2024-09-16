@@ -55,7 +55,7 @@ Calyxium is designed to be easy to learn and use. Here are some basic commands a
 - `let x: int = 10;` Declares a variable `x` and assigns it the value of `int 10`.
 - `if (condition) { ... };`: Executes a block of code if the condition is true.
 
-For a more indepth tutorial, refer to the [official documentation](https://calyxium.cc/docs)
+For a more in-depth tutorial, refer to the [official documentation](https://calyxium.cc/docs)
 
 ## Examples
 Here are some examples to help you get started with Calyxium:
