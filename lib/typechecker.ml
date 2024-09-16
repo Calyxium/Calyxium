@@ -9,6 +9,12 @@ module TypeChecker = struct
       return_type = Ast.Type.SymbolType { value = "void" };
     }
 
+  let println_func_sig =
+    {
+      param_types = [ Ast.Type.Any ];
+      return_type = Ast.Type.SymbolType { value = "void" };
+    }
+
   type class_info = {
     class_type : Ast.Type.t;
     properties : (string * Ast.Type.t) list;
@@ -54,7 +60,8 @@ module TypeChecker = struct
           (Env.add "len" len_func_sig
              (Env.add "print" print_func_sig
                 (Env.add "ToInt" to_int_func_sig
-                   (Env.add "ToFloat" to_float_func_sig Env.empty))));
+                   (Env.add "ToFloat" to_float_func_sig
+                      (Env.add "println" println_func_sig Env.empty)))));
       class_env = Env.empty;
       modules = [];
       exports = [];

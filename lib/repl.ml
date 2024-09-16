@@ -11,14 +11,11 @@ let eval_input input =
     in
 
     let bytecode = Bytecode.compile_stmt ast in
-    List.iter
-      (fun op ->
-        Bytecode.pp_opcode Format.str_formatter op;
-        let opcode_str = Format.flush_str_formatter () in
-        Printf.printf "Generated opcode: %s\n" opcode_str)
-      bytecode;
-    let result = Interpreter.run bytecode in
-    Printf.printf "Result: %f\n" result
+
+    List.iter (fun op -> Bytecode.pp_opcode Format.str_formatter op) bytecode;
+
+    let _result = Interpreter.run bytecode in
+    ()
   with e ->
     Printf.printf "Repl: An unexpected error occurred: %s\n"
       (Printexc.to_string e)
@@ -36,7 +33,6 @@ let print_repl_info () =
   Printf.printf "Calyxium %s on %s\n" version platform
 
 let rec repl () =
-  print_repl_info ();
   Printf.printf ">> ";
   let input = read_line () in
   if input <> "exit" then (

@@ -2,8 +2,8 @@ let str: string = "Hello, world!";
 let a: int = 10;
 let b: int = 10;
 
-print("The answer is: " ^ ToString(ToFloat(a) + 5.5) ^ "\n");
-print("The answer is: " ^ ToString(len(str)) ^ "\n");
-print("The answer is: " ^ ToString(ToInt(b) + 10) ^ "\n");
-print("The answer is: " ^ ToString(ToInt(b) + a) ^ "\n");
-print("The length of string Hello, world! is: " ^ ToString(len(str)) ^ "\n");
+println("The answer is: " ^ ToString(ToFloat(a) + 5.5));
+println("The answer is: " ^ ToString(len(str)));
+println("The answer is: " ^ ToString(ToInt(b) + 10));
+println("The answer is: " ^ ToString(ToInt(b) + a));
+println("The length of string Hello, world! is: " ^ ToString(len(str)));

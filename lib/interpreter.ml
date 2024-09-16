@@ -180,6 +180,19 @@ let rec execute_bytecode instructions stack env pc =
             else Printf.printf "%f" value;
             execute_bytecode instructions rest env (pc + 1)
         | [] -> failwith "Runtime Error: Stack underflow during PRINT")
+    | Bytecode.PRINTLN -> (
+        match stack with
+        | value :: rest ->
+            let int_value = int_of_float value in
+            if Hashtbl.mem string_table int_value then
+              let str = Hashtbl.find string_table int_value in
+              let processed_str = replace_newline str in
+              Printf.printf "%s\n" processed_str
+            else if floor value = value then
+              Printf.printf "%d\n" (int_of_float value)
+            else Printf.printf "%f\n" value;
+            execute_bytecode instructions rest env (pc + 1)
+        | [] -> failwith "Runtime Error: Stack underflow during PRINT")
     | Bytecode.CONCAT -> (
         match stack with
         | a :: b :: rest ->

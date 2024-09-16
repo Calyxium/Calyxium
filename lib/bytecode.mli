@@ -30,6 +30,7 @@ type opcode =
   | JUMP of int
   | JUMP_IF_FALSE of int
   | PRINT
+  | PRINTLN
   | LEN
   | TOSTRING
   | TOINT

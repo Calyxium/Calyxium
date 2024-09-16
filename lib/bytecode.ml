@@ -30,6 +30,7 @@ type opcode =
   | JUMP of int
   | JUMP_IF_FALSE of int
   | PRINT
+  | PRINTLN
   | LEN
   | TOSTRING
   | TOINT
@@ -67,6 +68,7 @@ let pp_opcode fmt = function
   | JUMP label -> Format.fprintf fmt "JUMP %d" label
   | JUMP_IF_FALSE label -> Format.fprintf fmt "JUMP_IF_FALSE %d" label
   | PRINT -> Format.fprintf fmt "PRINT"
+  | PRINTLN -> Format.fprintf fmt "PRINTLN"
   | LEN -> Format.fprintf fmt "LEN"
   | TOSTRING -> Format.fprintf fmt "TOSTRING"
   | TOINT -> Format.fprintf fmt "TOINT"
@@ -107,6 +109,11 @@ let rec compile_expr = function
             List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
           in
           args_bytecode @ [ PRINT ]
+      | Ast.Expr.VarExpr "println" ->
+          let args_bytecode =
+            List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
+          in
+          args_bytecode @ [ PRINTLN ]
       | Ast.Expr.VarExpr "len" ->
           let args_bytecode =
             List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
