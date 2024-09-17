@@ -36,9 +36,7 @@ let () =
       let bytecode = Bytecode.compile_stmt ast in
       List.iter
         (fun op ->
-          Bytecode.pp_opcode Format.str_formatter op;
-          let opcode_str = Format.flush_str_formatter () in
-          Printf.printf "Generated opcode: %s\n" opcode_str)
+          Bytecode.pp_opcode Format.str_formatter op;)
         bytecode;
       let _result = Interpreter.run bytecode in
 
