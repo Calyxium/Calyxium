@@ -325,6 +325,20 @@ let rec execute_bytecode instructions env pc =
           if b <> 0.0 || a <> 0.0 then Stack.push 1.0 stack
           else Stack.push 0.0 stack;
           execute_bytecode instructions env (pc + 1)
+    | Bytecode.INC ->
+        if Stack.is_empty stack then
+          failwith "Runtime Error: Stack underflow during INC"
+        else
+          let value = Stack.pop stack in
+          Stack.push (value +. 1.0) stack;
+          execute_bytecode instructions env (pc + 1)
+    | Bytecode.DEC ->
+        if Stack.is_empty stack then
+          failwith "Runtime Error: Stack underflow during DEC"
+        else
+          let value = Stack.pop stack in
+          Stack.push (value -. 1.0) stack;
+          execute_bytecode instructions env (pc + 1)
     | _ -> failwith "Runtime Error: Unsupported opcode"
 
 let run instructions =
