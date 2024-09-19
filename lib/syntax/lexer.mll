@@ -26,7 +26,7 @@
     t
 }
 
-let Identifier = ['a'-'z' 'A'-'Z' '_']*
+let Identifier = ['a'-'z' 'A'-'Z']*
 let Digits = ['0'-'9']+
 let Floats = Digits '.' Digits+
 

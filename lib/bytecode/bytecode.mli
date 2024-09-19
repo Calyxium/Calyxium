@@ -1,5 +1,3 @@
-open Syntax
-
 type opcode =
   | LOAD_INT of int
   | LOAD_FLOAT of float
@@ -8,6 +6,10 @@ type opcode =
   | LOAD_STRING of string
   | LOAD_BYTE of char
   | LOAD_BOOL of bool
+  | LOAD_ARRAY of int
+  | LOAD_INDEX
+  | LOAD_SLICE
+  | FUNC of string
   | POW
   | MOD
   | CONCAT
@@ -37,7 +39,10 @@ type opcode =
   | TOSTRING
   | TOINT
   | TOFLOAT
+  | CALL of string
+  | PUSH_ARGS
 
+val function_table : (string, opcode list) Hashtbl.t
 val pp_opcode : Format.formatter -> opcode -> unit
-val compile_expr : Ast.Expr.t -> opcode list
-val compile_stmt : Ast.Stmt.t -> opcode list
+val compile_expr : Syntax.Ast.Expr.t -> opcode list
+val compile_stmt : Syntax.Ast.Stmt.t -> opcode list

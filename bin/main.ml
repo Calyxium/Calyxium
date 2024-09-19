@@ -38,7 +38,7 @@ let () =
         (fun op ->
           Bytecode.pp_opcode Format.str_formatter op;)
         bytecode;
-      let _result = Interpreter.run bytecode in
+      let _result = Vm.run bytecode in
 
       close_in file_channel
     with

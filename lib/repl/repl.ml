@@ -17,7 +17,7 @@ let eval_input input =
 
     List.iter (fun op -> Bytecode.pp_opcode Format.str_formatter op) bytecode;
 
-    let _result = Interpreter.run bytecode in
+    let _result = Vm.run bytecode in
     ()
   with e ->
     Printf.printf "Repl: An unexpected error occurred: %s\n"
@@ -38,7 +38,7 @@ let print_repl_info () =
 let rec repl () =
   Printf.printf ">> ";
   let input = read_line () in
-  if input <> "exit" then (
+  if input <> "help()" && input <> "copyright()" then (
     eval_input input;
     repl ())
   else Printf.printf "Exiting REPL.\n"

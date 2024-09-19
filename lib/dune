@@ -1,6 +1,6 @@
 (library
  (name calyxium)
- (libraries syntax bytecode semantics repl interpreter)
+ (libraries syntax bytecode semantics repl vm)
  (preprocess
   (pps ppx_deriving.show))
  (flags :standard)

@@ -1,6 +1,6 @@
 (library
- (name interpreter)
- (modules interpreter)
+ (name vm)
+ (modules vm)
  (libraries ppx_deriving.show syntax bytecode)
  (preprocess
   (pps ppx_deriving.show))

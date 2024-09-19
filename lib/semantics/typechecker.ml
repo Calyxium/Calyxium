@@ -208,6 +208,14 @@ module TypeChecker = struct
             failwith
               "TypeChecker: Assignment operation cannot be used as a condition \
                in an if statement"
+        | Ast.LogicalAnd | Ast.LogicalOr ->
+            if
+              (left_type = Ast.Type.SymbolType { value = "bool" }
+              || left_type = Ast.Type.SymbolType { value = "int" })
+              && (right_type = Ast.Type.SymbolType { value = "bool" }
+                 || right_type = Ast.Type.SymbolType { value = "int" })
+            then Ast.Type.SymbolType { value = "bool" }
+            else failwith "TypeChecker: Type mismatch in logical expression"
         | _ -> failwith "TypeChecker: Unsupported operator in binary expression"
         )
     | Ast.Expr.PropertyAccessExpr { object_name; property_name } -> (
