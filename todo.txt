@@ -1,15 +1,13 @@
 1 (A) Add For Loops into programming language
 2 (A) Fix incermentation issue inside For loops
 3 Fix Functions
-4 (B) Add Arrays
-5 (B) Add Array Indexing
-6 (B) Add Array Slicing
-7 Add Null
-8 (C) Add Structs
-9 (C) Add New 
-10 (C) Add PropertyAccess
-11 (D) Add Switch
-12 (D) Add Case
-13 (D) Add Break
-14 (E) Add Import
-15 (E) Add Export
+4 Fix Array Slicing
+5 Add Null
+6 (B) Add Structs
+7 (B) Add New 
+8 (B) Add PropertyAccess
+9 (C) Add Switch
+10 (C) Add Case
+11 (C) Add Break
+12 (D) Add Import
+13 (D) Add Export

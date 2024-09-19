@@ -29,6 +29,44 @@ if (str == "Hello") {
     };
 };
 
-# let x: []int = {1, 2, 3};
-# println(x[1]); # prints 2
-# println(x[0:2]); # prints [1, 2]
+let x: []int = {1, 2, 3};
+let strArray: []string = {"Hello", "World"};
+println(strArray[0] ^ ", " ^ strArray[1]);
+println(x[1]);
+
+# fun add(x: int, y: int): int {
+    # return x + y;
+# };
+
+# println(add(5, 6)); # Prints 11
+
+# struct Person {
+    # let age: int;
+    # let name: string;
+# };
+
+# let p = new Person;
+# p.age = 10;
+# p.name = "Alice";
+
+# println(p.age); # Print 10
+# println(p.name); # Print Alice
+
+# struct NewPerson {
+    # let age: int = 50;
+    # let name: string = "John";
+# };
+
+# let nPerson = new NewPerson;
+# println(nPerson.age); # Prints 50
+# println(nPerson.name); # Prints John
+
+# let op: byte = '+';
+
+# switch op {
+    # case '+':
+        # println("plus");
+        # break;
+    # default:
+        # println("Default");
+# };

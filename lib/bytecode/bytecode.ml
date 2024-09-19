@@ -8,6 +8,9 @@ type opcode =
   | LOAD_STRING of string
   | LOAD_BYTE of char
   | LOAD_BOOL of bool
+  | LOAD_ARRAY of int
+  | LOAD_INDEX
+  | LOAD_SLICE
   | FUNC of string
   | POW
   | MOD
@@ -81,6 +84,9 @@ let pp_opcode fmt = function
   | TOSTRING -> Format.fprintf fmt "TOSTRING"
   | TOINT -> Format.fprintf fmt "TOINT"
   | TOFLOAT -> Format.fprintf fmt "TOFLOAT"
+  | LOAD_ARRAY value -> Format.fprintf fmt "LOAD_ARRAY %d" value
+  | LOAD_INDEX -> Format.fprintf fmt "LOAD_INDEX"
+  | LOAD_SLICE -> Format.fprintf fmt "LOAD_SLICE"
   | CALL name -> Format.fprintf fmt "CALL %s" name
   | PUSH_ARGS -> Format.fprintf fmt "PUSH ARGS"
 
@@ -92,6 +98,20 @@ let rec compile_expr = function
   | Ast.Expr.BoolExpr { value } ->
       if value then [ LOAD_BOOL true ] else [ LOAD_BOOL false ]
   | Ast.Expr.VarExpr name -> [ LOAD_VAR name ]
+  | Ast.Expr.IndexExpr { array; index } ->
+      compile_expr array @ compile_expr index @ [ LOAD_INDEX ]
+  | Ast.Expr.SliceExpr { array; start; end_ } ->
+      let start_expr =
+        match start with
+        | Ast.Expr.NullExpr -> [ LOAD_INT 0 ]
+        | _ -> compile_expr start
+      in
+      let end_expr =
+        match end_ with
+        | Ast.Expr.NullExpr -> [ LOAD_INT (-1) ]
+        | _ -> compile_expr end_
+      in
+      compile_expr array @ start_expr @ end_expr @ [ LOAD_SLICE ]
   | Ast.Expr.BinaryExpr { left; operator; right } -> (
       let left_bytecode = compile_expr left in
       let right_bytecode = compile_expr right in
@@ -145,7 +165,6 @@ let rec compile_expr = function
           in
           args_bytecode @ [ TOFLOAT ]
       | Ast.Expr.VarExpr function_name ->
-          let function_name = function_name in
           let args_bytecode =
             List.fold_left
               (fun acc arg -> acc @ compile_expr arg @ [ PUSH_ARGS ])
@@ -163,9 +182,9 @@ let rec compile_expr = function
   | Ast.Expr.NullExpr -> failwith "NullExpr not supported"
   | Ast.Expr.NewExpr _ -> failwith "NewExpr not supported"
   | Ast.Expr.PropertyAccessExpr _ -> failwith "PropertyAccessExpr not supported"
-  | Ast.Expr.ArrayExpr _ -> failwith "ArrayExpr not supported"
-  | Ast.Expr.IndexExpr _ -> failwith "IndexExpr not supported"
-  | Ast.Expr.SliceExpr _ -> failwith "SliceExpr not supported"
+  | Ast.Expr.ArrayExpr { elements } ->
+      let elements_bytecode = List.concat (List.map compile_expr elements) in
+      elements_bytecode @ [ LOAD_ARRAY (List.length elements) ]
 
 let rec compile_stmt = function
   | Ast.Stmt.ExprStmt expr -> compile_expr expr
@@ -188,7 +207,6 @@ let rec compile_stmt = function
       condition_bytecode
       @ [ JUMP_IF_FALSE (then_jump_label + 1) ]
       @ then_bytecode @ [ JUMP else_jump_label ] @ else_bytecode
-  | Ast.Stmt.ForStmt _ -> failwith "ForStmt not supported"
   | Ast.Stmt.VarDeclarationStmt
       { identifier; constant = _; assigned_value; explicit_type = _ } ->
       let expr_bytecode =
@@ -205,8 +223,4 @@ let rec compile_stmt = function
       let full_function_bytecode = start_bytecode @ function_body in
       Hashtbl.add function_table name full_function_bytecode;
       full_function_bytecode
-  | Ast.Stmt.ClassDeclStmt _ -> failwith "ClassDeclStmt not supported"
-  | Ast.Stmt.ImportStmt _ -> failwith "ImportStmt not supported"
-  | Ast.Stmt.ExportStmt _ -> failwith "ExportStmt not supported"
-  | Ast.Stmt.SwitchStmt _ -> failwith "SwitchStmt not supported"
-  | Ast.Stmt.BreakStmt -> failwith "BreakStmt not supported"
+  | _ -> failwith "Unsupported statement"
