@@ -8,6 +8,7 @@ type opcode =
   | LOAD_STRING of string
   | LOAD_BYTE of char
   | LOAD_BOOL of bool
+  | FUNC of string
   | POW
   | MOD
   | CONCAT
@@ -37,6 +38,10 @@ type opcode =
   | TOSTRING
   | TOINT
   | TOFLOAT
+  | CALL of string
+  | PUSH_ARGS
+
+let function_table : (string, opcode list) Hashtbl.t = Hashtbl.create 10
 
 let pp_opcode fmt = function
   | LOAD_INT value -> Format.fprintf fmt "LOAD_INT %d" value
@@ -46,6 +51,7 @@ let pp_opcode fmt = function
   | LOAD_STRING value -> Format.fprintf fmt "LOAD_STRING %s" value
   | LOAD_BYTE value -> Format.fprintf fmt "LOAD_BYTE %c" value
   | LOAD_BOOL value -> Format.fprintf fmt "LOAD_BOOL %b" value
+  | FUNC name -> Format.fprintf fmt "FUNC %s" name
   | POW -> Format.fprintf fmt "POW"
   | MOD -> Format.fprintf fmt "MOD"
   | CONCAT -> Format.fprintf fmt "CONCAT"
@@ -75,6 +81,8 @@ let pp_opcode fmt = function
   | TOSTRING -> Format.fprintf fmt "TOSTRING"
   | TOINT -> Format.fprintf fmt "TOINT"
   | TOFLOAT -> Format.fprintf fmt "TOFLOAT"
+  | CALL name -> Format.fprintf fmt "CALL %s" name
+  | PUSH_ARGS -> Format.fprintf fmt "PUSH ARGS"
 
 let rec compile_expr = function
   | Ast.Expr.IntExpr { value } -> [ LOAD_INT value ]
@@ -136,6 +144,14 @@ let rec compile_expr = function
             List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
           in
           args_bytecode @ [ TOFLOAT ]
+      | Ast.Expr.VarExpr function_name ->
+          let function_name = function_name in
+          let args_bytecode =
+            List.fold_left
+              (fun acc arg -> acc @ compile_expr arg @ [ PUSH_ARGS ])
+              [] arguments
+          in
+          args_bytecode @ [ CALL function_name ]
       | _ -> failwith "ByteCode: Unsupported function call")
   | Ast.Expr.UnaryExpr { operator; operand } -> (
       let operand_bytecode = compile_expr operand in
@@ -161,7 +177,17 @@ let rec compile_stmt = function
       in
       compile_body body
   | Ast.Stmt.ReturnStmt expr -> compile_expr expr @ [ RETURN ]
-  | Ast.Stmt.IfStmt _ -> failwith "IfStmt not supported"
+  | Ast.Stmt.IfStmt { condition; then_branch; else_branch } ->
+      let condition_bytecode = compile_expr condition in
+      let then_bytecode = compile_stmt then_branch in
+      let else_bytecode =
+        match else_branch with Some branch -> compile_stmt branch | None -> []
+      in
+      let then_jump_label = List.length then_bytecode + 1 in
+      let else_jump_label = List.length else_bytecode + 1 in
+      condition_bytecode
+      @ [ JUMP_IF_FALSE (then_jump_label + 1) ]
+      @ then_bytecode @ [ JUMP else_jump_label ] @ else_bytecode
   | Ast.Stmt.ForStmt _ -> failwith "ForStmt not supported"
   | Ast.Stmt.VarDeclarationStmt
       { identifier; constant = _; assigned_value; explicit_type = _ } ->
@@ -173,7 +199,12 @@ let rec compile_stmt = function
       expr_bytecode @ [ STORE_VAR identifier ]
   | Ast.Stmt.NewVarDeclarationStmt _ ->
       failwith "NewVarDeclarationStmt not supported"
-  | Ast.Stmt.FunctionDeclStmt _ -> failwith "FunctionDeclStmt not supported"
+  | Ast.Stmt.FunctionDeclStmt { name; parameters = _; body; _ } ->
+      let start_bytecode = [ FUNC name ] in
+      let function_body = compile_stmt (Ast.Stmt.BlockStmt { body }) in
+      let full_function_bytecode = start_bytecode @ function_body in
+      Hashtbl.add function_table name full_function_bytecode;
+      full_function_bytecode
   | Ast.Stmt.ClassDeclStmt _ -> failwith "ClassDeclStmt not supported"
   | Ast.Stmt.ImportStmt _ -> failwith "ImportStmt not supported"
   | Ast.Stmt.ExportStmt _ -> failwith "ExportStmt not supported"

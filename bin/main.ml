@@ -40,7 +40,7 @@ let () =
           let opcode_str = Format.flush_str_formatter () in
           Printf.printf "Generated opcode: %s\n" opcode_str)
         bytecode;
-      let _result = Interpreter.run bytecode in
+      let _result = Vm.run bytecode in
 
       close_in file_channel
     with

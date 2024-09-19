@@ -8,6 +8,7 @@ type opcode =
   | LOAD_STRING of string
   | LOAD_BYTE of char
   | LOAD_BOOL of bool
+  | FUNC of string
   | POW
   | MOD
   | CONCAT
@@ -37,7 +38,10 @@ type opcode =
   | TOSTRING
   | TOINT
   | TOFLOAT
+  | CALL of string
+  | PUSH_ARGS
 
 val pp_opcode : Format.formatter -> opcode -> unit
 val compile_expr : Ast.Expr.t -> opcode list
 val compile_stmt : Ast.Stmt.t -> opcode list
+val function_table : (string, opcode list) Hashtbl.t
