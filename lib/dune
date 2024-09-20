@@ -1,5 +1,5 @@
 (library
- (name calyxium)
+ (name calyxiumlib)
  (libraries syntax bytecode semantics repl vm)
  (preprocess
   (pps ppx_deriving.show))
