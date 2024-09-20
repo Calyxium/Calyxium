@@ -121,15 +121,6 @@ module TypeChecker = struct
         match array_type with
         | Ast.Type.ArrayType { element_type } -> element_type
         | _ -> failwith "TypeChecker: Cannot index non-array type")
-    | Ast.Expr.SliceExpr { array; start; end_ } ->
-        let array_type = check_expr env array in
-        let start_type = check_expr env start in
-        let end_type = check_expr env end_ in
-        if
-          start_type <> Ast.Type.SymbolType { value = "int" }
-          || end_type <> Ast.Type.SymbolType { value = "int" }
-        then failwith "TypeChecker: Array slice indices must be integers";
-        array_type
     | Ast.Expr.CallExpr { callee; arguments } ->
         let func_name =
           match callee with

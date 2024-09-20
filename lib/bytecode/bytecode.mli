@@ -8,7 +8,6 @@ type opcode =
   | LOAD_BOOL of bool
   | LOAD_ARRAY of int
   | LOAD_INDEX
-  | LOAD_SLICE
   | FUNC of string
   | POW
   | MOD

@@ -10,7 +10,6 @@ type opcode =
   | LOAD_BOOL of bool
   | LOAD_ARRAY of int
   | LOAD_INDEX
-  | LOAD_SLICE
   | FUNC of string
   | POW
   | MOD
@@ -86,7 +85,6 @@ let pp_opcode fmt = function
   | TOFLOAT -> Format.fprintf fmt "TOFLOAT"
   | LOAD_ARRAY value -> Format.fprintf fmt "LOAD_ARRAY %d" value
   | LOAD_INDEX -> Format.fprintf fmt "LOAD_INDEX"
-  | LOAD_SLICE -> Format.fprintf fmt "LOAD_SLICE"
   | CALL name -> Format.fprintf fmt "CALL %s" name
   | PUSH_ARGS -> Format.fprintf fmt "PUSH ARGS"
 
@@ -100,18 +98,6 @@ let rec compile_expr = function
   | Ast.Expr.VarExpr name -> [ LOAD_VAR name ]
   | Ast.Expr.IndexExpr { array; index } ->
       compile_expr array @ compile_expr index @ [ LOAD_INDEX ]
-  | Ast.Expr.SliceExpr { array; start; end_ } ->
-      let start_expr =
-        match start with
-        | Ast.Expr.NullExpr -> [ LOAD_INT 0 ]
-        | _ -> compile_expr start
-      in
-      let end_expr =
-        match end_ with
-        | Ast.Expr.NullExpr -> [ LOAD_INT (-1) ]
-        | _ -> compile_expr end_
-      in
-      compile_expr array @ start_expr @ end_expr @ [ LOAD_SLICE ]
   | Ast.Expr.BinaryExpr { left; operator; right } -> (
       let left_bytecode = compile_expr left in
       let right_bytecode = compile_expr right in
@@ -223,4 +209,10 @@ let rec compile_stmt = function
       let full_function_bytecode = start_bytecode @ function_body in
       Hashtbl.add function_table name full_function_bytecode;
       full_function_bytecode
-  | _ -> failwith "Unsupported statement"
+  | Ast.Stmt.ForStmt _ -> failwith "ForStmt not implemented"
+  | Ast.Stmt.ClassDeclStmt _ -> failwith "ClassStmt not implemented"
+  | Ast.Stmt.DefaultStmt -> failwith "DefaultStmt not implemented"
+  | Ast.Stmt.SwitchStmt _ -> failwith "SWitchStmt not implemented"
+  | Ast.Stmt.ImportStmt _ -> failwith "ImportStmt not implemented"
+  | Ast.Stmt.BreakStmt -> failwith "BreakStmt not implemented"
+  | Ast.Stmt.ExportStmt _ -> failwith "ExportStmt not implemented"

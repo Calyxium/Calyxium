@@ -159,7 +159,6 @@ module Expr = struct
     | PropertyAccessExpr of { object_name : t; property_name : string }
     | ArrayExpr of { elements : t list }
     | IndexExpr of { array : t; index : t }
-    | SliceExpr of { array : t; start : t; end_ : t }
   [@@deriving show]
 end
 

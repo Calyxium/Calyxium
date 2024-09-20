@@ -2,14 +2,6 @@ let stack : float Stack.t = Stack.create ()
 let string_table = Hashtbl.create 10
 let gc_threshold = ref 256
 
-let sublist lst start len =
-  let rec aux acc i = function
-    | [] -> List.rev acc
-    | hd :: tl when i >= start && i < start + len -> aux (hd :: acc) (i + 1) tl
-    | _ :: tl -> aux acc (i + 1) tl
-  in
-  aux [] 0 lst
-
 let log_memory_usage label =
   let stats = Gc.stat () in
   Printf.printf
@@ -363,21 +355,6 @@ let rec execute_bytecode instructions env pc =
         in
         let element = List.nth array_list index in
         Stack.push element stack;
-        execute_bytecode instructions env (pc + 1)
-    | Bytecode.LOAD_SLICE ->
-        let end_ = int_of_float (Stack.pop stack) in
-        let start = int_of_float (Stack.pop stack) in
-        let array_stack = (Obj.magic (Stack.pop stack) : float Stack.t) in
-        let array_list =
-          Stack.fold (fun acc x -> x :: acc) [] array_stack |> List.rev
-        in
-        let length = List.length array_list in
-        let start = if start < 0 then 0 else start in
-        let end_ = if end_ < 0 || end_ > length then length else end_ in
-        let slice = sublist array_list start (end_ - start) in
-        let slice_stack = Stack.create () in
-        List.iter (fun el -> Stack.push el slice_stack) slice;
-        Stack.push (Obj.magic slice_stack : float) stack;
         execute_bytecode instructions env (pc + 1)
     | _ -> failwith "Runtime Error: Unsupported opcode"
 
