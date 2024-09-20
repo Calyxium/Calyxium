@@ -120,7 +120,6 @@ expr:
     | LBrace RBrace { Ast.Expr.ArrayExpr { elements = [] } }
     | LBrace expr_list RBrace { Ast.Expr.ArrayExpr { elements = $2 } }
     | Ident LBracket expr RBracket { Ast.Expr.IndexExpr { array = Ast.Expr.VarExpr $1; index = $3 } }
-    | Ident LBracket expr Colon expr RBracket { Ast.Expr.SliceExpr { array = Ast.Expr.VarExpr $1; start = $3; end_ = $5 } }
 
 expr_list:
     | expr Comma expr_list { $1 :: $3 }

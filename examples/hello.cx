@@ -1,1 +1,4 @@
-println("Hello, World!");
+let i: int = 1;
+for (i; i <= 10; i++) {
+    println("Hello, world!");
+};
