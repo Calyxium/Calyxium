@@ -1,40 +1,47 @@
-# let x: int = 10 + 5;
-# 
-# println("result of x: " ^ ToString(x));
-# print("dl\n");
-# 
-# let a: int = 10;
-# let b: float = 5.5;
-# let c: float = ToFloat(a) + b;
-# 
-# println(c);
-# 
-# let age: int = 18;
-# 
-# if (age >= 18) {
-#     println("You are an adult.");
-# } else {
-#     println("You are not an adult.");
-# };
-# 
-# let str: string = "Helloo";
-# 
-# if (str == "Hello") {
-#     println("String Len is 5");
-# } else {
-#     if (str == "Helloo") {
-#         println("String is Helloo");
-#     } else {
-#         println("Random Data");
-#     };
-# };
+let x: int = 10 + 5;
+
+println("result of x: " ^ ToString(x));
+print("dl\n");
+
+let a: int = 10;
+let b: float = 5.5;
+let c: float = ToFloat(a) + b;
+
+println(c);
+
+let age: int = 18;
+let str: string = "Helloo";
+
+if (age >= 18) {
+    println("You are an adult.");
+} else {
+    println("You are not an adult.");
+};
+
+if (str == "Hello") {
+    println("String is Hello");
+} else {
+    if (str == "Helloo") {
+        println("String is Helloo");
+    } else {
+        println("Error");
+    };
+};
 
 let x: []int = {1, 2, 3};
 println(x[2]);
 
-# fun add(x: int, y: int): int {
-    # return x + y;
+# let i: int = 1;
+# for (i; i <= 10; i++) {
+#     print("Hello");
 # };
+
+# fun add(x: int, y: int): int {
+#     return x + y;
+# };
+
+# println(add(5, 5));
+# print("E\n");
 
 # println(add(5, 6)); # Prints 11
 
