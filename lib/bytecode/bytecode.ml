@@ -234,7 +234,9 @@ let rec compile_stmt = function
             in
             let jump_to_next_case = List.length case_body_bytecode + 2 in
             let jump_if_false = [ JUMP_IF_FALSE jump_to_next_case ] in
-            case_compare_bytecode @ jump_if_false @ case_body_bytecode)
+            let jump_to_end = [ JUMP (-1) ] in
+            case_compare_bytecode @ jump_if_false @ case_body_bytecode
+            @ jump_to_end)
           cases
       in
       let default_bytecode =
@@ -244,7 +246,16 @@ let rec compile_stmt = function
       in
       switch_bytecode :=
         !switch_bytecode @ List.flatten compiled_cases @ default_bytecode;
-      !switch_bytecode
-  | Ast.Stmt.BreakStmt -> [ JUMP (-1) ]
+      let end_of_switch = List.length !switch_bytecode in
+      let patched_bytecode =
+        List.mapi
+          (fun i instr ->
+            if instr = JUMP (-1) then
+              let jump_distance = end_of_switch - i in
+              JUMP jump_distance
+            else instr)
+          !switch_bytecode
+      in
+      patched_bytecode
   | Ast.Stmt.ImportStmt _ -> failwith "ImportStmt not implemented"
   | Ast.Stmt.ExportStmt _ -> failwith "ExportStmt not implemented"

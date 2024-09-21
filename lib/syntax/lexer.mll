@@ -79,7 +79,6 @@ rule token = parse
     | "const"               { ignore (update_column_with_lexeme lexbuf); Const }
     | "switch"              { ignore (update_column_with_lexeme lexbuf); Switch }
     | "case"                { ignore (update_column_with_lexeme lexbuf); Case }
-    | "break"               { ignore (update_column_with_lexeme lexbuf); Break }
     | "default"             { ignore (update_column_with_lexeme lexbuf); Default }
     | "return"              { ignore (update_column_with_lexeme lexbuf); Return}
     | "for"                 { ignore (update_column_with_lexeme lexbuf); For }

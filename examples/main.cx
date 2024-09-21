@@ -5,6 +5,7 @@ let c: float = ToFloat(a) + b;
 let age: int = 18;
 let str: string = "Hellooo";
 let r: []int = {1, 2, 3};
+let op: byte = '+';
 
 println("result of x: " ^ ToString(x));
 print("Random Print with newline escape char\n");
@@ -28,6 +29,13 @@ if (str == "Hello") {
 };
 
 println("Second element of array r: " ^ ToString(r[2]));
+
+switch op {
+    case '+':
+        println("plus");
+    case '-':
+        println("minus");
+};
 
 # let i: int = 1;
 # for (i; i <= 10; i++) {

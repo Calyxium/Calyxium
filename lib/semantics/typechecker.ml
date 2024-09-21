@@ -404,8 +404,6 @@ module TypeChecker = struct
         env
     | Ast.Stmt.ImportStmt { module_name } -> check_import env module_name
     | Ast.Stmt.ExportStmt { identifier } -> check_export env identifier
-    | stmt ->
-        failwith ("TypeChecker: Unsupported statement: " ^ Ast.Stmt.show stmt)
 
   and check_block env stmts ~expected_return_type =
     List.fold_left

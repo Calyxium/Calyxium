@@ -140,6 +140,5 @@ module Stmt : sig
         cases : (Expr.t * t list) list;
         default_case : t list option;
       }
-    | BreakStmt
   [@@deriving show]
 end

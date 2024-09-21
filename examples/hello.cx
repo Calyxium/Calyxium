@@ -1,10 +1,10 @@
-let y: int = 10;
+let op: byte = '*';
 
-switch y {
-    case 10:
-        println("int is 10");
-        break;
-    case 20:
-        println("int is 20");
-        break;
+switch op {
+    case '+':
+        println("plus");
+    case '-':
+        println("minus");
+    default:
+        println("case not supported");
 };

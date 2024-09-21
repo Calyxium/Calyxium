@@ -3,7 +3,7 @@
 %left Star Slash Mod
 %left Pow
 
-%token Function If Else Var Const Switch Case Break Default For Import Export New Null Return Class True False Plus Minus Star Slash Mod Pow LParen RParen LBracket RBracket LBrace RBrace Dot Colon Carot Semi Comma Not Greater Less LogicalOr LogicalAnd Eq Neq Geq Leq Dec Inc IntType FloatType StringType ByteType BoolType Assign PlusAssign MinusAssign StarAssign SlashAssign
+%token Function If Else Var Const Switch Case Default For Import Export New Null Return Class True False Plus Minus Star Slash Mod Pow LParen RParen LBracket RBracket LBrace RBrace Dot Colon Carot Semi Comma Not Greater Less LogicalOr LogicalAnd Eq Neq Geq Leq Dec Inc IntType FloatType StringType ByteType BoolType Assign PlusAssign MinusAssign StarAssign SlashAssign
 %token <string> Ident
 %token <int> Int
 %token <float> Float
@@ -44,15 +44,11 @@ SwitchStmt:
     }
 
 case_list:
-    | Case expr Colon stmt_list break_opt case_list { ($2, $4) :: $6 }
-    | Case expr Colon stmt_list break_opt { [($2, $4)] }
+    | Case expr Colon stmt_list case_list { ($2, $4) :: $5 }
+    | Case expr Colon stmt_list { [($2, $4)] }
 
 default_opt:
     | Default Colon stmt_list { Some $3 }
-    | { None }
-
-break_opt:
-    | Break Semi { Some Ast.Stmt.BreakStmt }
     | { None }
 
 stmt_opt:

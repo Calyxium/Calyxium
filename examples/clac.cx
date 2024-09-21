@@ -1,0 +1,34 @@
+let a: int = 5;
+let b: int = 10;
+let op: byte = '_';
+
+fun add(x: int, y: int): int {
+    return x + y;
+};
+
+fun sub(x: int, y: int): int {
+    return x + y;
+};
+
+fun mul(x: int, y: int): int {
+    return x * y;
+};
+
+fun div(x: int, y: int): float {
+    if (y == 0) {
+        println("Can't divied by 0");
+    };
+
+    return ToFloat(x / y);
+};
+
+switch op {
+    case '+':
+        println(add(a, b));
+    case '-':
+        println(sub(a, b));
+    case '*':
+        println(mul(a, b));
+    case '/':
+        println(div(a, b));
+};
