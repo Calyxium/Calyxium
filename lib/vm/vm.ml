@@ -124,6 +124,10 @@ let rec execute_bytecode instructions env pc =
           let b = Stack.pop stack in
           Stack.push (b ** a) stack;
           execute_bytecode instructions env (pc + 1)
+    | Bytecode.RETURN ->
+        let return_value = Stack.pop stack in
+        Stack.push return_value stack;
+        execute_bytecode instructions env (pc + 2)
     | Bytecode.CALL function_name -> (
         try
           let function_body =
@@ -135,10 +139,6 @@ let rec execute_bytecode instructions env pc =
         with Not_found ->
           failwith ("Runtime Error: Function '" ^ function_name ^ "' not found")
         )
-    | Bytecode.RETURN ->
-        let return_value = Stack.pop stack in
-        Stack.push return_value stack;
-        raise Exit
     | Bytecode.PRINT ->
         if Stack.is_empty stack then
           failwith "Runtime Error: Stack underflow during PRINT"
@@ -356,6 +356,25 @@ let rec execute_bytecode instructions env pc =
         let element = List.nth array_list index in
         Stack.push element stack;
         execute_bytecode instructions env (pc + 1)
+    | Bytecode.SWITCH ->
+        let switch_value = Stack.pop stack in
+        let rec execute_cases pc =
+          match instructions.(pc) with
+          | Bytecode.CASE value ->
+              if switch_value = value then
+                execute_bytecode instructions env (pc + 1)
+              else execute_cases (pc + 1)
+          | Bytecode.DEFAULT -> execute_bytecode instructions env (pc + 1)
+          | _ -> failwith "Runtime Error: Unexpected bytecode in SWITCH"
+        in
+        execute_cases (pc + 1)
+    | Bytecode.DUP ->
+        if Stack.is_empty stack then
+          failwith "Runtime Error: Stack underflow during DUP"
+        else
+          let top_value = Stack.top stack in
+          Stack.push top_value stack;
+          execute_bytecode instructions env (pc + 1)
     | _ -> failwith "Runtime Error: Unsupported opcode"
 
 let run instructions =

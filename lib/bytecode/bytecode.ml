@@ -42,6 +42,11 @@ type opcode =
   | TOFLOAT
   | CALL of string
   | PUSH_ARGS
+  | SWITCH
+  | CASE of float
+  | DEFAULT
+  | BREAK
+  | DUP
 
 let function_table : (string, opcode list) Hashtbl.t = Hashtbl.create 10
 
@@ -87,6 +92,11 @@ let pp_opcode fmt = function
   | LOAD_INDEX -> Format.fprintf fmt "LOAD_INDEX"
   | CALL name -> Format.fprintf fmt "CALL %s" name
   | PUSH_ARGS -> Format.fprintf fmt "PUSH ARGS"
+  | SWITCH -> Format.fprintf fmt "SWITCH"
+  | CASE value -> Format.fprintf fmt "CASE %f" value
+  | DEFAULT -> Format.fprintf fmt "DEFAULT"
+  | BREAK -> Format.fprintf fmt "BREAK"
+  | DUP -> Format.fprintf fmt "DUP"
 
 let rec compile_expr = function
   | Ast.Expr.IntExpr { value } -> [ LOAD_INT value ]
@@ -211,8 +221,30 @@ let rec compile_stmt = function
       full_function_bytecode
   | Ast.Stmt.ForStmt _ -> failwith "ForStmt not implemented"
   | Ast.Stmt.ClassDeclStmt _ -> failwith "ClassStmt not implemented"
-  | Ast.Stmt.DefaultStmt -> failwith "DefaultStmt not implemented"
-  | Ast.Stmt.SwitchStmt _ -> failwith "SWitchStmt not implemented"
+  | Ast.Stmt.SwitchStmt { expr; cases; default_case } ->
+      let expr_bytecode = compile_expr expr in
+      let switch_bytecode = ref expr_bytecode in
+      let compiled_cases =
+        List.mapi
+          (fun _i (case_expr, case_body) ->
+            let case_bytecode = compile_expr case_expr in
+            let case_compare_bytecode = [ DUP ] @ case_bytecode @ [ EQUAL ] in
+            let case_body_bytecode =
+              List.flatten (List.map compile_stmt case_body)
+            in
+            let jump_to_next_case = List.length case_body_bytecode + 2 in
+            let jump_if_false = [ JUMP_IF_FALSE jump_to_next_case ] in
+            case_compare_bytecode @ jump_if_false @ case_body_bytecode)
+          cases
+      in
+      let default_bytecode =
+        match default_case with
+        | Some body -> List.flatten (List.map compile_stmt body)
+        | None -> []
+      in
+      switch_bytecode :=
+        !switch_bytecode @ List.flatten compiled_cases @ default_bytecode;
+      !switch_bytecode
+  | Ast.Stmt.BreakStmt -> [ JUMP (-1) ]
   | Ast.Stmt.ImportStmt _ -> failwith "ImportStmt not implemented"
-  | Ast.Stmt.BreakStmt -> failwith "BreakStmt not implemented"
   | Ast.Stmt.ExportStmt _ -> failwith "ExportStmt not implemented"

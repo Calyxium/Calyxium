@@ -141,6 +141,5 @@ module Stmt : sig
         default_case : t list option;
       }
     | BreakStmt
-    | DefaultStmt
   [@@deriving show]
 end

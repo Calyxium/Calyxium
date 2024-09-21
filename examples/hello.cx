@@ -1,4 +1,10 @@
-let i: int = 1;
-for (i; i <= 10; i++) {
-    println("Hello, world!");
+let y: int = 10;
+
+switch y {
+    case 10:
+        println("int is 10");
+        break;
+    case 20:
+        println("int is 20");
+        break;
 };

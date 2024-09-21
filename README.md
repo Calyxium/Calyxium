@@ -1,30 +1,12 @@
 # Calyxium
 Calyxium is a split memory safe language
 
-- [Prerequisite](#prerequisite)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
 - [Examples](#examples)
 - [Contributing](#contributing)
 - [License](#license)
-
-## Prerequisite
-- Visit the Windows SDK Download Page:
-Go to the official [Windows SDK download page](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/).
-
-- Download the Installer:
-Select the appropriate version of the SDK for your Windows version (Windows 10 or 11).
-Download the installer and run it.
-
-- Install the SDK:
-During installation, ensure that the "Windows SDK" is selected.
-Follow the on-screen instructions to complete the installation.
-
-- Verify Installation
-After installation, verify that the advapi32.lib file is present. It should be located in a directory similar to:
-`C:\Program Files (x86)\Windows Kits\10\Lib\<version>\um\x64\advapi32.lib
-`
 
 ## Installation
 To install Calyxium, follow these steps:
@@ -46,7 +28,7 @@ To start using Calyxium, you need to create a script file with the `.cx` extensi
 println("Hello, world");
 ```
 To run your script, use the following command:
-`./calyxium main.cx`
+`calyxium main.cx`
 
 ## Usage
 Calyxium is designed to be easy to learn and use. Here are some basic commands and their usage:

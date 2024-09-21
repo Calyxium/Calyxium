@@ -207,6 +207,5 @@ module Stmt = struct
         default_case : t list option;
       }
     | BreakStmt
-    | DefaultStmt
   [@@deriving show]
 end

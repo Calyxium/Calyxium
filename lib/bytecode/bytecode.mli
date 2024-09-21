@@ -40,6 +40,11 @@ type opcode =
   | TOFLOAT
   | CALL of string
   | PUSH_ARGS
+  | SWITCH
+  | CASE of float
+  | DEFAULT
+  | BREAK
+  | DUP
 
 val function_table : (string, opcode list) Hashtbl.t
 val pp_opcode : Format.formatter -> opcode -> unit

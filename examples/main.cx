@@ -1,16 +1,15 @@
 let x: int = 10 + 5;
-
-println("result of x: " ^ ToString(x));
-print("dl\n");
-
 let a: int = 10;
 let b: float = 5.5;
 let c: float = ToFloat(a) + b;
-
-println(c);
-
 let age: int = 18;
-let str: string = "Helloo";
+let str: string = "Hellooo";
+let r: []int = {1, 2, 3};
+
+println("result of x: " ^ ToString(x));
+print("Random Print with newline escape char\n");
+
+println("Floating point answer of c: " ^ ToString(c));
 
 if (age >= 18) {
     println("You are an adult.");
@@ -19,17 +18,16 @@ if (age >= 18) {
 };
 
 if (str == "Hello") {
-    println("String is Hello");
+    println("String is: " ^ str);
 } else {
     if (str == "Helloo") {
-        println("String is Helloo");
+        println("String is: " ^ str);
     } else {
-        println("Error");
+        println("Neither condition was met string was: " ^ str);
     };
 };
 
-let x: []int = {1, 2, 3};
-println(x[2]);
+println("Second element of array r: " ^ ToString(r[2]));
 
 # let i: int = 1;
 # for (i; i <= 10; i++) {
@@ -65,13 +63,3 @@ println(x[2]);
 # let nPerson = new NewPerson;
 # println(nPerson.age); # Prints 50
 # println(nPerson.name); # Prints John
-
-# let op: byte = '+';
-
-# switch op {
-    # case '+':
-        # println("plus");
-        # break;
-    # default:
-        # println("Default");
-# };

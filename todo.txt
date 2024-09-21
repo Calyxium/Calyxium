@@ -5,8 +5,7 @@
 5 (B) Add Structs
 6 (B) Add New 
 7 (B) Add PropertyAccess
-8 (C) Add Switch
-9 (C) Add Case
-10 (C) Add Break
-11 (D) Add Import
-12 (D) Add Export
+8 (D) Add Import
+9 (D) Add Export
+10 Add Errors for var redecl
+11 Fix default cases
