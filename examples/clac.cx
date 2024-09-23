@@ -1,34 +1,22 @@
-let a: int = 5;
-let b: int = 10;
-let op: byte = '_';
+# let a: float = 50.3;
+# let b: float = 40.14;
+# let op: byte = 's';
 
-fun add(x: int, y: int): int {
-    return x + y;
-};
+println(5 ** 100);
 
-fun sub(x: int, y: int): int {
-    return x + y;
-};
-
-fun mul(x: int, y: int): int {
-    return x * y;
-};
-
-fun div(x: int, y: int): float {
-    if (y == 0) {
-        println("Can't divied by 0");
-    };
-
-    return ToFloat(x / y);
-};
-
-switch op {
-    case '+':
-        println(add(a, b));
-    case '-':
-        println(sub(a, b));
-    case '*':
-        println(mul(a, b));
-    case '/':
-        println(div(a, b));
-};
+# switch op {
+#     case '+':
+#         println(a + b);
+#     case '-':
+#         println(a - b);
+#     case '*':
+#         println(a * b);
+#     case '/':
+#         if (b == 0.0) {
+#             println("Can't divide by zero");
+#         } else {
+#             println(a / b);
+#         };
+#     default:
+#         println("Case not found!");
+# };

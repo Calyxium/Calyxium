@@ -18,15 +18,24 @@ if (age >= 18) {
     println("You are not an adult.");
 };
 
-if (str == "Hello") {
-    println("String is: " ^ str);
-} else {
-    if (str == "Helloo") {
+switch str {
+    case "Hello":
         println("String is: " ^ str);
-    } else {
+    case "Helloo":
+        println("String is: " ^ str);
+    default:
         println("Neither condition was met string was: " ^ str);
-    };
 };
+
+# if (str == "Hello") {
+#     println("String is: " ^ str);
+# } else {
+#     if (str == "Helloo") {
+#         println("String is: " ^ str);
+#     } else {
+#         println("Neither condition was met string was: " ^ str);
+#     };
+# };
 
 println("Second element of array r: " ^ ToString(r[2]));
 
@@ -35,6 +44,8 @@ switch op {
         println("plus");
     case '-':
         println("minus");
+    default:
+        println("Default");
 };
 
 # let i: int = 1;

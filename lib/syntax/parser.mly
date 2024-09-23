@@ -1,11 +1,10 @@
-(** Precedence and Associativity *)
 %left Plus Minus Carot
 %left Star Slash Mod
 %left Pow
 
 %token Function If Else Var Const Switch Case Default For Import Export New Null Return Class True False Plus Minus Star Slash Mod Pow LParen RParen LBracket RBracket LBrace RBrace Dot Colon Carot Semi Comma Not Greater Less LogicalOr LogicalAnd Eq Neq Geq Leq Dec Inc IntType FloatType StringType ByteType BoolType Assign PlusAssign MinusAssign StarAssign SlashAssign
 %token <string> Ident
-%token <int> Int
+%token <int64> Int
 %token <float> Float
 %token <string> String
 %token <char> Byte
@@ -103,7 +102,7 @@ expr:
     | Not expr { Ast.Expr.UnaryExpr { operator = Ast.Not; operand = $2 } }
     | Ident LParen argument_list RParen { Ast.Expr.CallExpr { callee = Ast.Expr.VarExpr $1; arguments = $3 } }
     | Null { Ast.Expr.NullExpr }
-    | Minus Int { Ast.Expr.IntExpr { value = -$2 } }
+    | Minus Int { Ast.Expr.IntExpr { value = Int64.neg $2 } }
     | Minus Float { Ast.Expr.FloatExpr { value = -. $2 } }
     | Int { Ast.Expr.IntExpr { value = $1 } }
     | Float { Ast.Expr.FloatExpr { value = $1 } }

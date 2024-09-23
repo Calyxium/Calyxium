@@ -6,6 +6,4 @@
 6 (B) Add New 
 7 (B) Add PropertyAccess
 8 (D) Add Import
-9 (D) Add Export
-10 Add Errors for var redecl
-11 Fix default cases
+9 (D) Add Exports

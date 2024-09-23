@@ -1,10 +1,19 @@
-let op: byte = '*';
+# let a: int = 5;
+# let b: int = 10;
 
-switch op {
-    case '+':
-        println("plus");
-    case '-':
-        println("minus");
-    default:
-        println("case not supported");
+# fun num(x: int, y: int): int {
+#     return x + y;
+# };
+
+# println(num(a, b));
+
+fun greet(name: string): string {
+    if (name == "a") {
+        println("Error");
+        return "";
+    } else {
+        return name;
+    };
 };
+
+println(greet("a"));

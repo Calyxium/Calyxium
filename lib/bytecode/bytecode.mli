@@ -1,5 +1,5 @@
 type opcode =
-  | LOAD_INT of int
+  | LOAD_INT of int64
   | LOAD_FLOAT of float
   | LOAD_VAR of string
   | STORE_VAR of string

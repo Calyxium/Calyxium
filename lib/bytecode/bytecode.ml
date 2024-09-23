@@ -1,7 +1,8 @@
 open Syntax
+open Syntax.Ast.Stmt
 
 type opcode =
-  | LOAD_INT of int
+  | LOAD_INT of int64
   | LOAD_FLOAT of float
   | LOAD_VAR of string
   | STORE_VAR of string
@@ -51,7 +52,7 @@ type opcode =
 let function_table : (string, opcode list) Hashtbl.t = Hashtbl.create 10
 
 let pp_opcode fmt = function
-  | LOAD_INT value -> Format.fprintf fmt "LOAD_INT %d" value
+  | LOAD_INT value -> Format.fprintf fmt "LOAD_INT %d" (Int64.to_int value)
   | LOAD_FLOAT value -> Format.fprintf fmt "LOAD_FLOAT %f" value
   | LOAD_VAR name -> Format.fprintf fmt "LOAD_VAR %s" name
   | STORE_VAR name -> Format.fprintf fmt "STORE_VAR %s" name
@@ -162,9 +163,7 @@ let rec compile_expr = function
           args_bytecode @ [ TOFLOAT ]
       | Ast.Expr.VarExpr function_name ->
           let args_bytecode =
-            List.fold_left
-              (fun acc arg -> acc @ compile_expr arg @ [ PUSH_ARGS ])
-              [] arguments
+            List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
           in
           args_bytecode @ [ CALL function_name ]
       | _ -> failwith "ByteCode: Unsupported function call")
@@ -208,15 +207,22 @@ let rec compile_stmt = function
       let expr_bytecode =
         match assigned_value with
         | Some expr -> compile_expr expr
-        | None -> [ LOAD_INT 0 ]
+        | None -> [ LOAD_INT 0L ]
       in
       expr_bytecode @ [ STORE_VAR identifier ]
   | Ast.Stmt.NewVarDeclarationStmt _ ->
       failwith "NewVarDeclarationStmt not supported"
-  | Ast.Stmt.FunctionDeclStmt { name; parameters = _; body; _ } ->
+  | Ast.Stmt.FunctionDeclStmt { name; parameters; body; _ } ->
       let start_bytecode = [ FUNC name ] in
       let function_body = compile_stmt (Ast.Stmt.BlockStmt { body }) in
-      let full_function_bytecode = start_bytecode @ function_body in
+      let param_bytecodes =
+        List.map
+          (fun (param : Syntax.Ast.Stmt.parameter) -> [ STORE_VAR param.name ])
+          parameters
+      in
+      let full_function_bytecode =
+        start_bytecode @ List.concat param_bytecodes @ function_body
+      in
       Hashtbl.add function_table name full_function_bytecode;
       full_function_bytecode
   | Ast.Stmt.ForStmt _ -> failwith "ForStmt not implemented"

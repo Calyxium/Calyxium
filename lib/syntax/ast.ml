@@ -145,7 +145,7 @@ end
 
 module Expr = struct
   type t =
-    | IntExpr of { value : int }
+    | IntExpr of { value : int64 }
     | FloatExpr of { value : float }
     | StringExpr of { value : string }
     | ByteExpr of { value : char }

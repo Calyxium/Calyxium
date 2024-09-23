@@ -98,7 +98,7 @@ rule token = parse
 
     | Identifier            { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Ident lexeme }
     | Floats                { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Float (float_of_string lexeme) }
-    | Digits                { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Int (int_of_string lexeme) }
+    | Digits                { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Int (Int64.of_string lexeme) }
     | '\'' [^'\''] '\''     { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; Byte (lexeme.[1]) }
     | '"' [^'"']* '"'       { let lexeme = Lexing.lexeme lexbuf in column := !column + String.length lexeme; String (String.sub lexeme 1 (String.length lexeme - 2)) }
     | eof                   { EOF }

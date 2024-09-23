@@ -2,6 +2,25 @@ let stack : float Stack.t = Stack.create ()
 let string_table = Hashtbl.create 10
 let gc_threshold = ref 256
 
+let big_int_pow base exp =
+  let rec aux acc base exp =
+    if Z.equal exp Z.zero then acc
+    else if Z.equal (Z.rem exp (Z.of_int 2)) Z.zero then
+      aux acc (Z.mul base base) (Z.div exp (Z.of_int 2))
+    else aux (Z.mul acc base) base (Z.sub exp (Z.of_int 1))
+  in
+  aux Z.one base exp
+
+let safe_pow base exponent =
+  if floor base = base && floor exponent = exponent then
+    let base_int = Z.of_int (int_of_float base) in
+    let exponent_int = Z.of_int (int_of_float exponent) in
+    Z.to_float (big_int_pow base_int exponent_int)
+  else base ** exponent
+
+let inf_check value =
+  if value > Int64.to_float Int64.max_int then Float.infinity else value
+
 let log_memory_usage label =
   let stats = Gc.stat () in
   Printf.printf
@@ -16,24 +35,40 @@ let add_string str =
   Hashtbl.add string_table id str;
   id
 
-let replace_newline str =
+let escape_sequences =
+  [ ("\\n", '\n'); ("\\t", '\t'); ("\\r", '\r'); ("\\\\", '\\') ]
+
+let replace_escape_sequences str =
   let buffer = Buffer.create (String.length str) in
   let rec process_chars i =
-    if i < String.length str then
-      if i < String.length str - 1 && str.[i] = '\\' && str.[i + 1] = 'n' then (
-        Buffer.add_char buffer '\n';
-        process_chars (i + 2))
-      else (
-        Buffer.add_char buffer str.[i];
-        process_chars (i + 1))
+    if i >= String.length str then Buffer.contents buffer
+    else
+      let found_escape =
+        List.find_opt
+          (fun (esc, _) ->
+            String.starts_with ~prefix:esc
+              (String.sub str i (String.length str - i)))
+          escape_sequences
+      in
+      match found_escape with
+      | Some (esc, char) ->
+          Buffer.add_char buffer char;
+          process_chars (i + String.length esc)
+      | None ->
+          Buffer.add_char buffer str.[i];
+          process_chars (i + 1)
   in
-  process_chars 0;
-  Buffer.contents buffer
+  process_chars 0
+
+let update_gc_threshold stats =
+  let heap_size_kb = stats.Gc.heap_words * 8 / 1024 in
+  if heap_size_kb > !gc_threshold then gc_threshold := heap_size_kb * 2
 
 let trigger_gc instruction_count =
-  if instruction_count > !gc_threshold then (
+  let stats = Gc.stat () in
+  if instruction_count > !gc_threshold || stats.Gc.heap_words > 1_000_000 then (
     Gc.full_major ();
-    gc_threshold := !gc_threshold + 256)
+    update_gc_threshold stats)
 
 let rec execute_bytecode instructions env pc =
   if pc >= Array.length instructions then
@@ -44,10 +79,10 @@ let rec execute_bytecode instructions env pc =
     if instruction_count mod 256 = 0 then log_memory_usage "Instruction Count";
     match instructions.(pc) with
     | Bytecode.LOAD_INT value ->
-        Stack.push (float_of_int value) stack;
+        Stack.push (inf_check (Int64.to_float value)) stack;
         execute_bytecode instructions env (pc + 1)
     | Bytecode.LOAD_FLOAT value ->
-        Stack.push value stack;
+        Stack.push (inf_check value) stack;
         execute_bytecode instructions env (pc + 1)
     | Bytecode.LOAD_STRING value ->
         let id = Hashtbl.hash value in
@@ -71,9 +106,11 @@ let rec execute_bytecode instructions env pc =
     | Bytecode.STORE_VAR name ->
         if Stack.is_empty stack then
           failwith "Runtime Error: Stack is empty when trying to store variable"
+        else if List.mem_assoc name env then
+          failwith ("Runtime Error: Variable " ^ name ^ " is already declared")
         else
           let value = Stack.pop stack in
-          let env = (name, (value, true)) :: List.remove_assoc name env in
+          let env = (name, (value, true)) :: env in
           execute_bytecode instructions env (pc + 1)
     | Bytecode.FADD ->
         if Stack.length stack < 2 then
@@ -81,7 +118,7 @@ let rec execute_bytecode instructions env pc =
         else
           let a = Stack.pop stack in
           let b = Stack.pop stack in
-          Stack.push (b +. a) stack;
+          Stack.push (inf_check (b +. a)) stack;
           execute_bytecode instructions env (pc + 1)
     | Bytecode.FSUB ->
         if Stack.length stack < 2 then
@@ -89,7 +126,7 @@ let rec execute_bytecode instructions env pc =
         else
           let a = Stack.pop stack in
           let b = Stack.pop stack in
-          Stack.push (b -. a) stack;
+          Stack.push (inf_check (b -. a)) stack;
           execute_bytecode instructions env (pc + 1)
     | Bytecode.FMUL ->
         if Stack.length stack < 2 then
@@ -97,7 +134,7 @@ let rec execute_bytecode instructions env pc =
         else
           let a = Stack.pop stack in
           let b = Stack.pop stack in
-          Stack.push (b *. a) stack;
+          Stack.push (inf_check (b *. a)) stack;
           execute_bytecode instructions env (pc + 1)
     | Bytecode.FDIV ->
         if Stack.length stack < 2 then
@@ -106,7 +143,7 @@ let rec execute_bytecode instructions env pc =
           let a = Stack.pop stack in
           let b = Stack.pop stack in
           if a = 0.0 then failwith "Runtime Error: Division by zero"
-          else Stack.push (b /. a) stack;
+          else Stack.push (inf_check (b /. a)) stack;
           execute_bytecode instructions env (pc + 1)
     | Bytecode.MOD ->
         if Stack.length stack < 2 then
@@ -122,50 +159,69 @@ let rec execute_bytecode instructions env pc =
         else
           let a = Stack.pop stack in
           let b = Stack.pop stack in
-          Stack.push (b ** a) stack;
+          let result = safe_pow b a in
+          Stack.push (inf_check result) stack;
           execute_bytecode instructions env (pc + 1)
     | Bytecode.RETURN ->
-        let return_value = Stack.pop stack in
-        Stack.push return_value stack;
-        execute_bytecode instructions env (pc + 2)
+        if Stack.is_empty stack then
+          failwith "Runtime Error: Stack underflow during RETURN"
+        else
+          let return_value = Stack.pop stack in
+          return_value
     | Bytecode.CALL function_name -> (
         try
           let function_body =
             Hashtbl.find Bytecode.function_table function_name
           in
-          let return_address = float_of_int (pc + 1) in
-          Stack.push return_address stack;
-          execute_bytecode (Array.of_list function_body) env 0
+          let return_value =
+            execute_bytecode (Array.of_list function_body) env 0
+          in
+          Stack.push return_value stack;
+          execute_bytecode instructions env (pc + 1)
         with Not_found ->
-          failwith ("Runtime Error: Function '" ^ function_name ^ "' not found")
-        )
+          failwith ("Function '" ^ function_name ^ "' not found"))
     | Bytecode.PRINT ->
         if Stack.is_empty stack then
           failwith "Runtime Error: Stack underflow during PRINT"
         else
           let value = Stack.pop stack in
-          let int_value = int_of_float value in
-          if Hashtbl.mem string_table int_value then
-            let str = Hashtbl.find string_table int_value in
-            let proc_str = replace_newline str in
-            Printf.printf "%s" proc_str
-          else if floor value = value then
-            Printf.printf "%d" (int_of_float value)
-          else Printf.printf "%f" value;
-          execute_bytecode instructions env (pc + 1)
+          if value = Float.infinity then (
+            Printf.printf "inf";
+            execute_bytecode instructions env (pc + 1))
+          else if value = Float.neg_infinity then (
+            Printf.printf "-inf";
+            execute_bytecode instructions env (pc + 1))
+          else
+            let int_value = int_of_float value in
+            if Hashtbl.mem string_table int_value then
+              let str = Hashtbl.find string_table int_value in
+              let proc_str = replace_escape_sequences str in
+              Printf.printf "%s" proc_str
+            else if floor value = value then
+              Printf.printf "%Ld" (Int64.of_float value)
+            else Printf.printf "%.10f" value;
+            execute_bytecode instructions env (pc + 1)
     | Bytecode.PRINTLN ->
         if Stack.is_empty stack then
           failwith "Runtime Error: Stack underflow during PRINTLN"
         else
           let value = Stack.pop stack in
-          let int_value = int_of_float value in
-          if Hashtbl.mem string_table int_value then
-            let str = Hashtbl.find string_table int_value in
-            Printf.printf "%s\n" str
-          else if floor value = value then
-            Printf.printf "%d\n" (int_of_float value)
-          else Printf.printf "%f\n" value;
-          execute_bytecode instructions env (pc + 1)
+          if value = Float.infinity then (
+            Printf.printf "inf\n";
+            execute_bytecode instructions env (pc + 1))
+          else if value = Float.neg_infinity then (
+            Printf.printf "-inf\n";
+            execute_bytecode instructions env (pc + 1))
+          else
+            let int_value = int_of_float value in
+            if Hashtbl.mem string_table int_value then
+              let str = Hashtbl.find string_table int_value in
+              let processed_str = replace_escape_sequences str in
+              Printf.printf "%s\n" processed_str
+            else if floor value = value then
+              Printf.printf "%Ld\n" (Int64.of_float value)
+            else Printf.printf "%.10f\n" value;
+            execute_bytecode instructions env (pc + 1)
     | Bytecode.LEN ->
         if Stack.is_empty stack then
           failwith "Runtime Error: Stack underflow during LEN"
@@ -353,9 +409,12 @@ let rec execute_bytecode instructions env pc =
         let array_list =
           Stack.fold (fun acc x -> x :: acc) [] array_stack |> List.rev
         in
-        let element = List.nth array_list index in
-        Stack.push element stack;
-        execute_bytecode instructions env (pc + 1)
+        if index < 0 || index >= List.length array_list then
+          failwith "Runtime Error: index out of bounds"
+        else
+          let element = List.nth array_list index in
+          Stack.push element stack;
+          execute_bytecode instructions env (pc + 1)
     | Bytecode.SWITCH ->
         let switch_value = Stack.pop stack in
         let rec execute_cases pc =
