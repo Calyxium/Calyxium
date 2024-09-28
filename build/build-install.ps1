@@ -3,7 +3,7 @@ param (
     [string]$env
 )
 
-$requiredPackages = @("dune", "menhir", "llvm", "ppx_deriving", "odoc")
+$requiredPackages = @("dune", "menhir", "llvm", "ppx_deriving", "odoc", "zarith")
 $installPathLinux = "/usr/local/bin"
 $installPathWindows = "$env:ProgramFiles\Calyxium\bin"
 
@@ -91,7 +91,7 @@ function Build-Project {
 
 
 function Install-OnLinux {
-    $binaryPath = "_build/default/bin/main.exe"
+    $binaryPath = "_build/default/bin/calyxium.exe"
     $targetPath = Join-Path $installPathLinux "calyxium"
 
     if (Test-Path $binaryPath) {
@@ -106,7 +106,7 @@ function Install-OnLinux {
 }
 
 function Install-OnWindows {
-    $binaryPath = "_build/default/bin/main.exe"
+    $binaryPath = "_build/default/bin/clayxium.exe"
     $targetPath = Join-Path $installPathWindows "calyxium.exe"
 
     if (Test-Path $binaryPath) {

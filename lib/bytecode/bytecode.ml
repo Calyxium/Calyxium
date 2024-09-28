@@ -48,6 +48,7 @@ type opcode =
   | DEFAULT
   | BREAK
   | DUP
+  | INPUT
 
 let function_table : (string, opcode list) Hashtbl.t = Hashtbl.create 10
 
@@ -98,6 +99,7 @@ let pp_opcode fmt = function
   | DEFAULT -> Format.fprintf fmt "DEFAULT"
   | BREAK -> Format.fprintf fmt "BREAK"
   | DUP -> Format.fprintf fmt "DUP"
+  | INPUT -> Format.fprintf fmt "INPUT"
 
 let rec compile_expr = function
   | Ast.Expr.IntExpr { value } -> [ LOAD_INT value ]
@@ -161,6 +163,11 @@ let rec compile_expr = function
             List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
           in
           args_bytecode @ [ TOFLOAT ]
+      | Ast.Expr.VarExpr "input" ->
+          let args_bytecode =
+            List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
+          in
+          args_bytecode @ [ INPUT ]
       | Ast.Expr.VarExpr function_name ->
           let args_bytecode =
             List.fold_left (fun acc arg -> acc @ compile_expr arg) [] arguments
@@ -176,7 +183,7 @@ let rec compile_expr = function
       | _ -> failwith "Unsupported unary operator")
   | Ast.Expr.NullExpr -> failwith "NullExpr not supported"
   | Ast.Expr.NewExpr _ -> failwith "NewExpr not supported"
-  | Ast.Expr.PropertyAccessExpr _ -> failwith "PropertyAccessExpr not supported"
+  | Ast.Expr.PropertyAccessExpr _ -> failwith "PropertyAccessExpr"
   | Ast.Expr.ArrayExpr { elements } ->
       let elements_bytecode = List.concat (List.map compile_expr elements) in
       elements_bytecode @ [ LOAD_ARRAY (List.length elements) ]

@@ -45,6 +45,7 @@ type opcode =
   | DEFAULT
   | BREAK
   | DUP
+  | INPUT
 
 val function_table : (string, opcode list) Hashtbl.t
 val pp_opcode : Format.formatter -> opcode -> unit

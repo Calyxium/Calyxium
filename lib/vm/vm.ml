@@ -201,6 +201,25 @@ let rec execute_bytecode instructions env pc =
               Printf.printf "%Ld" (Int64.of_float value)
             else Printf.printf "%.10f" value;
             execute_bytecode instructions env (pc + 1)
+    | Bytecode.INPUT ->
+        if Stack.is_empty stack then
+          failwith "Runtime Error: Stack underflow during INPUT"
+        else
+          let value = Stack.pop stack in
+          let int_value = int_of_float value in
+          if Hashtbl.mem string_table int_value then (
+            let prompt = Hashtbl.find string_table int_value in
+            Printf.printf "%s" prompt;
+            let input_value = read_line () in
+            let processed_value =
+              try float_of_string input_value
+              with Failure _ ->
+                let id = add_string input_value in
+                float_of_int id
+            in
+            Stack.push processed_value stack;
+            execute_bytecode instructions env (pc + 1))
+          else failwith "Runtime Error: Invalid prompt ID for INPUT"
     | Bytecode.PRINTLN ->
         if Stack.is_empty stack then
           failwith "Runtime Error: Stack underflow during PRINTLN"

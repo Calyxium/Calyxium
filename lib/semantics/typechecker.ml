@@ -11,6 +11,9 @@ module TypeChecker = struct
       return_type = Ast.Type.SymbolType { value = "void" };
     }
 
+  let input_func_sig =
+    { param_types = [ Ast.Type.Any ]; return_type = Ast.Type.Any }
+
   let println_func_sig =
     {
       param_types = [ Ast.Type.Any ];
@@ -54,20 +57,79 @@ module TypeChecker = struct
       return_type = Ast.Type.SymbolType { value = "float" };
     }
 
-  let empty_env =
+  let register_builtin_functions env =
+    let builtin_functions =
+      [
+        ("print", print_func_sig);
+        ("println", println_func_sig);
+        ("input", input_func_sig);
+        ("len", len_func_sig);
+        ("ToString", to_string_func_sig);
+        ("ToInt", to_int_func_sig);
+        ("ToFloat", to_float_func_sig);
+      ]
+    in
     {
-      var_type = Env.empty;
+      env with
       func_env =
-        Env.add "ToString" to_string_func_sig
-          (Env.add "len" len_func_sig
-             (Env.add "print" print_func_sig
-                (Env.add "ToInt" to_int_func_sig
-                   (Env.add "ToFloat" to_float_func_sig
-                      (Env.add "println" println_func_sig Env.empty)))));
-      class_env = Env.empty;
-      modules = [];
-      exports = [];
+        List.fold_left
+          (fun acc (name, f_sig) -> Env.add name f_sig acc)
+          env.func_env builtin_functions;
     }
+
+  let empty_env =
+    let base_env =
+      {
+        var_type = Env.empty;
+        func_env = Env.empty;
+        class_env = Env.empty;
+        modules = [];
+        exports = [];
+      }
+    in
+    register_builtin_functions base_env
+
+  let register_module_functions env module_name =
+    match module_name with
+    | "Time" ->
+        let time_functions =
+          [
+            ( "current",
+              {
+                param_types = [];
+                return_type = Ast.Type.SymbolType { value = "float" };
+              } );
+          ]
+        in
+        List.fold_left
+          (fun acc (fname, f_sig) -> Env.add fname f_sig acc)
+          env.func_env time_functions
+    | _ -> env.func_env
+
+  let load_module env module_name =
+    let updated_func_env = register_module_functions env module_name in
+    {
+      env with
+      func_env = updated_func_env;
+      modules = module_name :: env.modules;
+    }
+
+  let check_function_call env function_name =
+    try Env.find function_name env.func_env
+    with Not_found ->
+      let module_name, func_name =
+        match String.split_on_char '.' function_name with
+        | [ mod_name; fun_name ] -> (mod_name, fun_name)
+        | _ -> failwith ("Unsupported function call: " ^ function_name)
+      in
+      if List.mem module_name env.modules then
+        let updated_env = load_module env module_name in
+        try Env.find func_name updated_env.func_env
+        with Not_found ->
+          failwith
+            ("Function '" ^ func_name ^ "' not found in module '" ^ module_name
+           ^ "'")
+      else failwith ("Module '" ^ module_name ^ "' not imported")
 
   let lookup_var env name =
     try Env.find name env.var_type
@@ -127,7 +189,7 @@ module TypeChecker = struct
           | Ast.Expr.VarExpr name -> name
           | _ -> failwith "TypeChecker: Unsupported function call"
         in
-        let { param_types; return_type } = lookup_func env func_name in
+        let { param_types; return_type } = check_function_call env func_name in
         if List.length arguments <> List.length param_types then
           failwith
             ("TypeChecker: Incorrect number of arguments for function "
@@ -135,15 +197,7 @@ module TypeChecker = struct
         List.iter2
           (fun arg param_type ->
             let arg_type = check_expr env arg in
-            if
-              param_type <> Ast.Type.Any
-              && not
-                   (param_type = Ast.Type.SymbolType { value = "float" }
-                    && arg_type = Ast.Type.SymbolType { value = "int" }
-                   || param_type = Ast.Type.SymbolType { value = "int" }
-                      && arg_type = Ast.Type.SymbolType { value = "float" }
-                   || param_type = arg_type)
-            then
+            if param_type <> Ast.Type.Any && param_type <> arg_type then
               failwith
                 ("TypeChecker: Argument type mismatch in function call "
                ^ func_name))
@@ -250,7 +304,11 @@ module TypeChecker = struct
     match assigned_value with
     | Some expr ->
         let value_type = check_expr env expr in
-        if value_type = explicit_type then
+        if
+          value_type = Ast.Type.Any
+          || explicit_type = Ast.Type.Any
+          || explicit_type = value_type
+        then
           { env with var_type = Env.add identifier explicit_type env.var_type }
         else
           failwith
